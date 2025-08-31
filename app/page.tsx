@@ -2,6 +2,9 @@
 
 import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
 import { Command } from "@/components/command"
+import { Button } from "@/components/ui/button"
+import { ArrowRight, BookOpen, Github, ExternalLink } from "lucide-react"
+import Link from "next/link"
 import { useState } from "react"
 
 export default function Home() {
@@ -124,6 +127,22 @@ export default function Home() {
             <code className="bg-muted px-2 py-1 rounded font-mono">@opentui/react</code>
             <span>•</span>
             <code className="bg-muted px-2 py-1 rounded font-mono">shadcn/ui</code>
+          </div>
+          <div className="flex items-center justify-center gap-4 pt-4">
+            <Button asChild>
+              <Link href="/docs">
+                <BookOpen className="mr-2 h-4 w-4" />
+                View Documentation
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="https://github.com/sst/opentui" target="_blank">
+                <Github className="mr-2 h-4 w-4" />
+                GitHub
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
 
