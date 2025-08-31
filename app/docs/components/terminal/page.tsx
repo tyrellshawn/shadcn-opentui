@@ -11,7 +11,8 @@ export default function TerminalComponentPage() {
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Terminal Component</h1>
         <p className="text-xl text-muted-foreground">
-          A fully interactive terminal component with command handling, history, and customizable appearance.
+          A fully interactive terminal component built with shadcn/ui, featuring command handling, history, and
+          customizable appearance.
         </p>
       </div>
 
@@ -22,7 +23,7 @@ export default function TerminalComponentPage() {
             <TerminalIcon className="h-5 w-5" />
             Overview
           </CardTitle>
-          <CardDescription>Key features and capabilities</CardDescription>
+          <CardDescription>Key features and capabilities of the shadcn terminal component</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,16 +33,16 @@ export default function TerminalComponentPage() {
                 <li>• Command input with history (↑/↓ arrows)</li>
                 <li>• Tab completion for commands</li>
                 <li>• Keyboard shortcuts (Ctrl+L to clear)</li>
-                <li>• Custom command handlers</li>
+                <li>• Custom command handlers with TypeScript support</li>
               </ul>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-sm">Customization</h4>
+              <h4 className="font-semibold text-sm">Shadcn Integration</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Multiple visual variants</li>
-                <li>• Custom prompt and welcome messages</li>
-                <li>• Configurable line limits</li>
-                <li>• Timestamp display options</li>
+                <li>• Built with shadcn/ui design system</li>
+                <li>• Consistent theming and styling</li>
+                <li>• Responsive design patterns</li>
+                <li>• TypeScript support out of the box</li>
               </ul>
             </div>
           </div>
@@ -232,7 +233,7 @@ const customCommands: TerminalCommand[] = [
       <Card>
         <CardHeader>
           <CardTitle>Built-in Commands</CardTitle>
-          <CardDescription>Commands available by default in every terminal</CardDescription>
+          <CardDescription>Commands available by default in the shadcn terminal component</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -263,9 +264,9 @@ const customCommands: TerminalCommand[] = [
               </div>
               <div className="space-y-2">
                 <Badge variant="outline" className="font-mono">
-                  opentui
+                  info
                 </Badge>
-                <p className="text-sm text-muted-foreground">Show OpenTUI information and links</p>
+                <p className="text-sm text-muted-foreground">Show terminal component information and links</p>
               </div>
             </div>
           </div>
@@ -279,14 +280,14 @@ const customCommands: TerminalCommand[] = [
             <Eye className="h-5 w-5" />
             Live Demo
           </CardTitle>
-          <CardDescription>Try the terminal component with all features enabled</CardDescription>
+          <CardDescription>Try the shadcn terminal component with all features enabled</CardDescription>
         </CardHeader>
         <CardContent>
           <Terminal
             welcomeMessage={[
-              "🚀 OpenTUI Terminal Component Demo",
+              "🚀 Shadcn Terminal Component Demo",
               "Features: command history, tab completion, keyboard shortcuts",
-              "Try: help, date, history, clear, opentui",
+              "Try: help, date, history, clear, info",
               "",
             ]}
             showTimestamp={true}

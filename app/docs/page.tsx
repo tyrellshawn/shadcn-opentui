@@ -12,14 +12,14 @@ export default function DocsPage() {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Terminal className="h-8 w-8 text-green-500" />
-          <h1 className="text-4xl font-bold tracking-tight">OpenTUI React</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Shadcn OpenTUI</h1>
           <Badge variant="secondary" className="ml-2">
-            v0.1.0
+            v1.0.0
           </Badge>
         </div>
         <p className="text-xl text-muted-foreground max-w-2xl">
-          Build beautiful terminal user interfaces with React. OpenTUI provides a React renderer for creating rich,
-          interactive console applications using familiar React patterns and components.
+          A beautiful, interactive terminal component built with shadcn/ui and React. Create rich terminal user
+          interfaces with familiar React patterns, complete command handling, and customizable styling.
         </p>
         <div className="flex items-center gap-4 pt-4">
           <Button asChild>
@@ -29,7 +29,7 @@ export default function DocsPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="https://github.com/sst/opentui" target="_blank">
+            <Link href="https://github.com/shadcn-opentui/terminal" target="_blank">
               <Github className="mr-2 h-4 w-4" />
               View on GitHub
               <ExternalLink className="ml-2 h-4 w-4" />
@@ -46,14 +46,14 @@ export default function DocsPage() {
             Interactive Terminal Demo
           </CardTitle>
           <CardDescription>
-            Try out the terminal component right here. Type commands like 'help', 'clear', or 'opentui info'.
+            Try out the shadcn terminal component right here. Type commands like 'help', 'clear', or 'info'.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <TerminalComponent
             variant="default"
             className="h-64"
-            initialOutput={["Welcome to OpenTUI React Documentation!", "Type 'help' to see available commands.", ""]}
+            initialOutput={["Welcome to Shadcn OpenTUI Terminal!", "Type 'help' to see available commands.", ""]}
           />
         </CardContent>
       </Card>
@@ -64,13 +64,13 @@ export default function DocsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-blue-500" />
-              React Familiar
+              Shadcn Compatible
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Use familiar React patterns like hooks, state, and JSX to build terminal UIs. No need to learn new
-              paradigms.
+              Built with shadcn/ui components and design system. Integrates seamlessly with your existing shadcn
+              projects and follows the same patterns.
             </p>
           </CardContent>
         </Card>
@@ -79,13 +79,13 @@ export default function DocsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code className="h-5 w-5 text-green-500" />
-              Rich Components
+              Rich Terminal Features
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Built-in components like text, box, input, select, and more. Create complex layouts with flexbox-like
-              positioning.
+              Command history, tab completion, keyboard shortcuts, custom commands, and interactive UI modes. Everything
+              you need for a professional terminal experience.
             </p>
           </CardContent>
         </Card>
@@ -94,12 +94,13 @@ export default function DocsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-yellow-500" />
-              Interactive
+              Easy Installation
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Handle keyboard events, manage focus, and create responsive terminal applications with real-time updates.
+              Install with a single shadcn command. No complex setup or configuration required. Works out of the box
+              with TypeScript support.
             </p>
           </CardContent>
         </Card>
@@ -109,31 +110,33 @@ export default function DocsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Quick Start</CardTitle>
-          <CardDescription>Get up and running with OpenTUI React in minutes.</CardDescription>
+          <CardDescription>Get up and running with the shadcn terminal component in seconds.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted rounded-lg p-4">
             <code className="text-sm">
-              {`# Install OpenTUI React
-bun install @opentui/react @opentui/core react
-
-# Or with npm
-npm install @opentui/react @opentui/core react`}
+              {`# Install the terminal component
+npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal`}
             </code>
           </div>
           <div className="bg-muted rounded-lg p-4">
             <code className="text-sm">
-              {`import { render } from "@opentui/react"
+              {`import { Terminal } from "@/components/ui/terminal"
 
 function App() {
   return (
-    <box>
-      <text fg="#00FF00">Hello, Terminal!</text>
-    </box>
+    <Terminal
+      welcomeMessage={["Welcome to my app!"]}
+      commands={[
+        {
+          name: "hello",
+          description: "Say hello",
+          handler: () => "Hello, World!"
+        }
+      ]}
+    />
   )
-}
-
-render(<App />)`}
+}`}
             </code>
           </div>
           <Button asChild variant="outline">
@@ -150,7 +153,7 @@ render(<App />)`}
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle className="text-lg">Installation Guide</CardTitle>
-            <CardDescription>Step-by-step setup instructions for OpenTUI React</CardDescription>
+            <CardDescription>Step-by-step setup instructions for Shadcn OpenTUI</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="ghost" className="p-0 h-auto">

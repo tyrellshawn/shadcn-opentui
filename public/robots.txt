@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Allow LLM crawlers and indexing bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Sitemap location
+Sitemap: https://opentui.vercel.app/sitemap.xml

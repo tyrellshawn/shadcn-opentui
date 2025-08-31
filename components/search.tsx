@@ -234,12 +234,16 @@ export function CommandDialog({ onOpenChange, ...props }: CommandDialogProps) {
                       onSelect={() => {
                         runCommand(() => router.push(item.href))
                       }}
-                      className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                      className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none group-hover:bg-accent group-hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                     >
                       <Icon className="mr-2 h-4 w-4" />
                       <div className="flex flex-col">
-                        <span>{item.title}</span>
-                        {item.description && <span className="text-xs text-muted-foreground">{item.description}</span>}
+                        <span className="group-hover:font-medium aria-selected:font-medium">{item.title}</span>
+                        {item.description && (
+                          <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
+                            {item.description}
+                          </span>
+                        )}
                       </div>
                     </CommandPrimitive.Item>
                   )
@@ -261,14 +265,14 @@ export function SearchButton() {
       <Button
         variant="outline"
         className={cn(
-          "relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-64",
+          "relative h-9 w-full max-w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground sm:pr-12",
         )}
         onClick={() => setOpen(true)}
       >
-        <Search className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">Search documentation...</span>
-        <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+        <Search className="mr-2 h-4 w-4 shrink-0" />
+        <span className="hidden lg:inline-flex truncate">Search documentation...</span>
+        <span className="inline-flex lg:hidden truncate">Search...</span>
+        <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span className="text-xs">⌘</span>K
         </kbd>
       </Button>

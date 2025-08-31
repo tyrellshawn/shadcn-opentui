@@ -1,6 +1,6 @@
 "use client"
 
-import { Play, Terminal, Code, ArrowRight } from "lucide-react"
+import { Play, TerminalIcon, Code, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -14,70 +14,69 @@ export default function QuickStartPage() {
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Quick Start</h1>
         <p className="text-xl text-muted-foreground">
-          Build your first terminal user interface with OpenTUI React in just a few minutes.
+          Build your first interactive terminal interface with the shadcn terminal component in just a few minutes.
         </p>
       </div>
 
       {/* Hello Terminal Example */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Your First Terminal App</h2>
+        <h2 className="text-2xl font-bold">Your First Terminal</h2>
 
         <CodePreview
-          title="Hello Terminal"
-          description="A simple terminal app that displays green text and a welcome box"
-          code={`import { render } from "@opentui/react"
+          title="Basic Terminal"
+          description="A simple terminal with welcome message and basic styling"
+          code={`import { Terminal } from "@/components/ui/terminal"
 
-function App() {
+export default function MyTerminal() {
   return (
-    <box>
-      <text fg="#00FF00">Hello, Terminal!</text>
-      <box title="Welcome" padding={2}>
-        <text>Welcome to OpenTUI with React!</text>
-      </box>
-    </box>
+    <Terminal
+      welcomeMessage={[
+        "Welcome to my application!",
+        "Type 'help' to see available commands."
+      ]}
+      className="h-64"
+    />
   )
-}
-
-render(<App />)`}
+}`}
           preview={
             <div className="bg-black text-green-400 font-mono p-4 rounded-lg">
-              <div className="text-green-400">Hello, Terminal!</div>
-              <div className="border border-green-400/30 mt-2 p-2 rounded">
-                <div className="text-xs text-green-400/70 mb-1">Welcome</div>
-                <div>Welcome to OpenTUI with React!</div>
+              <div>Welcome to my application!</div>
+              <div>Type 'help' to see available commands.</div>
+              <div className="mt-2">
+                <span className="text-green-500">user@terminal:~$ </span>
+                <span className="bg-green-400 w-2 h-4 inline-block animate-pulse"></span>
               </div>
             </div>
           }
         />
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">What's happening here?</h3>
+          <h3 className="text-lg font-semibold">What's included?</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Code className="h-4 w-4" />
-                  JSX Elements
+                  Shadcn Integration
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  OpenTUI provides custom JSX elements like <code>&lt;box&gt;</code> and <code>&lt;text&gt;</code> that
-                  render to the terminal instead of the DOM.
+                  Built with shadcn/ui components and follows the same design patterns. Integrates seamlessly with your
+                  existing components.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Terminal className="h-4 w-4" />
-                  Terminal Rendering
+                  <TerminalIcon className="h-4 w-4" />
+                  Interactive Features
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  The <code>render()</code> function mounts your React component tree to the terminal, handling all the
-                  low-level terminal operations.
+                  Command history, tab completion, keyboard shortcuts, and custom command handling built-in.
                 </p>
               </CardContent>
             </Card>
@@ -87,44 +86,51 @@ render(<App />)`}
 
       {/* Interactive Example */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Adding Interactivity</h2>
+        <h2 className="text-2xl font-bold">Adding Custom Commands</h2>
 
         <CodePreview
-          title="Interactive Counter"
-          description="A counter that updates every second using React hooks"
-          code={`import { render } from "@opentui/react"
-import { useState, useEffect } from "react"
+          title="Custom Commands"
+          description="Add your own commands with custom handlers"
+          code={`import { Terminal } from "@/components/ui/terminal"
 
-function Counter() {
-  const [count, setCount] = useState(0)
+const customCommands = [
+  {
+    name: "greet",
+    description: "Greet the user",
+    handler: (args: string[]) => {
+      const name = args[0] || "World"
+      return \`Hello, \${name}! 👋\`
+    }
+  },
+  {
+    name: "time",
+    description: "Show current time",
+    handler: () => {
+      return \`Current time: \${new Date().toLocaleTimeString()}\`
+    }
+  }
+]
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount(prev => prev + 1)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [])
-
+export default function CustomTerminal() {
   return (
-    <box title="Live Counter" padding={2}>
-      <text>Count: {count}</text>
-      <text fg="#00FF00">Updates every second!</text>
-    </box>
+    <Terminal
+      commands={customCommands}
+      welcomeMessage={["Try: greet [name], time, help"]}
+      className="h-64"
+    />
   )
-}
-
-function App() {
-  return <Counter />
-}
-
-render(<App />)`}
+}`}
           preview={
             <div className="bg-black text-green-400 font-mono p-4 rounded-lg">
-              <div className="border border-green-400/30 p-2 rounded">
-                <div className="text-xs text-green-400/70 mb-1">Live Counter</div>
-                <div>Count: 42</div>
-                <div className="text-green-400">Updates every second!</div>
+              <div>Try: greet [name], time, help</div>
+              <div className="mt-2">
+                <span className="text-green-500">user@terminal:~$ </span>
+                <span>greet Alice</span>
+              </div>
+              <div>Hello, Alice! 👋</div>
+              <div className="mt-1">
+                <span className="text-green-500">user@terminal:~$ </span>
+                <span className="bg-green-400 w-2 h-4 inline-block ml-1 animate-pulse"></span>
               </div>
             </div>
           }

@@ -80,7 +80,7 @@ export default function DocsLayout({
               <Terminal className="h-6 w-6 text-green-500" />
               <span className="font-semibold text-lg">OpenTUI Docs</span>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 w-full overflow-hidden">
               <SearchButton />
             </div>
           </SidebarHeader>

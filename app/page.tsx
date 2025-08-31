@@ -117,7 +117,7 @@ export default function Home() {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Shadcn OpenTui page</h1>
+          <h1 className="text-4xl font-bold text-foreground">Shadcn OpenTUI</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             A powerful, customizable terminal interface built with OpenTUI React and shadcn/ui. Features command
             history, tab completion, and extensible command system.

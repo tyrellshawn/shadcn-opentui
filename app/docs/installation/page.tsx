@@ -1,7 +1,6 @@
-import { Terminal, Package, Download, CheckCircle } from "lucide-react"
+import { Package, Download, CheckCircle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CodePreview } from "@/components/docs/code-preview"
 
 export default function InstallationPage() {
@@ -10,8 +9,7 @@ export default function InstallationPage() {
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Installation</h1>
         <p className="text-xl text-muted-foreground">
-          Get started with OpenTUI React by installing the required packages and setting up your development
-          environment.
+          Get started with the shadcn terminal component by installing it in your project using the shadcn CLI.
         </p>
       </div>
 
@@ -22,28 +20,29 @@ export default function InstallationPage() {
             <CheckCircle className="h-5 w-5" />
             Prerequisites
           </CardTitle>
-          <CardDescription>Requirements for using OpenTUI React</CardDescription>
+          <CardDescription>Requirements for using the shadcn terminal component</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-semibold">Node.js Environment</h4>
+              <h4 className="font-semibold">Next.js Project</h4>
               <p className="text-sm text-muted-foreground">
-                OpenTUI requires Node.js or Bun to render to your terminal. It's not intended to run in a browser.
+                A Next.js project with shadcn/ui already set up. The terminal component integrates with your existing
+                shadcn components.
               </p>
               <div className="flex gap-2">
-                <Badge variant="outline">Node.js 18+</Badge>
-                <Badge variant="outline">Bun (recommended)</Badge>
+                <Badge variant="outline">Next.js 13+</Badge>
+                <Badge variant="outline">shadcn/ui</Badge>
               </div>
             </div>
             <div className="space-y-2">
               <h4 className="font-semibold">React Knowledge</h4>
               <p className="text-sm text-muted-foreground">
-                Familiarity with React hooks, components, and JSX patterns will help you get started quickly.
+                Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
               </p>
               <div className="flex gap-2">
                 <Badge variant="outline">React 18+</Badge>
-                <Badge variant="outline">TypeScript (optional)</Badge>
+                <Badge variant="outline">TypeScript</Badge>
               </div>
             </div>
           </div>
@@ -52,19 +51,19 @@ export default function InstallationPage() {
 
       {/* Package Installation */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Package Installation</h2>
+        <h2 className="text-2xl font-bold">Installation</h2>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Using Bun (Recommended)
+              Using shadcn CLI (Recommended)
             </CardTitle>
-            <CardDescription>Bun provides the fastest installation and runtime performance</CardDescription>
+            <CardDescription>Install the terminal component using the shadcn CLI</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">bun install @opentui/react @opentui/core react</code>
+              <code className="text-sm">npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal</code>
             </div>
           </CardContent>
         </Card>
@@ -72,110 +71,24 @@ export default function InstallationPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Using npm
+              <Download className="h-5 w-5" />
+              Manual Installation
             </CardTitle>
-            <CardDescription>Standard npm installation</CardDescription>
+            <CardDescription>Copy the component files manually if needed</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              If you prefer to install manually, copy the terminal component from our GitHub repository to your
+              components/ui directory.
+            </p>
             <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">npm install @opentui/react @opentui/core react</code>
+              <code className="text-sm">
+                {`# Copy the terminal component
+curl -o components/ui/terminal.tsx https://opentui.vercel.app/api/registry/terminal/raw`}
+              </code>
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Using pnpm
-            </CardTitle>
-            <CardDescription>Fast, disk space efficient package manager</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">pnpm install @opentui/react @opentui/core react</code>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Start Project */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5" />
-            Quick Start Project
-          </CardTitle>
-          <CardDescription>Scaffold a new TUI project with Bun</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="bg-muted rounded-lg p-4">
-            <code className="text-sm">bun create tui</code>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            This sets up a starter TypeScript project configured for OpenTUI with example components and proper
-            configuration.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* TypeScript Configuration */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">TypeScript Configuration</h2>
-
-        <Alert>
-          <Terminal className="h-4 w-4" />
-          <AlertDescription>
-            To get proper JSX support for OpenTUI's custom elements like &lt;box&gt; and &lt;text&gt;, update your
-            tsconfig.json
-          </AlertDescription>
-        </Alert>
-
-        <CodePreview
-          title="tsconfig.json"
-          description="Recommended TypeScript configuration for OpenTUI"
-          language="json"
-          code={`{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "@opentui/react",
-    "target": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "lib": ["ESNext", "DOM"]
-  }
-}`}
-        />
-
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Key Configuration Options</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">jsxImportSource</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Critical setting that tells TypeScript to use OpenTUI's JSX runtime for elements like &lt;box&gt; and
-                  &lt;text&gt;.
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">target: "ESNext"</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Ensures compatibility with modern JavaScript features used by OpenTUI.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
       </div>
 
       {/* Verification */}
@@ -185,33 +98,25 @@ export default function InstallationPage() {
             <CheckCircle className="h-5 w-5" />
             Verify Installation
           </CardTitle>
-          <CardDescription>Test your OpenTUI setup with a simple example</CardDescription>
+          <CardDescription>Test your terminal component installation</CardDescription>
         </CardHeader>
         <CardContent>
           <CodePreview
-            title="test.ts"
+            title="Basic Usage"
             description="Simple test to verify your installation works"
-            code={`import { render } from "@opentui/react"
+            code={`import { Terminal } from "@/components/ui/terminal"
 
-function App() {
+export default function TestPage() {
   return (
-    <box>
-      <text fg="#00FF00">Hello, Terminal!</text>
-      <box title="Welcome" padding={2}>
-        <text>OpenTUI is working!</text>
-      </box>
-    </box>
+    <div className="p-4">
+      <Terminal
+        welcomeMessage={["Terminal component installed successfully!"]}
+        className="h-64"
+      />
+    </div>
   )
-}
-
-render(<App />)`}
+}`}
           />
-          <div className="mt-4 space-y-2">
-            <p className="text-sm text-muted-foreground">Run the test:</p>
-            <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">bun run test.ts</code>
-            </div>
-          </div>
         </CardContent>
       </Card>
 

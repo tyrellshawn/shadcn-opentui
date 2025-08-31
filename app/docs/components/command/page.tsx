@@ -9,7 +9,8 @@ export default function CommandComponentPage() {
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Command Component</h1>
         <p className="text-xl text-muted-foreground">
-          A styled component for displaying command snippets with different variants and visual states.
+          A styled component for displaying command snippets with different variants, built with shadcn/ui design
+          patterns.
         </p>
       </div>
 
@@ -20,19 +21,19 @@ export default function CommandComponentPage() {
             <Code className="h-5 w-5" />
             Overview
           </CardTitle>
-          <CardDescription>Display command snippets with consistent styling</CardDescription>
+          <CardDescription>Display command snippets with consistent shadcn styling</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              The Command component provides a consistent way to display command snippets, code examples, and terminal
-              commands throughout your documentation or application.
+              The Command component provides a consistent way to display command snippets and code examples throughout
+              your shadcn-based documentation or application.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Command>npm install</Command>
-              <Command variant="success">git commit -m "feat: add command component"</Command>
-              <Command variant="error">command not found</Command>
-              <Command variant="warning">deprecated command</Command>
+              <Command>npx shadcn@latest add terminal</Command>
+              <Command variant="success">✅ Component installed</Command>
+              <Command variant="error">❌ Command not found</Command>
+              <Command variant="warning">⚠️ Deprecated command</Command>
             </div>
           </div>
         </CardContent>
@@ -57,8 +58,8 @@ export default function CommandComponentPage() {
               <CodePreview
                 title="Default Usage"
                 description="Basic command component"
-                code={`<Command>npm install @opentui/react</Command>`}
-                preview={<Command>npm install @opentui/react</Command>}
+                code={`<Command>npx shadcn@latest add terminal</Command>`}
+                preview={<Command>npx shadcn@latest add terminal</Command>}
               />
             </CardContent>
           </Card>
@@ -185,8 +186,8 @@ export default function CommandComponentPage() {
                 <h4 className="font-semibold text-sm">Installation Commands</h4>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Command>npm install @opentui/react</Command>
-                    <span className="text-muted-foreground text-sm">Install with npm</span>
+                    <Command>npx shadcn@latest add terminal</Command>
+                    <span className="text-muted-foreground text-sm">Install with shadcn</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Command>bun install @opentui/react</Command>
@@ -200,11 +201,11 @@ export default function CommandComponentPage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Command>help</Command>
-                    <span className="text-muted-foreground text-sm">Show available commands</span>
+                    <span className="text-sm text-muted-foreground">Show available commands</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Command>clear</Command>
-                    <span className="text-muted-foreground text-sm">Clear terminal output</span>
+                    <span className="text-sm text-muted-foreground">Clear terminal output</span>
                   </div>
                 </div>
               </div>
