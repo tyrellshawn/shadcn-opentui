@@ -39,6 +39,7 @@ export function CodePreview({
   }
 
   const formatCode = (code: string) => {
+    if (!code) return null
     return code.split("\n").map((line, index) => (
       <div key={index} className="flex">
         {showLineNumbers && (
@@ -226,6 +227,54 @@ export function TerminalVariants() {
         <Terminal variant="compact" welcomeMessage={["Compact terminal"]} className="h-24" />
         <Terminal variant="minimal" welcomeMessage={["Minimal terminal"]} className="h-20" />
       </div>
+    ),
+  },
+
+  terminalCommandType: {
+    title: "TerminalCommand Type",
+    description: "TypeScript interface for defining custom commands",
+    language: "typescript",
+    code: `interface TerminalCommand {
+  name: string                    // Command name (e.g., "help")
+  description: string             // Help text description
+  handler: (args: string[]) => Promise<void> | void | string
+}
+
+// Example usage
+const customCommands: TerminalCommand[] = [
+  {
+    name: "greet",
+    description: "Greet the user",
+    handler: (args) => {
+      const name = args[0] || "World"
+      return \`Hello, \${name}!\`
+    },
+  },
+]`,
+    preview: (
+      <Terminal
+        commands={[
+          {
+            name: "greet",
+            description: "Greet the user",
+            handler: (args: string[]) => {
+              const name = args[0] || "World"
+              return `Hello, ${name}!`
+            },
+          },
+          {
+            name: "help",
+            description: "Show available commands",
+            handler: () => "Available commands: greet [name], help",
+          }
+        ]}
+        welcomeMessage={[
+          "Try these commands:",
+          "greet - Greet with optional name",
+          "help - Show available commands"
+        ]}
+        className="h-48"
+      />
     ),
   },
 }
