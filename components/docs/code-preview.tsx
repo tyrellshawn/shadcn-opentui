@@ -39,6 +39,7 @@ export function CodePreview({
   }
 
   const formatCode = (code: string) => {
+    if (!code) return null
     return code.split("\n").map((line, index) => (
       <div key={index} className="flex">
         {showLineNumbers && (
@@ -250,5 +251,30 @@ const customCommands: TerminalCommand[] = [
     },
   },
 ]`,
+    preview: (
+      <Terminal
+        commands={[
+          {
+            name: "greet",
+            description: "Greet the user",
+            handler: (args: string[]) => {
+              const name = args[0] || "World"
+              return `Hello, ${name}!`
+            },
+          },
+          {
+            name: "help",
+            description: "Show available commands",
+            handler: () => "Available commands: greet [name], help",
+          }
+        ]}
+        welcomeMessage={[
+          "Try these commands:",
+          "greet - Greet with optional name",
+          "help - Show available commands"
+        ]}
+        className="h-48"
+      />
+    ),
   },
 }
