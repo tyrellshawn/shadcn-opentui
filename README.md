@@ -40,14 +40,14 @@ A powerful, interactive terminal component for React applications built with sha
 Install the terminal component using the shadcn CLI:
 
 ```bash
-# Install the shadcn CLI
-npm install -g shadcn@canary
+# Install the latest shadcn CLI and initialize
+bunx shadcn@latest init
 
-# Add components from the registry
-shadcn add terminal --from=https://opentui.vercel.app/r/terminal.json
-shadcn add terminal-controls --from=https://opentui.vercel.app/r/terminal-controls.json
-shadcn add terminal-slider --from=https://opentui.vercel.app/r/terminal-slider.json
-shadcn add terminal-block --from=https://opentui.vercel.app/r/terminal-block.json
+# Add components from the @shadcn-opentui registry  
+bunx shadcn@latest add @shadcn-opentui/terminal
+bunx shadcn@latest add @shadcn-opentui/terminal-controls
+bunx shadcn@latest add @shadcn-opentui/terminal-slider
+bunx shadcn@latest add @shadcn-opentui/terminal-block
 ```
 
 ### Basic Usage
