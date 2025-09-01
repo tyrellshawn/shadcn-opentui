@@ -57,6 +57,7 @@
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
+    "shadcn": "2.9.3-canary.0",
     "sonner": "latest",
     "svelte": "latest",
     "tailwind-merge": "^2.5.5",
