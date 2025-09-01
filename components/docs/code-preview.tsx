@@ -228,4 +228,27 @@ export function TerminalVariants() {
       </div>
     ),
   },
+
+  terminalCommandType: {
+    title: "TerminalCommand Type",
+    description: "TypeScript interface for defining custom commands",
+    language: "typescript",
+    code: `interface TerminalCommand {
+  name: string                    // Command name (e.g., "help")
+  description: string             // Help text description
+  handler: (args: string[]) => Promise<void> | void | string
+}
+
+// Example usage
+const customCommands: TerminalCommand[] = [
+  {
+    name: "greet",
+    description: "Greet the user",
+    handler: (args) => {
+      const name = args[0] || "World"
+      return \`Hello, \${name}!\`
+    },
+  },
+]`,
+  },
 }
