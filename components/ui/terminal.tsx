@@ -372,6 +372,11 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
     const processCommand = useCallback(
       async (input: string) => {
+        if (!input || typeof input !== "string") {
+          addLine("Invalid command input", "error")
+          return
+        }
+
         const [commandName, ...args] = input.trim().split(/\s+/)
         const command = allCommands.find((cmd) => cmd.name === commandName)
 
@@ -399,6 +404,8 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     )
 
     const handleCommand = async (command: string) => {
+      if (!command || typeof command !== "string") return
+
       if (!command.trim()) return
 
       setCommandHistory((prev) => [...prev, command])
