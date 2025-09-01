@@ -17,6 +17,8 @@ interface CodePreviewProps {
   preview?: React.ReactNode
   language?: string
   showLineNumbers?: boolean
+  component?: React.ComponentType<any>
+  componentProps?: Record<string, any>
 }
 
 export function CodePreview({
@@ -26,8 +28,11 @@ export function CodePreview({
   preview,
   language = "tsx",
   showLineNumbers = true,
+  component: Component,
+  componentProps,
 }: CodePreviewProps) {
-  const [activeTab, setActiveTab] = useState(preview ? "preview" : "code")
+  const [activeTab, setActiveTab] = useState<"preview" | "code">("preview")
+  const hasPreview = Boolean(preview || Component)
 
   const copyToClipboard = async () => {
     try {
@@ -39,6 +44,7 @@ export function CodePreview({
   }
 
   const formatCode = (code: string) => {
+    if (!code) return null
     return code.split("\n").map((line, index) => (
       <div key={index} className="flex">
         {showLineNumbers && (
@@ -47,6 +53,13 @@ export function CodePreview({
         <span className="flex-1">{line}</span>
       </div>
     ))
+  }
+
+  const renderPreview = () => {
+    if (Component) {
+      return <Component {...componentProps} />
+    }
+    return preview
   }
 
   return (
@@ -71,7 +84,7 @@ export function CodePreview({
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          {preview && (
+          {hasPreview && (
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="preview" className="flex items-center gap-2">
                 <Eye className="h-4 w-4" />
@@ -84,9 +97,11 @@ export function CodePreview({
             </TabsList>
           )}
 
-          {preview && (
+          {hasPreview && (
             <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-lg p-4 bg-background">{preview}</div>
+              <div className="not-prose relative bg-background border rounded-lg p-4">
+                {renderPreview()}
+              </div>
             </TabsContent>
           )}
 
@@ -103,14 +118,106 @@ export function CodePreview({
   )
 }
 
+// Terminal Example Components
+function BasicTerminal() {
+  return (
+    <Terminal
+      welcomeMessage={[
+        "Welcome to OpenTUI Terminal",
+        "Type 'help' for available commands"
+      ]}
+      className="h-64"
+    />
+  )
+}
+
+function CustomCommandsTerminal() {
+  const customCommands = [
+    {
+      name: "greet",
+      description: "Greet the user",
+      handler: (args: string[]) => {
+        const name = args[0] || "World"
+        return `Hello, ${name}!`
+      },
+    },
+    {
+      name: "time",
+      description: "Show current time",
+      handler: () => {
+        return new Date().toLocaleTimeString()
+      },
+    },
+  ]
+
+  return (
+    <Terminal
+      commands={customCommands}
+      welcomeMessage={[
+        "Terminal with custom commands",
+        "Try: greet John, time"
+      ]}
+      className="h-64"
+    />
+  )
+}
+
+function TerminalVariants() {
+  return (
+    <div className="space-y-4">
+      <Terminal
+        variant="default"
+        welcomeMessage={["Default terminal"]}
+        className="h-32"
+      />
+      <Terminal
+        variant="compact"
+        welcomeMessage={["Compact terminal"]}
+        className="h-24"
+      />
+      <Terminal
+        variant="minimal"
+        welcomeMessage={["Minimal terminal"]}
+        className="h-20"
+      />
+    </div>
+  )
+}
+
+function TypeDemo() {
+  return (
+    <Terminal
+      commands={[
+        {
+          name: "greet",
+          description: "Greet the user",
+          handler: (args: string[]) => {
+            const name = args[0] || "World"
+            return `Hello, ${name}!`
+          },
+        },
+        {
+          name: "help",
+          description: "Show available commands",
+          handler: () => "Available commands: greet [name], help",
+        }
+      ]}
+      welcomeMessage={[
+        "Try these commands:",
+        "greet - Greet with optional name",
+        "help - Show available commands"
+      ]}
+      className="h-48"
+    />
+  )
+}
+
 // Predefined code examples
 export const codeExamples = {
   basicTerminal: {
     title: "Basic Terminal",
     description: "Simple terminal with welcome message",
-    code: `import { Terminal } from "@/components/ui/terminal"
-
-export function BasicTerminal() {
+    code: `export function BasicTerminal() {
   return (
     <Terminal
       welcomeMessage={[
@@ -121,38 +228,31 @@ export function BasicTerminal() {
     />
   )
 }`,
-    preview: (
-      <Terminal
-        welcomeMessage={["Welcome to OpenTUI Terminal", "Type 'help' for available commands"]}
-        className="h-64"
-      />
-    ),
+    component: BasicTerminal
   },
 
   customCommands: {
     title: "Custom Commands",
     description: "Terminal with custom command handlers",
-    code: `import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
-
-const customCommands: TerminalCommand[] = [
-  {
-    name: "greet",
-    description: "Greet the user",
-    handler: (args) => {
-      const name = args[0] || "World"
-      return \`Hello, \${name}!\`
+    code: `export function CustomCommandsTerminal() {
+  const customCommands = [
+    {
+      name: "greet",
+      description: "Greet the user",
+      handler: (args: string[]) => {
+        const name = args[0] || "World"
+        return \`Hello, \${name}!\`
+      },
     },
-  },
-  {
-    name: "time",
-    description: "Show current time",
-    handler: () => {
-      return new Date().toLocaleTimeString()
+    {
+      name: "time",
+      description: "Show current time",
+      handler: () => {
+        return new Date().toLocaleTimeString()
+      },
     },
-  },
-]
+  ]
 
-export function CustomCommandsTerminal() {
   return (
     <Terminal
       commands={customCommands}
@@ -164,68 +264,57 @@ export function CustomCommandsTerminal() {
     />
   )
 }`,
-    preview: (
-      <Terminal
-        commands={[
-          {
-            name: "greet",
-            description: "Greet the user",
-            handler: (args) => {
-              const name = args[0] || "World"
-              return `Hello, ${name}!`
-            },
-          },
-          {
-            name: "time",
-            description: "Show current time",
-            handler: () => {
-              return new Date().toLocaleTimeString()
-            },
-          },
-        ]}
-        welcomeMessage={["Terminal with custom commands", "Try: greet John, time"]}
-        className="h-64"
-      />
-    ),
+    component: CustomCommandsTerminal
   },
 
   variants: {
     title: "Terminal Variants",
     description: "Different terminal styles and sizes",
-    code: `import { Terminal } from "@/components/ui/terminal"
-
-export function TerminalVariants() {
+    code: `export function TerminalVariants() {
   return (
     <div className="space-y-4">
-      {/* Default variant */}
       <Terminal
         variant="default"
         welcomeMessage={["Default terminal"]}
-        className="h-48"
+        className="h-32"
       />
-      
-      {/* Compact variant */}
       <Terminal
         variant="compact"
         welcomeMessage={["Compact terminal"]}
-        className="h-32"
+        className="h-24"
       />
-      
-      {/* Minimal variant */}
       <Terminal
         variant="minimal"
         welcomeMessage={["Minimal terminal"]}
-        className="h-24"
+        className="h-20"
       />
     </div>
   )
 }`,
-    preview: (
-      <div className="space-y-4">
-        <Terminal variant="default" welcomeMessage={["Default terminal"]} className="h-32" />
-        <Terminal variant="compact" welcomeMessage={["Compact terminal"]} className="h-24" />
-        <Terminal variant="minimal" welcomeMessage={["Minimal terminal"]} className="h-20" />
-      </div>
-    ),
+    component: TerminalVariants
+  },
+
+  terminalCommandType: {
+    title: "TerminalCommand Type",
+    description: "TypeScript interface for defining custom commands",
+    language: "typescript",
+    code: `interface TerminalCommand {
+  name: string                    // Command name (e.g., "help")
+  description: string             // Help text description
+  handler: (args: string[]) => Promise<void> | void | string
+}
+
+// Example usage
+const customCommands: TerminalCommand[] = [
+  {
+    name: "greet",
+    description: "Greet the user",
+    handler: (args) => {
+      const name = args[0] || "World"
+      return \`Hello, \${name}!\`
+    },
+  },
+]`,
+    component: TypeDemo
   },
 }
