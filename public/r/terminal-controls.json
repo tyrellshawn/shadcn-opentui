@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "terminal-controls",
+  "type": "registry:component",
+  "title": "Terminal Controls",
+  "description": "Control panel for terminal settings with sliders and buttons.",
+  "files": [
+    {
+      "path": "registry/new-york/terminal-controls/terminal-controls.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { TerminalSlider } from \"../terminal-slider/terminal-slider\"\nimport { Button } from \"../ui/button\"\nimport { cn } from \"../../../lib/utils\"\n\ninterface TerminalControlsProps {\n  className?: string\n  onCommand?: (command: string) => void\n}\n\nfunction TerminalControls({ className, onCommand }: TerminalControlsProps) {\n  const [volume, setVolume] = React.useState([75])\n  const [brightness, setBrightness] = React.useState([50])\n  const [speed, setSpeed] = React.useState([25])\n\n  const handleControlCommand = (type: string, value: number) => {\n    const command = `set ${type} ${value}`\n    onCommand?.(command)\n  }\n\n  return (\n    <div className={cn(\"space-y-4 p-4 border border-green-400/20 rounded bg-black/50\", className)}>\n      <div className=\"text-green-400 font-mono text-sm border-b border-green-400/20 pb-2\">TERMINAL CONTROLS</div>\n\n      <TerminalSlider\n        label=\"Volume\"\n        value={volume}\n        onValueChange={(val) => {\n          setVolume(val)\n          handleControlCommand(\"volume\", val[0])\n        }}\n        unit=\"%\"\n        max={100}\n      />\n\n      <TerminalSlider\n        label=\"Brightness\"\n        value={brightness}\n        onValueChange={(val) => {\n          setBrightness(val)\n          handleControlCommand(\"brightness\", val[0])\n        }}\n        unit=\"%\"\n        max={100}\n        ascii\n        width={15}\n      />\n\n      <TerminalSlider\n        label=\"Processing Speed\"\n        value={speed}\n        onValueChange={(val) => {\n          setSpeed(val)\n          handleControlCommand(\"speed\", val[0])\n        }}\n        unit=\" ops/s\"\n        max={100}\n      />\n\n      <div className=\"flex gap-2 pt-2\">\n        <Button\n          variant=\"outline\"\n          size=\"sm\"\n          className=\"font-mono text-xs border-green-400/20 text-green-400 hover:bg-green-400/10 bg-transparent\"\n          onClick={() => onCommand?.(\"reset controls\")}\n        >\n          RESET\n        </Button>\n        <Button\n          variant=\"outline\"\n          size=\"sm\"\n          className=\"font-mono text-xs border-green-400/20 text-green-400 hover:bg-green-400/10 bg-transparent\"\n          onClick={() => onCommand?.(\"save config\")}\n        >\n          SAVE\n        </Button>\n      </div>\n    </div>\n  )\n}\n\nexport { TerminalControls }",
+      "type": "registry:component"
+    }
+  ]
+}

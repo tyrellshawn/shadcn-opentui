@@ -39,9 +39,16 @@ A powerful, interactive terminal component for React applications built with sha
 
 Install the terminal component using the shadcn CLI:
 
-\`\`\`bash
-npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal
-\`\`\`
+```bash
+# Install the shadcn CLI
+npm install -g shadcn@canary
+
+# Add components from the registry
+shadcn add terminal --from=https://opentui.vercel.app/r/terminal.json
+shadcn add terminal-controls --from=https://opentui.vercel.app/r/terminal-controls.json
+shadcn add terminal-slider --from=https://opentui.vercel.app/r/terminal-slider.json
+shadcn add terminal-block --from=https://opentui.vercel.app/r/terminal-block.json
+```
 
 ### Basic Usage
 
@@ -127,22 +134,27 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Setup
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone https://github.com/tyrellshawn/shadcn-opentui.git
 cd shadcn-opentui
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
-npm install
-\`\`\`
+```bash
+pnpm install
+```
 
 3. Start the development server:
-\`\`\`bash
-npm run dev
-\`\`\`
+```bash
+pnpm dev
+```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. Build the registry:
+```bash
+pnpm registry:build
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## 📄 License
 
