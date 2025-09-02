@@ -29,7 +29,7 @@ export default function DocsPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="https://github.com/shadcn-opentui/terminal" target="_blank">
+            <Link href="https://github.com/tyrellshawn/shadcn-opentui" target="_blank">
               <Github className="mr-2 h-4 w-4" />
               View on GitHub
               <ExternalLink className="ml-2 h-4 w-4" />
@@ -115,8 +115,13 @@ export default function DocsPage() {
         <CardContent className="space-y-4">
           <div className="bg-muted rounded-lg p-4">
             <code className="text-sm">
-              {`# Install the terminal component
-npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal`}
+              {`# Configure registry in components.json
+# "registries": {
+#   "@shadcn-opentui": "https://opentui.vercel.app/r/{name}.json"
+# }
+
+# Install the terminal component
+bunx shadcn@latest add @shadcn-opentui/terminal`}
             </code>
           </div>
           <div className="bg-muted rounded-lg p-4">

@@ -36,6 +36,19 @@ export default function InstallationPage() {
               </div>
             </div>
             <div className="space-y-2">
+              <h4 className="font-semibold">Registry Configuration</h4>
+              <p className="text-sm text-muted-foreground">
+                Make sure your components.json file includes the @shadcn-opentui registry configuration.
+              </p>
+              <div className="bg-muted rounded-lg p-3">
+                <code className="text-xs">
+                  {`"registries": {
+  "@shadcn-opentui": "https://opentui.vercel.app/r/{name}.json"
+}`}
+                </code>
+              </div>
+            </div>
+            <div className="space-y-2">
               <h4 className="font-semibold">React Knowledge</h4>
               <p className="text-sm text-muted-foreground">
                 Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
@@ -63,7 +76,7 @@ export default function InstallationPage() {
           </CardHeader>
           <CardContent>
             <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal</code>
+              <code className="text-sm">bunx shadcn@latest add @shadcn-opentui/terminal</code>
             </div>
           </CardContent>
         </Card>
@@ -83,8 +96,8 @@ export default function InstallationPage() {
             </p>
             <div className="bg-muted rounded-lg p-4">
               <code className="text-sm">
-                {`# Copy the terminal component
-curl -o components/ui/terminal.tsx https://opentui.vercel.app/api/registry/terminal/raw`}
+                {`# Manual installation (if needed)
+# Download from: https://opentui.vercel.app/r/terminal.json`}
               </code>
             </div>
           </CardContent>

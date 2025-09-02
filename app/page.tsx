@@ -137,7 +137,7 @@ export default function Home() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="https://github.com/sst/opentui" target="_blank">
+              <Link href="https://github.com/tyrellshawn/shadcn-opentui" target="_blank">
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
                 <ExternalLink className="ml-2 h-4 w-4" />
@@ -291,7 +291,20 @@ npm install github:sst/opentui#main`}</code>
               <div>
                 <h4 className="font-medium mb-2">Add shadcn/ui Terminal</h4>
                 <pre className="text-sm overflow-x-auto bg-background p-3 rounded border">
-                  <code>{`npx shadcn@latest add https://www.shadcn.io/registry/terminal.json`}</code>
+                  <code>{`# Install the latest shadcn CLI and initialize
+bunx shadcn@latest init
+
+# Add the @shadcn-opentui registry to your components.json
+# Add this to your components.json:
+# "registries": {
+#   "@shadcn-opentui": "https://opentui.vercel.app/r/{name}.json"
+# }
+
+# Add components from the @shadcn-opentui registry
+bunx shadcn@latest add @shadcn-opentui/terminal
+bunx shadcn@latest add @shadcn-opentui/terminal-controls
+bunx shadcn@latest add @shadcn-opentui/terminal-slider
+bunx shadcn@latest add @shadcn-opentui/terminal-block`}</code>
                 </pre>
               </div>
             </div>
