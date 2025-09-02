@@ -117,7 +117,7 @@ const createBuiltInCommands = (
     handler: () => {
       addLine("🚀 OpenTUI Terminal Component", "success")
       addLine("Built with React and shadcn/ui")
-      addLine("GitHub: https://github.com/sst/opentui")
+      addLine("GitHub: https://github.com/tyrellshawn/shadcn-opentui")
       addLine("Type 'help' for available commands")
     },
   },

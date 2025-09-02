@@ -29,7 +29,7 @@ export default function DocsPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="https://github.com/shadcn-opentui/terminal" target="_blank">
+            <Link href="https://github.com/tyrellshawn/shadcn-opentui" target="_blank">
               <Github className="mr-2 h-4 w-4" />
               View on GitHub
               <ExternalLink className="ml-2 h-4 w-4" />
