@@ -31,7 +31,7 @@ export default function InstallationPage() {
                 shadcn components.
               </p>
               <div className="flex gap-2">
-                <Badge variant="outline">Next.js 13+</Badge>
+                <Badge variant="outline">Next.js 16+</Badge>
                 <Badge variant="outline">shadcn/ui</Badge>
               </div>
             </div>
@@ -41,11 +41,24 @@ export default function InstallationPage() {
                 Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
               </p>
               <div className="flex gap-2">
-                <Badge variant="outline">React 18+</Badge>
+                <Badge variant="outline">React 19+</Badge>
                 <Badge variant="outline">TypeScript</Badge>
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-primary/50 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="text-lg">Version Consistency</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            For the best experience, we recommend using <strong>Next.js 16</strong> with <strong>React 19</strong> (the
+            latest stable versions). This ensures full compatibility with all terminal component features including
+            server components, streaming, and modern React patterns.
+          </p>
         </CardContent>
       </Card>
 

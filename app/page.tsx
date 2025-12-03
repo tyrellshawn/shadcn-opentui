@@ -1,329 +1,646 @@
 "use client"
 
+import type React from "react"
 import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
+import { TerminalControls } from "@/components/ui/terminal-controls"
+import { TerminalSlider } from "@/components/ui/terminal-slider"
 import { Command } from "@/components/command"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, BookOpen, Github, ExternalLink } from "lucide-react"
+import {
+  ArrowRight,
+  BookOpen,
+  Github,
+  TerminalIcon,
+  Zap,
+  Layers,
+  Code2,
+  Sparkles,
+  Copy,
+  Check,
+  SlidersHorizontal,
+  Gauge,
+} from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { MatrixRain } from "@/components/matrix-rain"
 
-export default function Home() {
-  const customCommands: TerminalCommand[] = [
-    {
-      name: "echo",
-      description: "Echo text to output",
-      handler: (args) => {
-        addOutput(args.join(" "))
-      },
-    },
-    {
-      name: "whoami",
-      description: "Display current user",
-      handler: () => {
-        addOutput("developer", "success")
-      },
-    },
-    {
-      name: "pwd",
-      description: "Print working directory",
-      handler: () => {
-        addOutput("/home/developer/opentui-terminal", "success")
-      },
-    },
-    {
-      name: "ls",
-      description: "List directory contents",
-      handler: (args) => {
-        if (args.includes("-la")) {
-          addOutput("total 8")
-          addOutput("drwxr-xr-x  5 developer developer  160 Dec 31 12:00 .")
-          addOutput("drwxr-xr-x  3 developer developer   96 Dec 31 11:00 ..")
-          addOutput("drwxr-xr-x  3 developer developer   96 Dec 31 12:00 components")
-          addOutput("drwxr-xr-x  2 developer developer   64 Dec 31 12:00 app")
-          addOutput("-rw-r--r--  1 developer developer  512 Dec 31 12:00 package.json")
-          addOutput("-rw-r--r--  1 developer developer 1024 Dec 31 12:00 README.md")
-        } else {
-          addOutput("components/  app/  lib/  package.json  README.md  node_modules/", "success")
-        }
-      },
-    },
-    {
-      name: "cat",
-      description: "Display file contents",
-      handler: (args) => {
-        if (args[0] === "package.json") {
-          addOutput(
-            '{\n  "name": "opentui-terminal-component",\n  "version": "1.0.0",\n  "description": "OpenTUI terminal component with React",\n  "dependencies": {\n    "@opentui/react": "github:sst/opentui#main",\n    "react": "^18.0.0",\n    "typescript": "^5.0.0"\n  }\n}',
-            "success",
-          )
-        } else if (args[0] === "README.md") {
-          addOutput(
-            "# OpenTUI Terminal Component\n\nA powerful terminal interface built with OpenTUI and React.\n\n## Features\n- Command history\n- Tab completion\n- Custom commands\n- Async support",
-            "success",
-          )
-        } else {
-          addOutput(`cat: ${args[0] || "filename"}: No such file or directory`, "error")
-        }
-      },
-    },
-    {
-      name: "npm",
-      description: "Node package manager",
-      handler: async (args) => {
-        if (args[0] === "install") {
-          addOutput("📦 Installing OpenTUI dependencies...")
-          await new Promise((resolve) => setTimeout(resolve, 1500))
-          addOutput("✅ @opentui/react@latest installed", "success")
-          addOutput("✅ @opentui/core@latest installed", "success")
-          addOutput("🎉 Installation complete!", "success")
-        } else if (args[0] === "run" && args[1] === "dev") {
-          addOutput("🚀 Starting development server...")
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-          addOutput("✅ Server running on http://localhost:3000", "success")
-        } else {
-          addOutput(`npm: unknown command '${args.join(" ")}'`, "error")
-        }
-      },
-    },
-    {
-      name: "git",
-      description: "Git version control",
-      handler: (args) => {
-        if (args[0] === "status") {
-          addOutput("On branch main", "success")
-          addOutput("Your branch is up to date with 'origin/main'.")
-          addOutput("nothing to commit, working tree clean")
-        } else if (args[0] === "log" && args[1] === "--oneline") {
-          addOutput("a1b2c3d feat: integrate OpenTUI React components", "success")
-          addOutput("d4e5f6g docs: update README with OpenTUI usage")
-          addOutput("g7h8i9j initial: setup terminal component")
-        } else if (args[0] === "branch") {
-          addOutput("* main", "success")
-          addOutput("  feature/opentui-integration")
-        } else {
-          addOutput(`git: '${args.join(" ")}' is not a git command.`, "error")
-        }
-      },
-    },
-  ]
+function TypewriterText({ text, delay = 50 }: { text: string; delay?: number }) {
+  const [displayText, setDisplayText] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(0)
 
-  const [terminalLines, setTerminalLines] = useState<string[]>([])
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayText((prev) => prev + text[currentIndex])
+        setCurrentIndex((prev) => prev + 1)
+      }, delay)
+      return () => clearTimeout(timer)
+    }
+  }, [currentIndex, text, delay])
 
-  const addOutput = (content: string, type: "output" | "error" | "success" = "output") => {
-    setTerminalLines((prev) => [...prev, content])
+  return (
+    <span>
+      {displayText}
+      <span className="animate-pulse">|</span>
+    </span>
+  )
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Shadcn OpenTUI</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            A powerful, customizable terminal interface built with OpenTUI React and shadcn/ui. Features command
-            history, tab completion, and extensible command system.
-          </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <span>Powered by</span>
-            <code className="bg-muted px-2 py-1 rounded font-mono">@opentui/react</code>
-            <span>•</span>
-            <code className="bg-muted px-2 py-1 rounded font-mono">shadcn/ui</code>
-          </div>
-          <div className="flex items-center justify-center gap-4 pt-4">
-            <Button asChild>
-              <Link href="/docs">
-                <BookOpen className="mr-2 h-4 w-4" />
-                View Documentation
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="https://github.com/sst/opentui" target="_blank">
-                <Github className="mr-2 h-4 w-4" />
-                GitHub
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
+    <button onClick={handleCopy} className="text-muted-foreground hover:text-primary transition-colors p-1">
+      {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+    </button>
+  )
+}
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Default Terminal</h3>
-            <Terminal
-              prompt="default@demo:~$"
-              commands={customCommands.slice(0, 3)}
-              welcomeMessage={["Default terminal variant", "Try: echo, whoami, pwd"]}
-              variant="default"
-            />
-          </div>
+function OpenTUITerminalDemo({
+  title,
+  script,
+}: {
+  title: string
+  script: Array<{ command: string; output: string[]; delay: number }>
+}) {
+  const [lines, setLines] = useState<Array<{ type: string; content: string }>>([])
+  const [currentStep, setCurrentStep] = useState(0)
+  const [typedCommand, setTypedCommand] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Compact Terminal</h3>
-            <Terminal
-              prompt="compact@demo:~$"
-              commands={customCommands.slice(0, 3)}
-              welcomeMessage={["Compact variant", "Smaller size"]}
-              variant="compact"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Minimal Terminal</h3>
-            <Terminal
-              prompt="minimal@demo:~$"
-              commands={customCommands.slice(0, 3)}
-              welcomeMessage={["Minimal variant"]}
-              variant="minimal"
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Features</h2>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Built with OpenTUI React reconciler</li>
-                <li>• Command history with arrow key navigation</li>
-                <li>• Enhanced tab completion with suggestions</li>
-                <li>• Custom command handling with async support</li>
-                <li>• Multiple terminal variants (default, compact, minimal)</li>
-                <li>• TypeScript support with full type safety</li>
-                <li>• Error handling and output formatting</li>
-                <li>• Scrollable output with auto-scroll</li>
-                <li>• Keyboard shortcuts (Ctrl+L to clear)</li>
-                <li>• Customizable prompts and welcome messages</li>
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium">Built-in Commands</h3>
-              <div className="grid gap-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <Command>help</Command>
-                  <span className="text-muted-foreground">Show available commands</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command>clear</Command>
-                  <span className="text-muted-foreground">Clear terminal output</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command>history</Command>
-                  <span className="text-muted-foreground">Show command history</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command>date</Command>
-                  <span className="text-muted-foreground">Show current date/time</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command>opentui</Command>
-                  <span className="text-muted-foreground">Show OpenTUI information</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-lg font-medium">Demo Commands</h3>
-              <div className="grid gap-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <Command variant="success">echo Hello OpenTUI!</Command>
-                  <span className="text-muted-foreground">Echo text</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command variant="success">ls -la</Command>
-                  <span className="text-muted-foreground">List files (detailed)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command variant="success">cat package.json</Command>
-                  <span className="text-muted-foreground">Show file contents</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command variant="success">npm install</Command>
-                  <span className="text-muted-foreground">Install packages (async)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Command variant="success">git status</Command>
-                  <span className="text-muted-foreground">Git repository status</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Full-Featured Terminal</h2>
-            <Terminal
-              prompt="opentui@demo:~$"
-              commands={customCommands}
-              welcomeMessage={[
-                "🚀 Welcome to OpenTUI Terminal Component!",
-                "Built with @opentui/react for enhanced terminal experiences.",
-                "",
-                "Try these commands:",
-                "• help - Show all available commands",
-                "• echo Hello World - Echo text",
-                "• ls -la - List files with details",
-                "• npm install - Simulate package installation",
-                "• git status - Show git repository status",
-                "",
-                "Use ↑/↓ for history, Tab for completion, Ctrl+L to clear",
-              ]}
-              showTimestamp={false}
-              maxLines={500}
-              className="h-[600px]"
-            />
-          </div>
-        </div>
-
-        <div className="bg-muted p-6 rounded-lg space-y-6">
-          <h3 className="text-xl font-semibold">Installation & Usage</h3>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Install Dependencies</h4>
-                <pre className="text-sm overflow-x-auto bg-background p-3 rounded border">
-                  <code>{`npm install @opentui/react @opentui/core
-# or from GitHub (latest)
-npm install github:sst/opentui#main`}</code>
-                </pre>
-              </div>
-
-              <div>
-                <h4 className="font-medium mb-2">Add shadcn/ui Terminal</h4>
-                <pre className="text-sm overflow-x-auto bg-background p-3 rounded border">
-                  <code>{`npx shadcn@latest add https://www.shadcn.io/registry/terminal.json`}</code>
-                </pre>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Basic Usage</h4>
-                <pre className="text-sm overflow-x-auto bg-background p-3 rounded border">
-                  <code>{`import { Terminal } from '@/components/ui/terminal'
-
-export default function MyApp() {
-  const customCommands = [
-    {
-      name: "hello",
-      description: "Say hello",
-      handler: () => console.log("Hello!")
+  useEffect(() => {
+    if (currentStep >= script.length) {
+      const resetTimer = setTimeout(() => {
+        setLines([])
+        setCurrentStep(0)
+        setTypedCommand("")
+      }, 5000)
+      return () => clearTimeout(resetTimer)
     }
+
+    const step = script[currentStep]
+    setIsTyping(true)
+    setTypedCommand("")
+
+    let charIndex = 0
+    const typeInterval = setInterval(() => {
+      if (charIndex < step.command.length) {
+        setTypedCommand(step.command.slice(0, charIndex + 1))
+        charIndex++
+      } else {
+        clearInterval(typeInterval)
+        setIsTyping(false)
+
+        setTimeout(() => {
+          setLines((prev) => [...prev, { type: "command", content: step.command }])
+          step.output.forEach((output, i) => {
+            setTimeout(() => {
+              setLines((prev) => [
+                ...prev,
+                { type: output.startsWith("✓") || output.startsWith("✔") ? "success" : "output", content: output },
+              ])
+            }, i * 150)
+          })
+          setTypedCommand("")
+          setTimeout(() => setCurrentStep((prev) => prev + 1), step.delay)
+        }, 200)
+      }
+    }, 50)
+
+    return () => clearInterval(typeInterval)
+  }, [currentStep, script])
+
+  return (
+    <div className="bg-black border border-primary/30 rounded-lg overflow-hidden shadow-lg shadow-primary/10">
+      {/* OpenTUI Terminal Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-primary/20 bg-black/80">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500/80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+            <div className="w-3 h-3 rounded-full bg-green-500/80" />
+          </div>
+          <span className="text-xs text-primary font-mono font-semibold ml-2">OpenTUI Terminal</span>
+        </div>
+        <span className="text-xs text-primary/50 font-mono">{title}</span>
+      </div>
+
+      {/* Terminal Body */}
+      <div className="p-4 font-mono text-sm h-[260px] overflow-hidden bg-black">
+        {lines.map((line, i) => (
+          <div key={i} className="leading-relaxed">
+            {line.type === "command" ? (
+              <span>
+                <span className="text-primary font-bold">user@opentui:~$</span>{" "}
+                <span className="text-white">{line.content}</span>
+              </span>
+            ) : (
+              <span className={line.type === "success" ? "text-primary" : "text-primary/70"}>{line.content}</span>
+            )}
+          </div>
+        ))}
+        {isTyping && (
+          <div className="leading-relaxed">
+            <span className="text-primary font-bold">user@opentui:~$</span>{" "}
+            <span className="text-white">{typedCommand}</span>
+            <span className="animate-pulse text-primary">█</span>
+          </div>
+        )}
+        {!isTyping && currentStep < script.length && (
+          <div className="leading-relaxed">
+            <span className="text-primary font-bold">user@opentui:~$</span>
+            <span className="animate-pulse text-primary ml-1">█</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: React.ElementType
+  title: string
+  description: string
+}) {
+  return (
+    <div className="group p-6 rounded-xl border border-primary/10 bg-black/40 backdrop-blur-sm hover:bg-black/60 hover:border-primary/30 transition-all duration-300">
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+        <Icon className="w-5 h-5 text-primary" />
+      </div>
+      <h3 className="text-lg font-semibold mb-2 text-foreground">{title}</h3>
+      <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
+    </div>
+  )
+}
+
+function StatItem({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="text-center">
+      <div className="text-3xl font-bold text-primary glow-text">{value}</div>
+      <div className="text-sm text-muted-foreground mt-1">{label}</div>
+    </div>
+  )
+}
+
+function RegistrySetupBlock() {
+  const [activeStep, setActiveStep] = useState(0)
+
+  const steps = [
+    {
+      title: "Initialize shadcn with OpenTUI registry",
+      command: "bunx shadcn@latest init -r https://opentui.vercel.app/api/registry",
+      description: "Set up shadcn/ui with the OpenTUI registry for seamless component integration",
+    },
+    {
+      title: "Add terminal component",
+      command: "bunx shadcn@latest add terminal",
+      description: "Install the main OpenTUI terminal component",
+    },
+    {
+      title: "Add terminal controls",
+      command: "bunx shadcn@latest add terminal-controls terminal-slider",
+      description: "Add interactive UI components for terminal control panels",
+    },
   ]
 
   return (
-    <Terminal
-      prompt="user@opentui:~$"
-      commands={customCommands}
-      variant="default"
-    />
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        {steps.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveStep(i)}
+            className={`px-3 py-1.5 text-xs font-mono rounded transition-all ${
+              activeStep === i
+                ? "bg-primary text-primary-foreground"
+                : "bg-black/40 text-primary/60 hover:text-primary border border-primary/20"
+            }`}
+          >
+            Step {i + 1}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-black/60 border border-primary/30 rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-primary/20 flex items-center justify-between">
+          <span className="text-sm text-primary font-medium">{steps[activeStep].title}</span>
+          <CopyButton text={steps[activeStep].command} />
+        </div>
+        <div className="p-4 font-mono text-sm">
+          <span className="text-primary">$</span> <span className="text-foreground">{steps[activeStep].command}</span>
+        </div>
+        <div className="px-4 pb-4 text-xs text-muted-foreground">{steps[activeStep].description}</div>
+      </div>
+    </div>
   )
-}`}</code>
-                </pre>
+}
+
+export default function Home() {
+  const customCommands: TerminalCommand[] = [
+    { name: "echo", description: "Echo text to output", handler: () => {} },
+    { name: "whoami", description: "Display current user", handler: () => {} },
+    { name: "pwd", description: "Print working directory", handler: () => {} },
+    { name: "ls", description: "List directory contents", handler: () => {} },
+    { name: "ui", description: "Enter UI mode", handler: () => {} },
+    { name: "form", description: "Create interactive form", handler: () => {} },
+    { name: "menu", description: "Create interactive menu", handler: () => {} },
+    { name: "progress", description: "Show progress bar", handler: () => {} },
+    { name: "ascii", description: "Generate ASCII art", handler: () => {} },
+  ]
+
+  const demoScript1 = [
+    {
+      command: "bunx shadcn@latest add terminal",
+      output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+      delay: 2000,
+    },
+    {
+      command: "npm run dev",
+      output: ["Starting development server...", "✓ Ready on localhost:3000"],
+      delay: 2500,
+    },
+  ]
+
+  const demoScript2 = [
+    {
+      command: "ui menu Dashboard Settings Logout",
+      output: ["Creating menu with options...", "► Dashboard", "  Settings", "  Logout"],
+      delay: 2500,
+    },
+    {
+      command: "form username email password",
+      output: ["Creating form...", "✓ Form ready - TAB to navigate"],
+      delay: 2000,
+    },
+  ]
+
+  const demoScript3 = [
+    {
+      command: "ascii HELLO",
+      output: [
+        "Generating ASCII art...",
+        "██   ██ ███████ ██      ██       ██████",
+        "██   ██ ██      ██      ██      ██    ██",
+        "███████ █████   ██      ██      ██    ██",
+      ],
+      delay: 3000,
+    },
+    {
+      command: "progress 2000",
+      output: ["[████████████░░░░░░░░] 60%", "✓ Progress complete!"],
+      delay: 2500,
+    },
+  ]
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Matrix Rain Background */}
+      <MatrixRain />
+
+      {/* Content overlay */}
+      <div className="relative z-10">
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-primary/10 bg-black/60 backdrop-blur-xl">
+          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+                <TerminalIcon className="w-4 h-4 text-primary" />
+              </div>
+              <span className="font-semibold text-lg text-primary">OpenTUI</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Docs
+              </Link>
+              <Link
+                href="/docs/components/terminal"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Components
+              </Link>
+              <Link
+                href="/docs/examples"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Examples
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
+                <Link href="https://github.com/sst/opentui" target="_blank">
+                  <Github className="w-4 h-4" />
+                </Link>
+              </Button>
+              <Button
+                size="sm"
+                className="bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 animate-pulse-glow"
+                asChild
+              >
+                <Link href="/docs">
+                  Get Started
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <section className="pt-32 pb-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="max-w-4xl mx-auto text-center space-y-8">
+              {/* Glowing OpenTUI Title */}
+              <div className="fade-in-up">
+                <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4 font-mono">
+                  <span className="text-primary glow-text-strong">OpenTUI</span>
+                </h1>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-black/40 text-sm">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-primary/80">Built with shadcn/ui</span>
+                </div>
+              </div>
+
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight fade-in-up-delay-1 text-balance">
+                <span className="text-foreground">The terminal component</span>
+                <br />
+                <span className="text-primary glow-text">for modern apps</span>
+              </h2>
+
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto fade-in-up-delay-2 text-balance leading-relaxed">
+                A powerful, customizable terminal interface built with OpenTUI and React. Command history, tab
+                completion, interactive UI components, and full TypeScript support.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up-delay-3">
+                <Button
+                  size="lg"
+                  className="px-8 bg-transparent border-2 border-primary text-primary hover:bg-primary/10"
+                  asChild
+                >
+                  <Link href="/docs">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Documentation
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="px-8 bg-black/40 border-border/50 hover:bg-black/60"
+                  asChild
+                >
+                  <Link href="https://github.com/sst/opentui" target="_blank">
+                    <Github className="w-4 h-4 mr-2" />
+                    View on GitHub
+                  </Link>
+                </Button>
+              </div>
+
+              {/* Install command with glow */}
+              <div className="pt-4 fade-in-up-delay-3">
+                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-black/60 border border-primary/30 font-mono text-sm backdrop-blur-sm">
+                  <span className="text-primary">$</span>
+                  <span className="text-foreground">npx shadcn@latest add terminal</span>
+                  <CopyButton text="npx shadcn@latest add terminal" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="py-16 px-6 border-y border-primary/10 bg-black/40 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
+                Quick Setup with @shadcn-opentui Registry
+              </h2>
+              <p className="text-muted-foreground">
+                Initialize your project with the OpenTUI registry for seamless integration
+              </p>
+            </div>
+            <RegistrySetupBlock />
+          </div>
+        </section>
+
+        {/* Animated Demos - Using OpenTUI Terminal */}
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">See it in action</h2>
+              <p className="text-muted-foreground text-lg">
+                Watch automated demos showcasing OpenTUI terminal features
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <OpenTUITerminalDemo title="Installation" script={demoScript1} />
+              <OpenTUITerminalDemo title="UI Components" script={demoScript2} />
+              <OpenTUITerminalDemo title="Built-in Commands" script={demoScript3} />
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 px-6 border-y border-primary/10 bg-black/20">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">OpenTUI Components</h2>
+              <p className="text-muted-foreground text-lg">
+                Interactive terminal UI components from the @shadcn-opentui registry
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Terminal Controls Demo */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-mono text-primary">
+                  <SlidersHorizontal className="w-4 h-4" />
+                  <span>@shadcn-opentui/terminal-controls</span>
+                </div>
+                <TerminalControls className="bg-black/80" onCommand={(cmd) => console.log("Command:", cmd)} />
+                <p className="text-xs text-muted-foreground">
+                  Pre-built control panel with sliders and buttons for terminal settings
+                </p>
+              </div>
+
+              {/* Terminal Slider Demo */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-mono text-primary">
+                  <Gauge className="w-4 h-4" />
+                  <span>@shadcn-opentui/terminal-slider</span>
+                </div>
+                <div className="p-6 border border-primary/20 rounded bg-black/50 space-y-6">
+                  <TerminalSlider label="CPU Usage" defaultValue={[65]} unit="%" max={100} />
+                  <TerminalSlider label="Memory" defaultValue={[42]} unit=" GB" max={64} ascii width={20} />
+                  <TerminalSlider label="Network Speed" defaultValue={[850]} unit=" Mbps" max={1000} />
+                </div>
+                <p className="text-xs text-muted-foreground">Terminal-styled sliders with ASCII visualization mode</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="py-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <StatItem value="15+" label="Built-in commands" />
+              <StatItem value="5" label="UI components" />
+              <StatItem value="100%" label="TypeScript" />
+              <StatItem value="<5kb" label="Bundle size" />
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Everything you need</h2>
+              <p className="text-muted-foreground text-lg">Powerful features for building terminal experiences</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <FeatureCard
+                icon={TerminalIcon}
+                title="Command History"
+                description="Navigate through previous commands with arrow keys, just like a real terminal."
+              />
+              <FeatureCard
+                icon={Zap}
+                title="Tab Completion"
+                description="Intelligent tab completion with suggestions for faster command entry."
+              />
+              <FeatureCard
+                icon={Layers}
+                title="UI Components"
+                description="Built-in forms, menus, sliders, and progress bars for interactive terminal UIs."
+              />
+              <FeatureCard
+                icon={Code2}
+                title="Async Commands"
+                description="Full support for async command handlers with loading states."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Demo - Using actual OpenTUI Terminal */}
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              <div className="space-y-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground">Try it yourself</h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Experience the full power of the OpenTUI terminal component. Type commands, use tab completion, and
+                  explore the built-in functionality including interactive UI modes.
+                </p>
+
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-foreground">Available commands</h3>
+                  <div className="grid gap-2">
+                    {[
+                      { cmd: "help", desc: "Show all commands" },
+                      { cmd: "ui menu [items]", desc: "Create interactive menu" },
+                      { cmd: "form [fields]", desc: "Create interactive form" },
+                      { cmd: "progress [ms]", desc: "Show animated progress" },
+                      { cmd: "ascii [text]", desc: "Generate ASCII art" },
+                      { cmd: "clear", desc: "Clear terminal" },
+                    ].map((item) => (
+                      <div key={item.cmd} className="flex items-center gap-3">
+                        <Command>{item.cmd}</Command>
+                        <span className="text-sm text-muted-foreground">{item.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
+                <Terminal
+                  prompt="demo@opentui:~$"
+                  commands={customCommands}
+                  welcomeMessage={[
+                    "🚀 Welcome to OpenTUI Terminal",
+                    "",
+                    "Type 'help' to see available commands.",
+                    "Use ↑/↓ for history, Tab for completion.",
+                    "Try 'ui menu' or 'form' for interactive modes!",
+                  ]}
+                  className="h-[500px] bg-black"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="p-12 rounded-2xl border border-primary/20 bg-black/40 backdrop-blur-sm">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Ready to get started?</h2>
+              <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
+                Add the OpenTUI terminal component to your project using the @shadcn-opentui registry.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button
+                  size="lg"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 animate-pulse-glow"
+                  asChild
+                >
+                  <Link href="/docs">
+                    Read the docs
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="bg-black/40 border-border/50 hover:bg-black/60" asChild>
+                  <Link href="/docs/installation">Installation guide</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-12 px-6 border-t border-primary/10">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center">
+                  <TerminalIcon className="w-3 h-3 text-primary" />
+                </div>
+                <span className="text-sm text-muted-foreground">OpenTUI - Built with shadcn/ui</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Documentation
+                </Link>
+                <Link
+                  href="https://github.com/sst/opentui"
+                  target="_blank"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  GitHub
+                </Link>
+                <Link
+                  href="https://twitter.com/shadcn"
+                  target="_blank"
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Twitter
+                </Link>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )
