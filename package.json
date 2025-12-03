@@ -6,9 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start",
-    "registry:build": "shadcn build",
-    "registry:dev": "shadcn build --watch"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -59,7 +57,6 @@
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
-    "shadcn": "2.9.3-canary.0",
     "sonner": "latest",
     "svelte": "latest",
     "tailwind-merge": "^2.5.5",

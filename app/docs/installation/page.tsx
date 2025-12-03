@@ -31,21 +31,8 @@ export default function InstallationPage() {
                 shadcn components.
               </p>
               <div className="flex gap-2">
-                <Badge variant="outline">Next.js 13+</Badge>
+                <Badge variant="outline">Next.js 16+</Badge>
                 <Badge variant="outline">shadcn/ui</Badge>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-semibold">Registry Configuration</h4>
-              <p className="text-sm text-muted-foreground">
-                Make sure your components.json file includes the @shadcn-opentui registry configuration.
-              </p>
-              <div className="bg-muted rounded-lg p-3">
-                <code className="text-xs">
-                  {`"registries": {
-  "@shadcn-opentui": "https://opentui.vercel.app/r/{name}.json"
-}`}
-                </code>
               </div>
             </div>
             <div className="space-y-2">
@@ -54,11 +41,24 @@ export default function InstallationPage() {
                 Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
               </p>
               <div className="flex gap-2">
-                <Badge variant="outline">React 18+</Badge>
+                <Badge variant="outline">React 19+</Badge>
                 <Badge variant="outline">TypeScript</Badge>
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-primary/50 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="text-lg">Version Consistency</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            For the best experience, we recommend using <strong>Next.js 16</strong> with <strong>React 19</strong> (the
+            latest stable versions). This ensures full compatibility with all terminal component features including
+            server components, streaming, and modern React patterns.
+          </p>
         </CardContent>
       </Card>
 
@@ -76,7 +76,7 @@ export default function InstallationPage() {
           </CardHeader>
           <CardContent>
             <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">bunx shadcn@latest add @shadcn-opentui/terminal</code>
+              <code className="text-sm">npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal</code>
             </div>
           </CardContent>
         </Card>
@@ -96,8 +96,8 @@ export default function InstallationPage() {
             </p>
             <div className="bg-muted rounded-lg p-4">
               <code className="text-sm">
-                {`# Manual installation (if needed)
-# Download from: https://opentui.vercel.app/r/terminal.json`}
+                {`# Copy the terminal component
+curl -o components/ui/terminal.tsx https://opentui.vercel.app/api/registry/terminal/raw`}
               </code>
             </div>
           </CardContent>

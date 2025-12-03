@@ -16,7 +16,7 @@ import {
   SidebarGroupLabel,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play } from "lucide-react"
+import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -43,12 +43,10 @@ const navigation = [
     ],
   },
   {
-    title: "OpenTUI Integration",
+    title: "Customization",
     items: [
-      { title: "Core Concepts", href: "/docs/opentui/concepts", icon: BookOpen },
-      { title: "React Components", href: "/docs/opentui/components", icon: Code },
-      { title: "Hooks & Events", href: "/docs/opentui/hooks", icon: Settings },
-      { title: "Custom Components", href: "/docs/opentui/custom", icon: Zap },
+      { title: "Themes", href: "/docs/themes", icon: Palette },
+      { title: "Plugins", href: "/docs/plugins", icon: Puzzle },
     ],
   },
   {

@@ -1,7 +1,8 @@
 "use client"
 
-import React, { useState, useRef, useCallback, useContext, createContext } from "react"
+import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect } from "react"
 import { cn } from "@/lib/utils"
+import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
 
 interface TerminalLine {
   id: string
@@ -21,11 +22,13 @@ interface TerminalCommand {
 interface TerminalProps extends React.HTMLAttributes<HTMLDivElement> {
   prompt?: string
   welcomeMessage?: string[]
-  commands?: TerminalCommand[]
+  commands?: Record<string, CommandHandler>
   onCommand?: (command: string, args: string[]) => Promise<void> | void
   maxLines?: number
   showTimestamp?: boolean
   variant?: "default" | "compact" | "minimal"
+  autoScroll?: boolean
+  smoothScroll?: boolean
 }
 
 interface TerminalUIComponent {
@@ -117,7 +120,7 @@ const createBuiltInCommands = (
     handler: () => {
       addLine("🚀 OpenTUI Terminal Component", "success")
       addLine("Built with React and shadcn/ui")
-      addLine("GitHub: https://github.com/tyrellshawn/shadcn-opentui")
+      addLine("GitHub: https://github.com/sst/opentui")
       addLine("Type 'help' for available commands")
     },
   },
@@ -287,22 +290,24 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
   (
     {
       className,
-      prompt = "user@terminal:~$",
-      welcomeMessage = ["Welcome to OpenTUI Terminal", "Type 'help' for available commands"],
-      commands = [],
+      prompt = "$",
+      welcomeMessage = ["Welcome to OpenTUI Terminal", 'Type "help" to see available commands'],
+      commands = {},
       onCommand,
       maxLines = 1000,
       showTimestamp = false,
       variant = "default",
+      autoScroll = true,
+      smoothScroll = true,
       ...props
     },
     ref,
   ) => {
     const [lines, setLines] = useState<TerminalLine[]>(() =>
-      welcomeMessage.map((content, index) => ({
-        id: `welcome-${index}`,
+      welcomeMessage.map((msg, i) => ({
+        id: `welcome-${i}`,
         type: "output" as const,
-        content,
+        content: msg,
         timestamp: new Date(),
       })),
     )
@@ -312,34 +317,43 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const [commandHistory, setCommandHistory] = useState<string[]>([])
     const [historyIndex, setHistoryIndex] = useState(-1)
     const [cursorPosition, setCursorPosition] = useState(0)
+    const [userScrolledUp, setUserScrolledUp] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
     const lineIdCounter = useRef(0)
+    const scrollAnimationRef = useRef<number | null>(null)
+    const lastScrollTimeRef = useRef<number>(0)
+    const rapidUpdateCountRef = useRef<number>(0)
+    const updateTimestampsRef = useRef<number[]>([])
+    const pendingScrollRef = useRef<number | null>(null)
+    const velocityRef = useRef<number>(0)
+    const isAnimatingRef = useRef<boolean>(false)
+    const targetScrollRef = useRef<number>(0)
 
-    const [opentuiState, setOpentuiState] = useState<TerminalState>({
+    const opentuiState = useState<TerminalState>({
       mode: "command",
       formData: {},
       menuSelection: 0,
     })
 
     const opentuiContext: OpenTUIContext = {
-      state: opentuiState,
-      setState: setOpentuiState,
+      state: opentuiState[0],
+      setState: opentuiState[1],
       addUIComponent: (component) => {
-        setOpentuiState((prev) => ({
+        opentuiState[1]((prev) => ({
           ...prev,
           activeComponent: component,
         }))
       },
       removeUIComponent: (id) => {
-        setOpentuiState((prev) => ({
+        opentuiState[1]((prev) => ({
           ...prev,
           activeComponent: prev.activeComponent?.id === id ? undefined : prev.activeComponent,
         }))
       },
       updateFormData: (key, value) => {
-        setOpentuiState((prev) => ({
+        opentuiState[1]((prev) => ({
           ...prev,
           formData: { ...prev.formData, [key]: value },
         }))
@@ -368,15 +382,10 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     }, [])
 
     const builtInCommands = createBuiltInCommands(addLine, clearLines, commandHistory, opentuiContext)
-    const allCommands = [...builtInCommands, ...commands]
+    const allCommands = [...builtInCommands, ...Object.values(commands)]
 
     const processCommand = useCallback(
       async (input: string) => {
-        if (!input || typeof input !== "string") {
-          addLine("Invalid command input", "error")
-          return
-        }
-
         const [commandName, ...args] = input.trim().split(/\s+/)
         const command = allCommands.find((cmd) => cmd.name === commandName)
 
@@ -404,8 +413,6 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     )
 
     const handleCommand = async (command: string) => {
-      if (!command || typeof command !== "string") return
-
       if (!command.trim()) return
 
       setCommandHistory((prev) => [...prev, command])
@@ -430,36 +437,36 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (opentuiState.mode === "ui" && opentuiState.activeComponent?.type === "menu") {
+      if (opentuiState[0].mode === "ui" && opentuiState[0].activeComponent?.type === "menu") {
         if (e.key === "ArrowUp") {
           e.preventDefault()
-          setOpentuiState((prev) => ({
+          opentuiState[1]((prev) => ({
             ...prev,
             menuSelection: Math.max(0, prev.menuSelection - 1),
           }))
           return
         } else if (e.key === "ArrowDown") {
           e.preventDefault()
-          const maxItems = opentuiState.activeComponent?.props.items?.length || 0
-          setOpentuiState((prev) => ({
+          const maxItems = opentuiState[0].activeComponent?.props.items?.length || 0
+          opentuiState[1]((prev) => ({
             ...prev,
             menuSelection: Math.min(maxItems - 1, prev.menuSelection + 1),
           }))
           return
         } else if (e.key === "Enter") {
           e.preventDefault()
-          const selectedItem = opentuiState.activeComponent?.props.items?.[opentuiState.menuSelection]
+          const selectedItem = opentuiState[0].activeComponent?.props.items?.[opentuiState[0].menuSelection]
           if (selectedItem) {
             addLine(`Selected: ${selectedItem}`, "success")
-            setOpentuiState((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
+            opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
           }
           return
         }
       }
 
-      if (e.key === "Escape" && opentuiState.mode !== "command") {
+      if (e.key === "Escape" && opentuiState[0].mode !== "command") {
         e.preventDefault()
-        setOpentuiState((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
+        opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
         addLine("Exited UI mode", "success")
         return
       }
@@ -509,9 +516,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     }
 
     const renderUIComponent = () => {
-      if (!opentuiState.activeComponent) return null
+      if (!opentuiState[0].activeComponent) return null
 
-      const { type, props } = opentuiState.activeComponent
+      const { type, props } = opentuiState[0].activeComponent
 
       switch (type) {
         case "menu":
@@ -523,10 +530,10 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   key={index}
                   className={cn(
                     "px-2 py-1 font-mono text-sm",
-                    index === opentuiState.menuSelection ? "bg-green-400 text-black" : "text-green-400",
+                    index === opentuiState[0].menuSelection ? "bg-green-400 text-black" : "text-green-400",
                   )}
                 >
-                  {index === opentuiState.menuSelection ? "► " : "  "}
+                  {index === opentuiState[0].menuSelection ? "► " : "  "}
                   {item}
                 </div>
               ))}
@@ -575,6 +582,194 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       }
     }
 
+    const scrollToBottom = useCallback(
+      (forceInstant = false) => {
+        if (!terminalRef.current || !autoScroll || userScrolledUp) return
+
+        const now = performance.now()
+        const element = terminalRef.current
+        const targetScrollTop = element.scrollHeight - element.clientHeight
+
+        // Track update timestamps for data rate calculation
+        updateTimestampsRef.current.push(now)
+        // Keep only last 10 timestamps for rate calculation
+        if (updateTimestampsRef.current.length > 10) {
+          updateTimestampsRef.current.shift()
+        }
+
+        // Calculate data rate (updates per second)
+        const timestamps = updateTimestampsRef.current
+        let dataRate = 0
+        if (timestamps.length >= 2) {
+          const timeSpan = timestamps[timestamps.length - 1] - timestamps[0]
+          dataRate = timeSpan > 0 ? (timestamps.length - 1) / (timeSpan / 1000) : 0
+        }
+
+        // Store target for animation
+        targetScrollRef.current = targetScrollTop
+
+        // Determine scroll strategy based on data rate
+        const isRapidUpdate = dataRate > 10 // More than 10 updates/second
+        const isVeryRapidUpdate = dataRate > 30 // More than 30 updates/second
+
+        // For instant scroll scenarios
+        if (forceInstant || !smoothScroll || isVeryRapidUpdate) {
+          // Cancel any pending animation
+          if (scrollAnimationRef.current) {
+            cancelAnimationFrame(scrollAnimationRef.current)
+            scrollAnimationRef.current = null
+          }
+          if (pendingScrollRef.current) {
+            clearTimeout(pendingScrollRef.current)
+            pendingScrollRef.current = null
+          }
+          isAnimatingRef.current = false
+          element.scrollTop = targetScrollTop
+          return
+        }
+
+        // For rapid updates, batch them with debounce to hide intermediary states
+        if (isRapidUpdate) {
+          if (pendingScrollRef.current) {
+            clearTimeout(pendingScrollRef.current)
+          }
+
+          // Batch updates - only animate to final position after brief pause
+          pendingScrollRef.current = window.setTimeout(() => {
+            pendingScrollRef.current = null
+            performSmoothScroll(element, targetScrollRef.current, dataRate)
+          }, 16) as unknown as number // ~1 frame delay for batching
+
+          return
+        }
+
+        // For normal updates, animate immediately
+        performSmoothScroll(element, targetScrollTop, dataRate)
+      },
+      [autoScroll, userScrolledUp, smoothScroll],
+    )
+
+    const performSmoothScroll = useCallback((element: HTMLDivElement, targetScrollTop: number, dataRate: number) => {
+      // Cancel existing animation
+      if (scrollAnimationRef.current) {
+        cancelAnimationFrame(scrollAnimationRef.current)
+        scrollAnimationRef.current = null
+      }
+
+      const currentScrollTop = element.scrollTop
+      const distance = targetScrollTop - currentScrollTop
+
+      // Skip animation for tiny distances
+      if (Math.abs(distance) < 2) {
+        element.scrollTop = targetScrollTop
+        return
+      }
+
+      // Adaptive duration based on data rate and distance
+      // Faster data rate = shorter duration for responsiveness
+      // Larger distance = slightly longer duration for smoothness
+      const baseSpeed = Math.max(0.1, 1 - dataRate / 50) // 0.1 to 1.0
+      const distanceFactor = Math.min(1.5, 1 + Math.abs(distance) / 500)
+      const duration = Math.max(50, Math.min(200, 120 * baseSpeed * distanceFactor))
+
+      const startTime = performance.now()
+      const startScrollTop = currentScrollTop
+      isAnimatingRef.current = true
+
+      // Calculate initial velocity for momentum
+      const initialVelocity = velocityRef.current
+
+      const animateScroll = (currentTime: number) => {
+        if (!isAnimatingRef.current) return
+
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+
+        // Spring-inspired easing: fast start, smooth deceleration
+        // Uses critically damped spring formula approximation
+        const springProgress = 1 - Math.pow(1 - progress, 3) * (1 + 3 * progress)
+
+        // Add momentum influence for natural feel
+        const momentumFactor =
+          Math.max(0, 1 - progress * 2) * Math.sign(initialVelocity) * Math.min(Math.abs(initialVelocity) * 0.01, 10)
+
+        const newScrollTop = startScrollTop + distance * springProgress + momentumFactor
+
+        // Check if target changed during animation (new content added)
+        const currentTarget = element.scrollHeight - element.clientHeight
+        if (Math.abs(currentTarget - targetScrollTop) > 50) {
+          // Target changed significantly, update and continue
+          targetScrollRef.current = currentTarget
+          element.scrollTop = currentTarget
+          isAnimatingRef.current = false
+          scrollAnimationRef.current = null
+          return
+        }
+
+        element.scrollTop = newScrollTop
+
+        // Track velocity for momentum
+        velocityRef.current = (distance / duration) * (1 - progress)
+
+        if (progress < 1) {
+          scrollAnimationRef.current = requestAnimationFrame(animateScroll)
+        } else {
+          // Ensure we end exactly at target
+          element.scrollTop = targetScrollTop
+          isAnimatingRef.current = false
+          scrollAnimationRef.current = null
+          velocityRef.current = 0
+        }
+      }
+
+      scrollAnimationRef.current = requestAnimationFrame(animateScroll)
+    }, [])
+
+    useLayoutEffect(() => {
+      scrollToBottom()
+    }, [lines, scrollToBottom])
+
+    const handleScroll = useCallback(() => {
+      if (!terminalRef.current) return
+
+      const element = terminalRef.current
+      const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 50
+
+      setUserScrolledUp(!isAtBottom)
+    }, [])
+
+    const handleSubmit = useCallback(async () => {
+      if (!currentInput.trim() || isProcessing) return
+
+      setUserScrolledUp(false)
+
+      const input = currentInput.trim()
+      setCurrentInput("")
+      setIsProcessing(true)
+
+      addLine(`${prompt} ${input}`, "input")
+
+      setCommandHistory((prev) => {
+        const newHistory = [...prev, input]
+        return newHistory.slice(-100)
+      })
+      setHistoryIndex(-1)
+
+      await processCommand(input)
+      setIsProcessing(false)
+    }, [currentInput, isProcessing, prompt, addLine, processCommand])
+
+    useEffect(() => {
+      return () => {
+        if (scrollAnimationRef.current) {
+          cancelAnimationFrame(scrollAnimationRef.current)
+        }
+        if (pendingScrollRef.current) {
+          clearTimeout(pendingScrollRef.current)
+        }
+      }
+    }, [])
+
     return (
       <OpenTUIContext.Provider value={opentuiContext}>
         <div
@@ -584,8 +779,19 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
             getVariantStyles(),
             className,
           )}
-          onClick={() => {
-            if (inputRef.current && !isProcessing) {
+          onClick={(e) => {
+            const target = e.target as HTMLElement
+            const isFormInput =
+              target.tagName === "INPUT" ||
+              target.tagName === "TEXTAREA" ||
+              target.tagName === "SELECT" ||
+              target.closest("input, textarea, select")
+
+            if (isFormInput) {
+              return
+            }
+
+            if (inputRef.current && !isProcessing && opentuiState[0].mode === "command") {
               inputRef.current.focus()
             }
           }}
@@ -594,7 +800,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           {variant !== "minimal" && (
             <div className="flex items-center justify-between mb-2 pb-2 border-b border-green-400/20">
               <div className="text-green-400 text-xs font-semibold">
-                OpenTUI Terminal {opentuiState.mode !== "command" && `- ${opentuiState.mode.toUpperCase()} MODE`}
+                OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
               </div>
               <div className="text-green-400/60 text-xs">Ctrl+L to clear</div>
             </div>
@@ -602,13 +808,23 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
           <div
             ref={terminalRef}
-            className={cn(
-              "overflow-y-auto scrollbar-thin scrollbar-thumb-muted-foreground scrollbar-track-transparent",
-              getHeightClass(),
-            )}
+            className={cn("overflow-y-auto terminal-scrollbar", getHeightClass())}
+            onScroll={handleScroll}
             onClick={(e) => {
+              const target = e.target as HTMLElement
+              const isFormInput =
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.tagName === "SELECT" ||
+                target.closest("input, textarea, select")
+
+              if (isFormInput) {
+                e.stopPropagation()
+                return
+              }
+
               e.stopPropagation()
-              if (inputRef.current && !isProcessing) {
+              if (inputRef.current && !isProcessing && opentuiState[0].mode === "command") {
                 inputRef.current.focus()
               }
             }}
@@ -659,8 +875,8 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   placeholder={
                     isProcessing
                       ? "Processing..."
-                      : opentuiState.mode !== "command"
-                        ? `${opentuiState.mode.toUpperCase()} mode - ESC to exit`
+                      : opentuiState[0].mode !== "command"
+                        ? `${opentuiState[0].mode.toUpperCase()} mode - ESC to exit`
                         : "Type a command..."
                   }
                 />
@@ -680,6 +896,28 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
             @keyframes blink {
               0%, 50% { opacity: 1; }
               51%, 100% { opacity: 0; }
+            }
+
+            .terminal-scrollbar {
+              scrollbar-width: thin;
+              scrollbar-color: green-400/50 transparent;
+            }
+
+            .terminal-scrollbar::-webkit-scrollbar {
+              width: 0.5em;
+            }
+
+            .terminal-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+
+            .terminal-scrollbar::-webkit-scrollbar-thumb {
+              background-color: green-400/50;
+              border-radius: 0.25em;
+            }
+
+            .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: green-400;
             }
           `}</style>
         </div>
