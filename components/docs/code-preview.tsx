@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Terminal } from "@/components/ui/terminal"
-import { Copy, Code, Eye } from "lucide-react"
+import { Copy, Code, Eye, Check } from "lucide-react"
 import { toast } from "sonner"
+import { SyntaxHighlighter } from "./syntax-highlighter"
 
 interface CodePreviewProps {
   title: string
@@ -17,6 +18,7 @@ interface CodePreviewProps {
   preview?: React.ReactNode
   language?: string
   showLineNumbers?: boolean
+  highlightLines?: number[]
 }
 
 export function CodePreview({
@@ -26,59 +28,73 @@ export function CodePreview({
   preview,
   language = "tsx",
   showLineNumbers = true,
+  highlightLines = [],
 }: CodePreviewProps) {
   const [activeTab, setActiveTab] = useState(preview ? "preview" : "code")
+  const [copied, setCopied] = useState(false)
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(code)
+      setCopied(true)
       toast.success("Code copied to clipboard!")
+      setTimeout(() => setCopied(false), 2000)
     } catch (err) {
       toast.error("Failed to copy code")
     }
   }
 
-  const formatCode = (code: string) => {
-    if (!code) return null
-    return code.split("\n").map((line, index) => (
-      <div key={index} className="flex">
-        {showLineNumbers && (
-          <span className="text-muted-foreground text-xs mr-4 select-none w-8 text-right">{index + 1}</span>
-        )}
-        <span className="flex-1">{line}</span>
-      </div>
-    ))
-  }
-
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden border-emerald-500/20 bg-black/40">
+      <CardHeader className="border-b border-emerald-500/10 pb-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <Code className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Code className="h-5 w-5 text-emerald-400" />
               {title}
             </CardTitle>
             <CardDescription>{description}</CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary">{language}</Badge>
-            <Button variant="outline" size="sm" onClick={copyToClipboard}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy
+            <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+              {language}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyToClipboard}
+              className="border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400 bg-transparent"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy
+                </>
+              )}
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {preview && (
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="preview" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-2 rounded-none border-b border-emerald-500/10 bg-transparent h-auto p-0">
+              <TabsTrigger
+                value="preview"
+                className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:text-emerald-400 py-3"
+              >
                 <Eye className="h-4 w-4" />
                 Preview
               </TabsTrigger>
-              <TabsTrigger value="code" className="flex items-center gap-2">
+              <TabsTrigger
+                value="code"
+                className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:bg-transparent data-[state=active]:text-emerald-400 py-3"
+              >
                 <Code className="h-4 w-4" />
                 Code
               </TabsTrigger>
@@ -86,16 +102,19 @@ export function CodePreview({
           )}
 
           {preview && (
-            <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-lg p-4 bg-background">{preview}</div>
+            <TabsContent value="preview" className="mt-0 p-4">
+              <div className="rounded-lg border border-emerald-500/10 bg-background/50 p-4">{preview}</div>
             </TabsContent>
           )}
 
-          <TabsContent value="code" className="mt-4">
-            <div className="bg-muted rounded-lg p-4 overflow-x-auto">
-              <pre className="text-sm font-mono">
-                <code className="language-tsx">{formatCode(code)}</code>
-              </pre>
+          <TabsContent value="code" className="mt-0">
+            <div className="bg-black/60 p-4 overflow-x-auto max-h-[500px] overflow-y-auto terminal-scrollbar">
+              <SyntaxHighlighter
+                code={code}
+                language={language}
+                showLineNumbers={showLineNumbers}
+                highlightLines={highlightLines}
+              />
             </div>
           </TabsContent>
         </Tabs>
@@ -266,13 +285,9 @@ const customCommands: TerminalCommand[] = [
             name: "help",
             description: "Show available commands",
             handler: () => "Available commands: greet [name], help",
-          }
+          },
         ]}
-        welcomeMessage={[
-          "Try these commands:",
-          "greet - Greet with optional name",
-          "help - Show available commands"
-        ]}
+        welcomeMessage={["Try these commands:", "greet - Greet with optional name", "help - Show available commands"]}
         className="h-48"
       />
     ),
