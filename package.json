@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "lint": "next lint",
+    "build": "bun --bun next build",
+    "dev": "bun --bun next dev",
+    "lint": "bun --bun  next lint",
     "registry:build": "bun scripts/build-registry.mjs",
-    "start": "next start"
+    "start": "bun --bun next start"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "latest",
