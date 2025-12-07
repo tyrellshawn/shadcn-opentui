@@ -139,7 +139,7 @@ export function SyntaxHighlighter({
           {tokens.map((line, lineIndex) => {
             const lineNumber = lineIndex + startingLineNumber
             const isHighlighted = highlightLines.includes(lineNumber)
-            const lineProps = getLineProps({ line, key: lineIndex })
+            const { key: _lineKey, ...lineProps } = getLineProps({ line })
 
             return (
               <div
@@ -158,9 +158,10 @@ export function SyntaxHighlighter({
                   </span>
                 )}
                 <span className="flex-1">
-                  {line.map((token, tokenIndex) => (
-                    <span key={tokenIndex} {...getTokenProps({ token, key: tokenIndex })} />
-                  ))}
+                  {line.map((token, tokenIndex) => {
+                    const { key: _tokenKey, ...tokenProps } = getTokenProps({ token })
+                    return <span key={tokenIndex} {...tokenProps} />
+                  })}
                 </span>
               </div>
             )
