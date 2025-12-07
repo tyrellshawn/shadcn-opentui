@@ -62,47 +62,52 @@ export default function InstallationPage() {
         </CardContent>
       </Card>
 
-      {/* Package Installation */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold">Installation</h2>
+       {/* Registry Setup */}
+       <div className="space-y-6">
+         <h2 className="text-2xl font-bold">Registry Setup</h2>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Using shadcn CLI (Recommended)
-            </CardTitle>
-            <CardDescription>Install the terminal component using the shadcn CLI</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal</code>
-            </div>
-          </CardContent>
-        </Card>
+         <Card>
+           <CardHeader>
+             <CardTitle className="flex items-center gap-2">
+               <Package className="h-5 w-5" />
+               Add Registry to components.json
+             </CardTitle>
+             <CardDescription>Configure your project to use the OpenTUI registry</CardDescription>
+           </CardHeader>
+           <CardContent>
+             <p className="text-sm text-muted-foreground mb-4">
+               Add the registry URL to your components.json file:
+             </p>
+             <div className="bg-muted rounded-lg p-4">
+               <code className="text-sm">
+{`"registries": [
+  "https://opentui.vercel.app/registry/index.json"
+]`}
+               </code>
+             </div>
+           </CardContent>
+         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
-              Manual Installation
-            </CardTitle>
-            <CardDescription>Copy the component files manually if needed</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              If you prefer to install manually, copy the terminal component from our GitHub repository to your
-              components/ui directory.
-            </p>
-            <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm">
-                {`# Copy the terminal component
-curl -o components/ui/terminal.tsx https://opentui.vercel.app/api/registry/terminal/raw`}
-              </code>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+         <Card>
+           <CardHeader>
+             <CardTitle className="flex items-center gap-2">
+               <Download className="h-5 w-5" />
+               Install Components
+             </CardTitle>
+             <CardDescription>Add terminal components to your project</CardDescription>
+           </CardHeader>
+           <CardContent className="space-y-4">
+             <p className="text-sm text-muted-foreground">
+               Use the shadcn CLI to install components from the registry:
+             </p>
+             <div className="bg-muted rounded-lg p-4 space-y-2">
+               <code className="text-sm block">npx shadcn@latest add terminal</code>
+               <code className="text-sm block">npx shadcn@latest add terminal-controls</code>
+               <code className="text-sm block">npx shadcn@latest add terminal-slider</code>
+             </div>
+           </CardContent>
+         </Card>
+       </div>
 
       {/* Verification */}
       <Card>
