@@ -363,7 +363,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const addLine = useCallback(
       (content: string, type: TerminalLine["type"] = "output") => {
         const newLine: TerminalLine = {
-          id: `line-${lineIdCounter.current++}`,
+          id: `line-${lineIdCounter.current++}-${Date.now()}`,
           type,
           content,
           timestamp: new Date(),
