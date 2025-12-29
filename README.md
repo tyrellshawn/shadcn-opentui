@@ -39,28 +39,28 @@ A powerful, interactive terminal component for React applications built with sha
 
 Add the OpenTUI registry to your `components.json`:
 
-\`\`\`json
+```json
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "registries": [
     "https://opentui.vercel.app/registry/index.json"
   ]
 }
-\`\`\`
+```
 
 ### Installation
 
 Install components using the shadcn CLI:
 
-\`\`\`bash
+```bash
 npx shadcn@latest add terminal
 npx shadcn@latest add terminal-controls
 npx shadcn@latest add terminal-slider
-\`\`\`
+```
 
 ### Basic Usage
 
-\`\`\`tsx
+```tsx
 import { Terminal } from "@/components/ui/terminal"
 
 export default function App() {
@@ -74,11 +74,11 @@ export default function App() {
     />
   )
 }
-\`\`\`
+```
 
 ### Advanced Usage with Custom Commands
 
-\`\`\`tsx
+```tsx
 import { Terminal } from "@/components/ui/terminal"
 
 const customCommands = {
@@ -101,7 +101,7 @@ export default function App() {
     />
   )
 }
-\`\`\`
+```
 
 ## 📚 Documentation
 
@@ -142,20 +142,20 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Setup
 
 1. Clone the repository:
-\`\`\`bash
+```bash
 git clone https://github.com/tyrellshawn/shadcn-opentui.git
 cd shadcn-opentui
-\`\`\`
+```
 
 2. Install dependencies:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 3. Start the development server:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 

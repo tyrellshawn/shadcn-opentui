@@ -4,6 +4,8 @@ import React, { useState, useRef, useCallback, useContext, createContext, useEff
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
 
+// Import the terminal styles: import "@/components/ui/terminal.css"
+
 interface TerminalLine {
   id: string
   type: "input" | "output" | "error" | "success"
@@ -318,6 +320,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const [historyIndex, setHistoryIndex] = useState(-1)
     const [cursorPosition, setCursorPosition] = useState(0)
     const [userScrolledUp, setUserScrolledUp] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
 
     const inputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
@@ -330,6 +335,114 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const velocityRef = useRef<number>(0)
     const isAnimatingRef = useRef<boolean>(false)
     const targetScrollRef = useRef<number>(0)
+    const touchStartYRef = useRef<number>(0)
+    const lastTouchYRef = useRef<number>(0)
+
+    useEffect(() => {
+      const checkMobile = () => {
+        const isMobileDevice =
+          /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+          (window.innerWidth <= 768 && "ontouchstart" in window)
+        setIsMobile(isMobileDevice)
+      }
+
+      checkMobile()
+      window.addEventListener("resize", checkMobile)
+      return () => window.removeEventListener("resize", checkMobile)
+    }, [])
+
+    useEffect(() => {
+      if (!isMobile) return
+
+      const handleResize = () => {
+        const windowHeight = window.innerHeight
+        const visualViewportHeight = window.visualViewport?.height || windowHeight
+        const heightDiff = windowHeight - visualViewportHeight
+
+        setKeyboardHeight(heightDiff)
+        setIsKeyboardVisible(heightDiff > 100)
+
+        // Auto-scroll when keyboard appears
+        if (heightDiff > 100 && autoScroll) {
+          setTimeout(() => {
+            terminalRef.current?.scrollTo({
+              top: terminalRef.current.scrollHeight,
+              behavior: "smooth",
+            })
+          }, 100)
+        }
+      }
+
+      window.visualViewport?.addEventListener("resize", handleResize)
+      window.addEventListener("resize", handleResize)
+
+      return () => {
+        window.visualViewport?.removeEventListener("resize", handleResize)
+        window.removeEventListener("resize", handleResize)
+      }
+    }, [isMobile, autoScroll])
+
+    const handleTouchStart = useCallback(
+      (e: React.TouchEvent) => {
+        if (!isMobile) return
+        touchStartYRef.current = e.touches[0].clientY
+        lastTouchYRef.current = e.touches[0].clientY
+      },
+      [isMobile],
+    )
+
+    const handleTouchMove = useCallback(
+      (e: React.TouchEvent) => {
+        if (!isMobile || !terminalRef.current) return
+
+        const currentY = e.touches[0].clientY
+        const deltaY = lastTouchYRef.current - currentY
+
+        // User is scrolling up
+        if (deltaY > 5) {
+          setUserScrolledUp(true)
+        }
+
+        // Check if scrolled to bottom
+        const element = terminalRef.current
+        const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 10
+
+        if (isAtBottom && deltaY < 0) {
+          setUserScrolledUp(false)
+        }
+
+        lastTouchYRef.current = currentY
+      },
+      [isMobile],
+    )
+
+    const handleTouchEnd = useCallback(() => {
+      if (!isMobile || !terminalRef.current) return
+
+      // Check if at bottom after touch ends
+      const element = terminalRef.current
+      const isAtBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 10
+
+      if (isAtBottom) {
+        setUserScrolledUp(false)
+      }
+    }, [isMobile])
+
+    const handleTerminalClick = useCallback(() => {
+      if (inputRef.current) {
+        inputRef.current.focus()
+
+        // On mobile, ensure input is visible when keyboard appears
+        if (isMobile) {
+          setTimeout(() => {
+            inputRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "end",
+            })
+          }, 300)
+        }
+      }
+    }, [isMobile])
 
     const opentuiState = useState<TerminalState>({
       mode: "command",
@@ -572,13 +685,17 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     }
 
     const getHeightClass = () => {
+      if (isMobile && isKeyboardVisible) {
+        return "" // Let dynamic style handle it
+      }
+
       switch (variant) {
         case "compact":
           return "h-64"
         case "minimal":
           return "h-48"
         default:
-          return "h-96"
+          return isMobile ? "h-[100dvh]" : "h-96"
       }
     }
 
@@ -775,151 +892,146 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         <div
           ref={ref}
           className={cn(
-            "bg-black text-green-400 font-mono rounded-lg border border-border overflow-hidden",
+            "bg-black text-green-400 font-mono rounded-lg border border-green-400/20 overflow-hidden flex flex-col",
             getVariantStyles(),
+            getHeightClass(),
             className,
           )}
-          onClick={(e) => {
-            const target = e.target as HTMLElement
-            const isFormInput =
-              target.tagName === "INPUT" ||
-              target.tagName === "TEXTAREA" ||
-              target.tagName === "SELECT" ||
-              target.closest("input, textarea, select")
-
-            if (isFormInput) {
-              return
-            }
-
-            if (inputRef.current && !isProcessing && opentuiState[0].mode === "command") {
-              inputRef.current.focus()
-            }
-          }}
+          style={
+            isMobile && isKeyboardVisible
+              ? {
+                  height: `calc(100dvh - ${keyboardHeight}px)`,
+                  maxHeight: `calc(100dvh - ${keyboardHeight}px)`,
+                }
+              : undefined
+          }
+          onClick={handleTerminalClick}
           {...props}
         >
-          {variant !== "minimal" && (
-            <div className="flex items-center justify-between mb-2 pb-2 border-b border-green-400/20">
-              <div className="text-green-400 text-xs font-semibold">
-                OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
-              </div>
-              <div className="text-green-400/60 text-xs">Ctrl+L to clear</div>
+          {isMobile && (
+            <div className="bg-green-400/10 px-3 py-1 text-xs text-green-400 border-b border-green-400/20 flex items-center justify-between">
+              <span>Mobile Terminal Mode</span>
+              {isKeyboardVisible && <span className="text-green-400/60">Keyboard Active</span>}
             </div>
           )}
 
           <div
             ref={terminalRef}
-            className={cn("overflow-y-auto terminal-scrollbar", getHeightClass())}
+            className={cn(
+              "flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-green-400/20 scrollbar-track-transparent",
+              isMobile && "overscroll-contain touch-pan-y",
+            )}
             onScroll={handleScroll}
-            onClick={(e) => {
-              const target = e.target as HTMLElement
-              const isFormInput =
-                target.tagName === "INPUT" ||
-                target.tagName === "TEXTAREA" ||
-                target.tagName === "SELECT" ||
-                target.closest("input, textarea, select")
-
-              if (isFormInput) {
-                e.stopPropagation()
-                return
-              }
-
-              e.stopPropagation()
-              if (inputRef.current && !isProcessing && opentuiState[0].mode === "command") {
-                inputRef.current.focus()
-              }
-            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {lines.map((line) => (
-              <div
-                key={line.id}
-                className={cn(
-                  "whitespace-pre-wrap break-words leading-relaxed mb-1",
-                  line.type === "input" && "text-white font-semibold",
-                  line.type === "error" && "text-red-400",
-                  line.type === "success" && "text-emerald-400",
-                  line.type === "output" && "text-green-400",
-                )}
-              >
-                {line.content}
-              </div>
-            ))}
+            <div className="space-y-1">
+              {lines.map((line) => (
+                <div
+                  key={line.id}
+                  className={cn(
+                    "whitespace-pre-wrap break-words",
+                    isMobile ? "text-base leading-relaxed" : "text-sm",
+                    line.type === "input" && "text-green-300",
+                    line.type === "output" && "text-green-400/90",
+                    line.type === "error" && "text-red-400",
+                    line.type === "success" && "text-green-400",
+                  )}
+                >
+                  {line.content}
+                </div>
+              ))}
+            </div>
 
             {renderUIComponent()}
 
-            <div className="flex items-center text-white mt-1 relative">
-              <span className="text-green-400 mr-2 font-bold shrink-0">{prompt}</span>
-              <div className="flex-1 relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={currentInput}
-                  onChange={(e) => {
-                    setCurrentInput(e.target.value)
-                    setCursorPosition(e.target.selectionStart || 0)
-                  }}
-                  onKeyDown={handleKeyDown}
-                  onSelect={() => {
-                    if (inputRef.current) {
-                      setCursorPosition(inputRef.current.selectionStart || 0)
-                    }
-                  }}
-                  onClick={() => {
-                    if (inputRef.current) {
-                      setCursorPosition(inputRef.current.selectionStart || 0)
-                    }
-                  }}
-                  disabled={isProcessing}
-                  className="w-full bg-transparent border-none outline-none text-white font-mono caret-transparent"
-                  autoComplete="off"
-                  spellCheck={false}
-                  placeholder={
-                    isProcessing
-                      ? "Processing..."
-                      : opentuiState[0].mode !== "command"
-                        ? `${opentuiState[0].mode.toUpperCase()} mode - ESC to exit`
-                        : "Type a command..."
-                  }
-                />
-                <div
-                  className="absolute top-0 w-2 h-5 bg-green-400 pointer-events-none"
-                  style={{
-                    left: `${cursorPosition * 0.6}em`,
-                    animation: "blink 1s infinite",
-                  }}
-                />
-              </div>
-              {isProcessing && <span className="ml-2 text-yellow-400 animate-pulse">⚡</span>}
+            {isProcessing && (
+              <div className={cn("text-green-400/60 animate-pulse", isMobile && "text-base")}>Processing...</div>
+            )}
+          </div>
+
+          <div
+            className={cn(
+              "flex items-center gap-2 border-t border-green-400/20 pt-2 mt-2 flex-shrink-0",
+              isMobile && "gap-3 pt-3",
+            )}
+          >
+            <span className={cn("text-green-400 flex-shrink-0 select-none", isMobile && "text-lg")}>{prompt}</span>
+            <div className="relative flex-1">
+              <input
+                ref={inputRef}
+                type="text"
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isProcessing}
+                className={cn(
+                  "w-full bg-transparent text-green-400 outline-none font-mono caret-green-400",
+                  isProcessing && "opacity-50",
+                  isMobile && "text-base min-h-[44px]",
+                )}
+                autoCapitalize="off"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck="false"
+                enterKeyHint="send"
+                inputMode="text"
+                placeholder={isMobile ? "Tap to enter command..." : ""}
+              />
             </div>
           </div>
 
-          <style jsx>{`
-            @keyframes blink {
-              0%, 50% { opacity: 1; }
-              51%, 100% { opacity: 0; }
-            }
-
-            .terminal-scrollbar {
-              scrollbar-width: thin;
-              scrollbar-color: green-400/50 transparent;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar {
-              width: 0.5em;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-track {
-              background: transparent;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-thumb {
-              background-color: green-400/50;
-              border-radius: 0.25em;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-              background-color: green-400;
-            }
-          `}</style>
+          {isMobile && (
+            <div className="flex gap-2 pt-2 border-t border-green-400/20 flex-wrap">
+              <button
+                onClick={() => {
+                  handleCommand("help")
+                }}
+                className="px-3 py-1 text-xs bg-green-400/10 text-green-400 rounded border border-green-400/20 active:bg-green-400/20"
+              >
+                help
+              </button>
+              <button
+                onClick={() => {
+                  handleCommand("clear")
+                }}
+                className="px-3 py-1 text-xs bg-green-400/10 text-green-400 rounded border border-green-400/20 active:bg-green-400/20"
+              >
+                clear
+              </button>
+              <button
+                onClick={() => {
+                  if (commandHistory.length > 0) {
+                    setCurrentInput(commandHistory[commandHistory.length - 1])
+                    inputRef.current?.focus()
+                  }
+                }}
+                className="px-3 py-1 text-xs bg-green-400/10 text-green-400 rounded border border-green-400/20 active:bg-green-400/20"
+              >
+                ↑ Last
+              </button>
+              <button
+                onClick={() => {
+                  if (!userScrolledUp) return
+                  terminalRef.current?.scrollTo({
+                    top: terminalRef.current.scrollHeight,
+                    behavior: "smooth",
+                  })
+                  setUserScrolledUp(false)
+                }}
+                className={cn(
+                  "px-3 py-1 text-xs rounded border",
+                  userScrolledUp
+                    ? "bg-green-400/10 text-green-400 border-green-400/20 active:bg-green-400/20"
+                    : "bg-green-400/5 text-green-400/30 border-green-400/10",
+                )}
+                disabled={!userScrolledUp}
+              >
+                ↓ Bottom
+              </button>
+            </div>
+          )}
         </div>
       </OpenTUIContext.Provider>
     )
@@ -928,5 +1040,4 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
 Terminal.displayName = "Terminal"
 
-export { Terminal }
-export type { TerminalProps, TerminalLine, TerminalCommand, OpenTUIContext }
+export { Terminal, type TerminalProps, type TerminalLine, type TerminalCommand }
