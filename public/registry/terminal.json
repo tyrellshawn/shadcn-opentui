@@ -8,13 +8,39 @@
   "files": [
     {
       "path": "components/ui/terminal.tsx",
-      "content": "\"use client\"\n\nimport React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect } from \"react\"\nimport { cn } from \"@/lib/utils\"\nimport { CommandHandler } from \"@/lib/types\" // Declare or import CommandHandler\n\ninterface TerminalLine {\n  id: string\n  type: \"input\" | \"output\" | \"error\" | \"success\"\n  content: string\n  timestamp: Date\n}\n\ninterface TerminalCommand {\n  name: string\n  description: string\n  handler: (args: string[], context?: any) => Promise<void> | void\n  category?: \"system\" | \"ui\" | \"data\" | \"custom\"\n  requiresUI?: boolean\n}\n\ninterface TerminalProps extends React.HTMLAttributes<HTMLDivElement> {\n  prompt?: string\n  welcomeMessage?: string[]\n  commands?: Record<string, CommandHandler>\n  onCommand?: (command: string, args: string[]) => Promise<void> | void\n  maxLines?: number\n  showTimestamp?: boolean\n  variant?: \"default\" | \"compact\" | \"minimal\"\n  autoScroll?: boolean\n  smoothScroll?: boolean\n}\n\ninterface TerminalUIComponent {\n  id: string\n  type: \"form\" | \"menu\" | \"slider\" | \"progress\" | \"table\" | \"chart\"\n  props: Record<string, any>\n  active: boolean\n}\n\ninterface TerminalState {\n  mode: \"command\" | \"ui\" | \"form\"\n  activeComponent?: TerminalUIComponent\n  formData: Record<string, any>\n  menuSelection: number\n}\n\ninterface OpenTUIContext {\n  state: TerminalState\n  setState: React.Dispatch<React.SetStateAction<TerminalState>>\n  addUIComponent: (component: TerminalUIComponent) => void\n  removeUIComponent: (id: string) => void\n  updateFormData: (key: string, value: any) => void\n}\n\nconst OpenTUIContext = createContext<OpenTUIContext | null>(null)\n\nexport const useOpenTUI = () => {\n  const context = useContext(OpenTUIContext)\n  if (!context) {\n    throw new Error(\"useOpenTUI must be used within a TerminalProvider\")\n  }\n  return context\n}\n\nexport const TerminalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {\n  const [state, setState] = useState<TerminalState>({ mode: \"command\", formData: {}, menuSelection: 0 })\n\n  const addUIComponent = useCallback((component: TerminalUIComponent) => {\n    setState(prevState => ({ ...prevState, activeComponent: component }))\n  }, [])\n\n  const removeUIComponent = useCallback((id: string) => {\n    setState(prevState => ({ ...prevState, activeComponent: undefined }))\n  }, [])\n\n  const updateFormData = useCallback((key: string, value: any) => {\n    setState(prevState => ({ ...prevState, formData: { ...prevState.formData, [key]: value } }))\n  }, [])\n\n  return (\n    <OpenTUIContext.Provider value={{ state, setState, addUIComponent, removeUIComponent, updateFormData }}>\n      {children}\n    </OpenTUIContext.Provider>\n  )\n}\n\nexport const Terminal: React.FC<TerminalProps> = ({ prompt = \"$ \", welcomeMessage, commands, onCommand, maxLines = 100, showTimestamp = false, variant = \"default\", autoScroll = true, smoothScroll = false, ...props }) => {\n  const [lines, setLines] = useState<TerminalLine[]>([])\n  const [input, setInput] = useState<string>(\"\")\n  const [history, setHistory] = useState<string[]>([])\n  const [historyIndex, setHistoryIndex] = useState<number>(-1)\n  const terminalRef = useRef<HTMLDivElement | null>(null)\n\n  const executeCommand = useCallback(async (command: string, args: string[]) => {\n    if (commands && commands[command]) {\n      await commands[command].handler(args)\n    } else if (onCommand) {\n      await onCommand(command, args)\n    } else {\n      setLines(prevLines => [...prevLines, { id: Date.now().toString(), type: \"error\", content: `Unknown command: ${command}`, timestamp: new Date() }])\n    }\n  }, [commands, onCommand])\n\n  const handleInput = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {\n    if (e.key === \"Enter\") {\n      const command = input.trim()\n      if (command) {\n        setHistory(prevHistory => [...prevHistory, command])\n        setHistoryIndex(-1)\n        setLines(prevLines => [...prevLines, { id: Date.now().toString(), type: \"input\", content: command, timestamp: new Date() }])\n        executeCommand(command.split(\" \")[0], command.split(\" \").slice(1))\n      }\n      setInput(\"\")\n    } else if (e.key === \"ArrowUp\") {\n      setHistoryIndex(prevIndex => Math.max(prevIndex - 1, -1))\n      setInput(history[historyIndex - 1] || \"\")\n    } else if (e.key === \"ArrowDown\") {\n      setHistoryIndex(prevIndex => Math.min(prevIndex + 1, history.length - 1))\n      setInput(history[historyIndex + 1] || \"\")\n    }\n  }, [input, history, executeCommand])\n\n  useLayoutEffect(() => {\n    if (terminalRef.current && autoScroll) {\n      terminalRef.current.scrollTop = terminalRef.current.scrollHeight\n    }\n  }, [lines, autoScroll])\n\n  return (\n    <div className={cn(\"flex flex-col\", props.className)} ref={terminalRef}>\n      {welcomeMessage && welcomeMessage.map((message, index) => (\n        <div key={index} className=\"text-sm text-gray-500\">\n          {message}\n        </div>\n      ))}\n      {lines.map(line => (\n        <div key={line.id} className={cn(\"text-sm\", { \"text-green-500\": line.type === \"success\", \"text-red-500\": line.type === \"error\", \"text-gray-300\": line.type === \"input\" })}>\n          {showTimestamp && <span className=\"text-gray-500 mr-2\">{line.timestamp.toLocaleTimeString()}</span>}\n          {line.content}\n        </div>\n      ))}\n      <input\n        type=\"text\"\n        value={input}\n        onChange={e => setInput(e.target.value)}\n        onKeyDown={handleInput}\n        className={cn(\"bg-black text-white p-2 rounded\", { \"border-b-2 border-green-500\": variant === \"default\", \"border-b-2 border-gray-500\": variant === \"compact\", \"border-b-2 border-white\": variant === \"minimal\" })}\n      />\n    </div>\n  )\n}\n",
       "type": "registry:ui"
     },
     {
       "path": "lib/types.ts",
-      "content": "export interface CommandHandler {\n  name: string\n  description: string\n  handler: (args: string[], context?: any) => Promise<void> | void\n  category?: \"system\" | \"ui\" | \"data\" | \"custom\"\n  requiresUI?: boolean\n}\n",
       "type": "registry:lib"
+    },
+    {
+      "path": "components/ui/terminal.css",
+      "type": "registry:ui"
     }
-  ]
+  ],
+  "tailwind": {
+    "config": {
+      "theme": {
+        "extend": {
+          "colors": {
+            "terminal": {
+              "bg": "rgb(0, 0, 0)",
+              "text": "rgb(74, 222, 128)",
+              "border": "rgba(74, 222, 128, 0.2)",
+              "input": "rgb(187, 247, 208)",
+              "error": "rgb(248, 113, 113)",
+              "success": "rgb(74, 222, 128)",
+              "output": "rgba(74, 222, 128, 0.9)"
+            }
+          }
+        }
+      }
+    }
+  },
+  "meta": {
+    "importStatement": "import { Terminal } from \"@/components/ui/terminal\"",
+    "cssImport": "import \"@/components/ui/terminal.css\""
+  },
+  "docs": "https://opentui.vercel.app/docs/components/terminal"
 }

@@ -14,18 +14,18 @@ Thank you for your interest in contributing to the Shadcn OpenTUI Terminal Compo
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
-   \`\`\`bash
+   ```bash
    git clone https://github.com/YOUR_USERNAME/shadcn-opentui.git
    cd shadcn-opentui
-   \`\`\`
+   ```
 3. **Install dependencies**:
-   \`\`\`bash
+   ```bash
    npm install
-   \`\`\`
+   ```
 4. **Start the development server**:
-   \`\`\`bash
+   ```bash
    npm run dev
-   \`\`\`
+   ```
 5. **Open** [http://localhost:3000](http://localhost:3000) to see the app
 
 ## 🎯 How to Contribute
@@ -59,9 +59,9 @@ We welcome feature suggestions! Please:
 #### Development Workflow
 
 1. **Create a branch** for your feature/fix:
-   \`\`\`bash
+   ```bash
    git checkout -b feature/your-feature-name
-   \`\`\`
+   ```
 
 2. **Make your changes** following our coding standards:
    - Use TypeScript for type safety
@@ -70,20 +70,20 @@ We welcome feature suggestions! Please:
    - Ensure responsive design works on all screen sizes
 
 3. **Test your changes**:
-   \`\`\`bash
+   ```bash
    npm run build
    npm run lint
-   \`\`\`
+   ```
 
 4. **Commit your changes** with a clear message:
-   \`\`\`bash
+   ```bash
    git commit -m "feat: add new terminal command for file operations"
-   \`\`\`
+   ```
 
 5. **Push to your fork**:
-   \`\`\`bash
+   ```bash
    git push origin feature/your-feature-name
-   \`\`\`
+   ```
 
 6. **Create a Pull Request** with:
    - Clear title and description
@@ -102,7 +102,7 @@ We welcome feature suggestions! Please:
 
 ### File Structure
 
-\`\`\`
+```
 components/
 ├── ui/                 # Core UI components
 │   ├── terminal.tsx    # Main terminal component
@@ -116,7 +116,7 @@ app/
 │   ├── examples/      # Interactive examples
 │   └── opentui/       # OpenTUI integration docs
 └── api/               # API routes (registry, etc.)
-\`\`\`
+```
 
 ### Component Guidelines
 
