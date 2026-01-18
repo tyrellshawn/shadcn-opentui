@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Code, Play, User, Menu, Palette, Monitor, Database, Settings, Activity } from "lucide-react"
+import { CodeBlock } from "@/components/docs/code-block"
 
 // Login Form Example Component
 export function LoginFormExample() {
@@ -946,9 +947,8 @@ export function InteractiveExamples() {
           <CardDescription>View the source code for these interactive examples</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="bg-muted rounded-lg p-4">
-            <code className="text-sm">
-              {`// Example: Custom Terminal Commands
+          <CodeBlock
+            code={`// Example: Custom Terminal Commands
 const customCommands: TerminalCommand[] = [
   {
     name: "greet",
@@ -964,8 +964,10 @@ const customCommands: TerminalCommand[] = [
   commands={customCommands}
   welcomeMessage={["Welcome to my terminal!"]}
 />`}
-            </code>
-          </div>
+            language="tsx"
+            title="Custom Terminal Commands"
+            maxHeight="400px"
+          />
         </CardContent>
       </Card>
     </div>
