@@ -3,7 +3,11 @@
   "type": "registry:ui",
   "title": "Terminal Controls",
   "description": "Window control buttons (close, minimize, maximize) for the terminal.",
-  "dependencies": [],
+  "dependencies": [
+    "class-variance-authority",
+    "tailwind-merge",
+    "clsx"
+  ],
   "registryDependencies": [
     "terminal"
   ],

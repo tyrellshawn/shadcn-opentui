@@ -3,7 +3,11 @@
   "type": "registry:ui",
   "title": "Terminal Slider",
   "description": "An ASCII slider component for terminal interfaces.",
-  "dependencies": [],
+  "dependencies": [
+    "@radix-ui/react-slider",
+    "tailwind-merge",
+    "clsx"
+  ],
   "registryDependencies": [
     "terminal"
   ],

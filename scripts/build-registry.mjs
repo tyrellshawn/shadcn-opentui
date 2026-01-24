@@ -24,16 +24,52 @@ const COMPONENTS = [
     type: 'registry:ui',
     title: 'Terminal',
     description: 'A fully featured terminal emulator component with command history, autocomplete, and theming.',
-    dependencies: ['lucide-react'],
-    files: ['components/ui/terminal.tsx'],
+    dependencies: ['lucide-react', 'tailwind-merge', 'clsx', 'tailwindcss-animate', 'tailwindcss'],
     registryDependencies: [],
+    tailwind: {
+      config: {
+        theme: {
+          extend: {
+            keyframes: {
+              'terminal-blink': {
+                '0%, 50%': { opacity: '1' },
+                '51%, 100%': { opacity: '0' },
+              },
+            },
+            animation: {
+              'terminal-blink': 'terminal-blink 1s infinite',
+            },
+          },
+        },
+      },
+    },
+    css: {
+      ".terminal-scrollbar::-webkit-scrollbar": {
+        "width": "6px"
+      },
+      ".terminal-scrollbar::-webkit-scrollbar-track": {
+        "background": "transparent"
+      },
+      ".terminal-scrollbar::-webkit-scrollbar-thumb": {
+        "background": "rgba(74, 222, 128, 0.3)",
+        "border-radius": "3px"
+      },
+      ".terminal-scrollbar::-webkit-scrollbar-thumb:hover": {
+        "background": "rgba(74, 222, 128, 0.5)"
+      },
+      ".terminal-scrollbar": {
+        "scrollbar-width": "thin",
+        "scrollbar-color": "rgba(74, 222, 128, 0.3) transparent"
+      }
+    },
+    files: ['components/ui/terminal.tsx'],
   },
   {
     name: 'terminal-controls',
     type: 'registry:ui',
     title: 'Terminal Controls',
     description: 'Window control buttons (close, minimize, maximize) for the terminal.',
-    dependencies: [],
+    dependencies: ['class-variance-authority', 'tailwind-merge', 'clsx'],
     files: ['components/ui/terminal-controls.tsx'],
     registryDependencies: ['terminal'],
   },
@@ -42,7 +78,7 @@ const COMPONENTS = [
     type: 'registry:ui',
     title: 'Terminal Slider',
     description: 'An ASCII slider component for terminal interfaces.',
-    dependencies: [],
+    dependencies: ['@radix-ui/react-slider', 'tailwind-merge', 'clsx'],
     files: ['components/ui/terminal-slider.tsx'],
     registryDependencies: ['terminal'],
   },
@@ -79,6 +115,8 @@ function generateRegistryItem(component) {
     description: component.description,
     dependencies: component.dependencies,
     registryDependencies: component.registryDependencies,
+    tailwind: component.tailwind,
+    css: component.css,
     files,
   }
 }

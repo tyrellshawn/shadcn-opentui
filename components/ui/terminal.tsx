@@ -881,45 +881,15 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   }
                 />
                 <div
-                  className="absolute top-0 w-2 h-5 bg-green-400 pointer-events-none"
+                  className="absolute top-0 w-2 h-5 bg-green-400 pointer-events-none animate-terminal-blink"
                   style={{
                     left: `${cursorPosition * 0.6}em`,
-                    animation: "blink 1s infinite",
                   }}
                 />
               </div>
               {isProcessing && <span className="ml-2 text-yellow-400 animate-pulse">⚡</span>}
             </div>
           </div>
-
-          <style jsx>{`
-            @keyframes blink {
-              0%, 50% { opacity: 1; }
-              51%, 100% { opacity: 0; }
-            }
-
-            .terminal-scrollbar {
-              scrollbar-width: thin;
-              scrollbar-color: green-400/50 transparent;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar {
-              width: 0.5em;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-track {
-              background: transparent;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-thumb {
-              background-color: green-400/50;
-              border-radius: 0.25em;
-            }
-
-            .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-              background-color: green-400;
-            }
-          `}</style>
         </div>
       </OpenTUIContext.Provider>
     )
