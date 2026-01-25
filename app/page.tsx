@@ -409,25 +409,12 @@ export default function Home() {
               <div className="pt-4 fade-in-up-delay-3">
                 <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-black/60 border border-primary/30 font-mono text-sm backdrop-blur-sm">
                   <span className="text-primary">$</span>
-                  <span className="text-foreground">npx shadcn@latest add terminal</span>
-                  <CopyButton text="npx shadcn@latest add terminal" />
+                  <span className="text-foreground"> bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json</span>
+                  <CopyButton text="bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json" />
                 </div>
+
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="py-16 px-6 border-y border-primary/10 bg-black/40 backdrop-blur-sm">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
-                Quick Setup with @shadcn-opentui Registry
-              </h2>
-              <p className="text-muted-foreground">
-                Initialize your project with the OpenTUI registry for seamless integration
-              </p>
-            </div>
-            <RegistrySetupBlock />
           </div>
         </section>
 

@@ -8,106 +8,75 @@ export default function InstallationPage() {
     <div className="space-y-8">
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Installation</h1>
-        <p className="text-xl text-muted-foreground">
-          Get started with the shadcn terminal component by installing it in your project using the shadcn CLI.
-        </p>
-      </div>
-
-      {/* Prerequisites */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
-            Prerequisites
-          </CardTitle>
-          <CardDescription>Requirements for using the shadcn terminal component</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="font-semibold">Next.js Project</h4>
-              <p className="text-sm text-muted-foreground">
-                A Next.js project with shadcn/ui already set up. The terminal component integrates with your existing
-                shadcn components.
-              </p>
-              <div className="flex gap-2">
-                <Badge variant="outline">Next.js 16+</Badge>
-                <Badge variant="outline">shadcn/ui</Badge>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-semibold">React Knowledge</h4>
-              <p className="text-sm text-muted-foreground">
-                Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
-              </p>
-              <div className="flex gap-2">
-                <Badge variant="outline">React 19+</Badge>
-                <Badge variant="outline">TypeScript</Badge>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-primary/50 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="text-lg">Version Consistency</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            For the best experience, we recommend using <strong>Next.js 16</strong> with <strong>React 19</strong> (the
-            latest stable versions). This ensures full compatibility with all terminal component features including
-            server components, streaming, and modern React patterns.
+          <p className="text-xl text-muted-foreground">
+            Get started with the shadcn terminal component using a single command.
           </p>
-        </CardContent>
-      </Card>
+        </div>
 
-       {/* Registry Setup */}
-       <div className="space-y-6">
-         <h2 className="text-2xl font-bold">Registry Setup</h2>
+        {/* Prerequisites */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              Installation
+            </CardTitle>
+            <CardDescription>Install the terminal component in one simple step</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-muted rounded-lg p-4">
+              <code className="text-sm block">bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json</code>
+            </div>
+          </CardContent>
+        </Card>
 
-         <Card>
-           <CardHeader>
-             <CardTitle className="flex items-center gap-2">
-               <Package className="h-5 w-5" />
-               Add Registry to components.json
-             </CardTitle>
-             <CardDescription>Configure your project to use the OpenTUI registry</CardDescription>
-           </CardHeader>
-           <CardContent>
-             <p className="text-sm text-muted-foreground mb-4">
-               Add the registry URL to your components.json file:
-             </p>
-             <div className="bg-muted rounded-lg p-4">
-               <code className="text-sm">
-{`"registries": [
-  "https://opentui.vercel.app/registry/index.json"
-]`}
-               </code>
-             </div>
-           </CardContent>
-         </Card>
+        {/* Prerequisites */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              Prerequisites
+            </CardTitle>
+            <CardDescription>Requirements for using the shadcn terminal component</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold">Next.js Project</h4>
+                <p className="text-sm text-muted-foreground">
+                  A Next.js project with shadcn/ui already set up. The terminal component integrates with your existing
+                  shadcn components.
+                </p>
+                <div className="flex gap-2">
+                  <Badge variant="outline">Next.js 16+</Badge>
+                  <Badge variant="outline">shadcn/ui</Badge>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h4 className="font-semibold">React Knowledge</h4>
+                <p className="text-sm text-muted-foreground">
+                  Familiarity with React hooks, components, and TypeScript will help you customize the terminal component.
+                </p>
+                <div className="flex gap-2">
+                  <Badge variant="outline">React 19+</Badge>
+                  <Badge variant="outline">TypeScript</Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-         <Card>
-           <CardHeader>
-             <CardTitle className="flex items-center gap-2">
-               <Download className="h-5 w-5" />
-               Install Components
-             </CardTitle>
-             <CardDescription>Add terminal components to your project</CardDescription>
-           </CardHeader>
-           <CardContent className="space-y-4">
-             <p className="text-sm text-muted-foreground">
-               Use the shadcn CLI to install components from the registry:
-             </p>
-             <div className="bg-muted rounded-lg p-4 space-y-2">
-               <code className="text-sm block">npx shadcn@latest add terminal</code>
-               <code className="text-sm block">npx shadcn@latest add terminal-controls</code>
-               <code className="text-sm block">npx shadcn@latest add terminal-slider</code>
-             </div>
-           </CardContent>
-         </Card>
-       </div>
+        <Card className="border-primary/50 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="text-lg">Version Consistency</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              For the best experience, we recommend using <strong>Next.js 16</strong> with <strong>React 19</strong> (the
+              latest stable versions). This ensures full compatibility with all terminal component features including
+              server components, streaming, and modern React patterns.
+            </p>
+          </CardContent>
+        </Card>
 
       {/* Verification */}
       <Card>
