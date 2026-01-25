@@ -23,6 +23,7 @@ import {
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 
 function TypewriterText({ text, delay = 50 }: { text: string; delay?: number }) {
   const [displayText, setDisplayText] = useState("")
@@ -310,17 +311,23 @@ export default function Home() {
       {/* Content overlay */}
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-primary/10 bg-black/60 backdrop-blur-xl">
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <TerminalIcon className="w-4 h-4 text-primary" />
               </div>
-              <span className="font-semibold text-lg text-primary">OpenTUI</span>
+              <span className="font-semibold text-lg text-foreground">OpenTUI</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Docs
+              </Link>
+              <Link
+                href="/themes"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Themes
               </Link>
               <Link
                 href="/docs/components/terminal"
@@ -336,6 +343,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeSwitcher />
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
                 <Link href="https://github.com/sst/opentui" target="_blank">
                   <Github className="w-4 h-4" />
@@ -343,7 +351,7 @@ export default function Home() {
               </Button>
               <Button
                 size="sm"
-                className="bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 animate-pulse-glow"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
                 asChild
               >
                 <Link href="/docs">
@@ -362,18 +370,18 @@ export default function Home() {
               {/* Glowing OpenTUI Title */}
               <div className="fade-in-up">
                 <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4 font-mono">
-                  <span className="text-primary glow-text-strong">OpenTUI</span>
+                  <span className="text-primary">OpenTUI</span>
                 </h1>
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-black/40 text-sm">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border bg-card text-sm">
                   <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-primary/80">Built with shadcn/ui</span>
+                  <span className="text-muted-foreground">Built with shadcn/ui</span>
                 </div>
               </div>
 
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight fade-in-up-delay-1 text-balance">
                 <span className="text-foreground">The terminal component</span>
                 <br />
-                <span className="text-primary glow-text">for modern apps</span>
+                <span className="text-primary">for modern apps</span>
               </h2>
 
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto fade-in-up-delay-2 text-balance leading-relaxed">
@@ -405,9 +413,9 @@ export default function Home() {
                 </Button>
               </div>
 
-              {/* Install command with glow */}
+              {/* Install command */}
               <div className="pt-4 fade-in-up-delay-3">
-                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-black/60 border border-primary/30 font-mono text-sm backdrop-blur-sm">
+                <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-muted border border-border font-mono text-sm">
                   <span className="text-primary">$</span>
                   <span className="text-foreground">npx shadcn@latest add https://opentui.vercel.app/r/terminal.json</span>
                   <CopyButton text="npx shadcn@latest add https://opentui.vercel.app/r/terminal.json" />
