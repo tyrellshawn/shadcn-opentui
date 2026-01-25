@@ -260,7 +260,7 @@ export default function Home() {
 
   const demoScript1 = [
     {
-      command: "bunx shadcn@latest add terminal",
+      command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
       output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
       delay: 2000,
     },
@@ -409,11 +409,13 @@ export default function Home() {
               <div className="pt-4 fade-in-up-delay-3">
                 <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-black/60 border border-primary/30 font-mono text-sm backdrop-blur-sm">
                   <span className="text-primary">$</span>
-                  <span className="text-foreground"> bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json</span>
-                  <CopyButton text="bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json" />
+                  <span className="text-foreground">npx shadcn@latest add https://opentui.vercel.app/r/terminal.json</span>
+                  <CopyButton text="npx shadcn@latest add https://opentui.vercel.app/r/terminal.json" />
                 </div>
-
-              </div>
+                <div className="mt-2 text-xs text-muted-foreground text-center">
+                  Compatible with npm, yarn, pnpm, and bun
+                </div>
+               </div>
             </div>
           </div>
         </section>
@@ -429,7 +431,15 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-              <OpenTUITerminalDemo title="Installation" script={demoScript1} />
+              <OpenTUITerminalDemo title="Installation" script={[{
+                command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
+                output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+                delay: 2000,
+              }, {
+                command: "npm run dev",
+                output: ["Starting development server...", "✓ Ready on localhost:3000"],
+                delay: 2500,
+              }]} />
               <OpenTUITerminalDemo title="UI Components" script={demoScript2} />
               <OpenTUITerminalDemo title="Built-in Commands" script={demoScript3} />
             </div>
