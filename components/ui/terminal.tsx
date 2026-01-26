@@ -45,13 +45,16 @@ interface TerminalState {
   menuSelection: number
 }
 
-interface OpenTUIContext {
-  state: TerminalState
-  setState: React.Dispatch<React.SetStateAction<TerminalState>>
-  addUIComponent: (component: TerminalUIComponent) => void
-  removeUIComponent: (id: string) => void
-  updateFormData: (key: string, value: any) => void
-}
+  interface OpenTUIContext {
+    state: TerminalState
+    setState: React.Dispatch<React.SetStateAction<TerminalState>>
+    addUIComponent: (component: TerminalUIComponent) => void
+    removeUIComponent: (id: string) => void
+    updateFormData: (key: string, value: any) => void
+    addLine: (content: string, type?: TerminalLine["type"]) => void
+    clearLines: () => void
+    updateLastLine: (content: string, type?: TerminalLine["type"]) => void
+  }
 
 const OpenTUIContext = createContext<OpenTUIContext | null>(null)
 
@@ -66,6 +69,7 @@ export const useOpenTUI = () => {
 const createBuiltInCommands = (
   addLine: (content: string, type?: TerminalLine["type"]) => void,
   clearLines: () => void,
+  updateLastLine: (content: string, type?: TerminalLine["type"]) => void,
   commandHistory: string[],
   opentuiContext?: OpenTUIContext,
 ): TerminalCommand[] => [
@@ -341,29 +345,6 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       menuSelection: 0,
     })
 
-    const opentuiContext: OpenTUIContext = {
-      state: opentuiState[0],
-      setState: opentuiState[1],
-      addUIComponent: (component) => {
-        opentuiState[1]((prev) => ({
-          ...prev,
-          activeComponent: component,
-        }))
-      },
-      removeUIComponent: (id) => {
-        opentuiState[1]((prev) => ({
-          ...prev,
-          activeComponent: prev.activeComponent?.id === id ? undefined : prev.activeComponent,
-        }))
-      },
-      updateFormData: (key, value) => {
-        opentuiState[1]((prev) => ({
-          ...prev,
-          formData: { ...prev.formData, [key]: value },
-        }))
-      },
-    }
-
     const addLine = useCallback(
       (content: string, type: TerminalLine["type"] = "output") => {
         const newLine: TerminalLine = {
@@ -403,7 +384,33 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       setLines([])
     }, [])
 
-    const builtInCommands = createBuiltInCommands(addLine, clearLines, commandHistory, opentuiContext)
+    const opentuiContext: OpenTUIContext = {
+      state: opentuiState[0],
+      setState: opentuiState[1],
+      addUIComponent: (component) => {
+        opentuiState[1]((prev) => ({
+          ...prev,
+          activeComponent: component,
+        }))
+      },
+      removeUIComponent: (id) => {
+        opentuiState[1]((prev) => ({
+          ...prev,
+          activeComponent: prev.activeComponent?.id === id ? undefined : prev.activeComponent,
+        }))
+      },
+      updateFormData: (key, value) => {
+        opentuiState[1]((prev) => ({
+          ...prev,
+          formData: { ...prev.formData, [key]: value },
+        }))
+      },
+      addLine,
+      clearLines,
+      updateLastLine,
+    }
+
+    const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext)
     const allCommands = [...builtInCommands, ...Object.values(commands)]
 
     const processCommand = useCallback(
