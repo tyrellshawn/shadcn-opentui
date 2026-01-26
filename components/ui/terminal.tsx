@@ -345,6 +345,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       menuSelection: 0,
     })
 
+    const [currentFormFieldIndex, setCurrentFormFieldIndex] = useState(0)
+    const formInputRefs = useRef<(HTMLInputElement | null)[]>([])
+
     const addLine = useCallback(
       (content: string, type: TerminalLine["type"] = "output") => {
         const newLine: TerminalLine = {
@@ -495,7 +498,8 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
       if (e.key === "Escape" && opentuiState[0].mode !== "command") {
         e.preventDefault()
-        opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
+        opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined, formData: {} }))
+        setCurrentFormFieldIndex(0)
         addLine("Exited UI mode", "success")
         return
       }
@@ -544,6 +548,72 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       }
     }
 
+    const handleFormKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, fieldIndex: number) => {
+      const fields = opentuiState[0].activeComponent?.props.fields || []
+      
+      if (e.key === "Enter") {
+        e.preventDefault()
+        
+        // Collect all form data
+        const formData: Record<string, string> = {}
+        formInputRefs.current.forEach((input, idx) => {
+          if (input) {
+            formData[fields[idx]] = input.value
+          }
+        })
+        
+        // Display form submission
+        addLine("Form submitted:", "success")
+        Object.entries(formData).forEach(([key, value]) => {
+          addLine(`  ${key}: ${value}`)
+        })
+        
+        // Reset form and return to command mode
+        opentuiState[1]((prev) => ({ 
+          ...prev, 
+          mode: "command", 
+          activeComponent: undefined,
+          formData: {} 
+        }))
+        setCurrentFormFieldIndex(0)
+        formInputRefs.current = []
+        
+        // Focus back on command input
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 0)
+        
+        return
+      }
+      
+      if (e.key === "Tab") {
+        e.preventDefault()
+        const nextIndex = e.shiftKey 
+          ? Math.max(0, fieldIndex - 1)
+          : Math.min(fields.length - 1, fieldIndex + 1)
+        setCurrentFormFieldIndex(nextIndex)
+        formInputRefs.current[nextIndex]?.focus()
+        return
+      }
+      
+      if (e.key === "Escape") {
+        e.preventDefault()
+        opentuiState[1]((prev) => ({ 
+          ...prev, 
+          mode: "command", 
+          activeComponent: undefined,
+          formData: {} 
+        }))
+        setCurrentFormFieldIndex(0)
+        formInputRefs.current = []
+        addLine("Form cancelled", "error")
+        setTimeout(() => {
+          inputRef.current?.focus()
+        }, 0)
+        return
+      }
+    }
+
     const renderUIComponent = () => {
       if (!opentuiState[0].activeComponent) return null
 
@@ -571,14 +641,22 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         case "form":
           return (
             <div className="border border-green-400/20 rounded p-2 mb-2 bg-black/50">
-              <div className="text-green-400 text-xs mb-2">FORM (TAB to navigate, ENTER to submit)</div>
+              <div className="text-green-400 text-xs mb-2">FORM (TAB to navigate, ENTER to submit, ESC to cancel)</div>
               {props.fields?.map((field: string, index: number) => (
                 <div key={index} className="mb-2">
                   <label className="text-green-400 text-sm block mb-1">{field}:</label>
                   <input
+                    ref={(el) => {
+                      formInputRefs.current[index] = el
+                      if (index === 0 && el && opentuiState[0].mode === "form") {
+                        setTimeout(() => el.focus(), 50)
+                      }
+                    }}
                     type="text"
                     className="w-full bg-transparent border border-green-400/20 rounded px-2 py-1 text-green-400 font-mono text-sm focus:border-green-400 outline-none"
                     placeholder={`Enter ${field}`}
+                    onKeyDown={(e) => handleFormKeyDown(e, index)}
+                    defaultValue={opentuiState[0].formData[field] || ""}
                   />
                 </div>
               ))}

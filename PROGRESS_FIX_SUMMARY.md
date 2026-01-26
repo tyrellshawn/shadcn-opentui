@@ -4,7 +4,7 @@
 The progress bar component was creating multiple lines during updates, causing visual clutter and layout shifts. Each progress update would add a new line instead of updating the existing progress bar in place.
 
 **Before:**
-```
+\`\`\`
 demo@opentui:~$ progress 10
 Starting progress...
 Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
@@ -12,14 +12,14 @@ Progress: [█░░░░░░░░░░░░░░░░░░░] 5%
 Progress: [██░░░░░░░░░░░░░░░░░░] 10%
 Progress: [███░░░░░░░░░░░░░░░░░] 15%
 ...
-```
+\`\`\`
 
 **After:**
-```
+\`\`\`
 demo@opentui:~$ progress 10
 Starting progress...
 Progress: [██████████████░░░░░░] 70%
-```
+\`\`\`
 
 ## Solution Implemented
 
@@ -28,7 +28,7 @@ Progress: [██████████████░░░░░░] 70%
 
 Added a new callback function that updates the content of the last terminal line instead of creating a new one:
 
-```typescript
+\`\`\`typescript
 const updateLastLine = useCallback(
   (content: string, type?: TerminalLine["type"]) => {
     setLines((prev) => {
@@ -46,7 +46,7 @@ const updateLastLine = useCallback(
   },
   [],
 )
-```
+\`\`\`
 
 ### 2. Fixed Progress Command (Terminal Component)
 **File:** `/components/ui/terminal.tsx`
@@ -69,7 +69,7 @@ Updated the progress command handler to follow the same pattern:
 
 Added CSS rules to prevent progress lines from wrapping:
 
-```css
+\`\`\`css
 .terminal-line {
   white-space: pre-wrap;
   word-break: break-word;
@@ -81,7 +81,7 @@ Added CSS rules to prevent progress lines from wrapping:
   text-overflow: clip;
   font-variant-numeric: tabular-nums;
 }
-```
+\`\`\`
 
 ### 5. Enhanced Line Rendering
 **File:** `/components/ui/terminal.tsx`
@@ -117,7 +117,7 @@ Updated the CI workflow to automatically rebuild the shadcn registry on every me
 
 To test the progress bar:
 
-```bash
+\`\`\`bash
 # Test with default 3 second duration
 progress
 
@@ -126,7 +126,7 @@ progress 5000
 
 # Test with short duration
 progress 1000
-```
+\`\`\`
 
 The progress bar should now stay on a single line and smoothly update from 0% to 100% without creating multiple lines.
 
