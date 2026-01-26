@@ -22,7 +22,7 @@
     "clsx": "^2.1.1",
     "cmdk": "latest",
     "lucide-react": "^0.454.0",
-    "next": "15.2.8",
+    "next": "15.2.6",
     "next-themes": "latest",
     "prism-react-renderer": "latest",
     "react": "19.0.0",
@@ -40,6 +40,5 @@
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
-  },
-  "packageManager": "bun@1.2.16"
+  }
 }

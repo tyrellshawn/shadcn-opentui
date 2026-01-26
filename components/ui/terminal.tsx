@@ -3,7 +3,6 @@
 import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect } from "react"
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
-import { useTerminalTheme } from "@/lib/opentui/themes"
 
 interface TerminalLine {
   id: string
@@ -220,6 +219,37 @@ const createBuiltInCommands = (
     },
   },
   {
+    name: "progress",
+    description: "Show a progress bar",
+    category: "ui",
+    handler: async (args) => {
+      const duration = Number.parseInt(args[0]) || 3000
+      const steps = 20
+      const stepDuration = duration / steps
+
+      addLine("Starting progress...")
+
+      // Add the initial progress line
+      addLine(`Progress: [░░░░░░░░░░░░░░░░░░░░] 0%`)
+
+      for (let i = 1; i <= steps; i++) {
+        const percent = Math.round((i / steps) * 100)
+        const filled = "█".repeat(i)
+        const empty = "░".repeat(steps - i)
+        const bar = `[${filled}${empty}] ${percent}%`
+
+        // Always update the last line - never add a new one
+        updateLastLine(`Progress: ${bar}`)
+
+        if (i < steps) {
+          await new Promise((resolve) => setTimeout(resolve, stepDuration))
+        }
+      }
+
+      addLine("Progress complete!", "success")
+    },
+  },
+  {
     name: "ascii",
     description: "Generate ASCII art",
     category: "ui",
@@ -281,8 +311,6 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     },
     ref,
   ) => {
-    const { theme } = useTerminalTheme()
-    
     const [lines, setLines] = useState<TerminalLine[]>(() =>
       welcomeMessage.map((msg, i) => ({
         id: `welcome-${i}`,
@@ -521,64 +549,41 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
       const { type, props } = opentuiState[0].activeComponent
 
-    switch (type) {
-      case "menu":
-        return (
-          <div 
-            className="border rounded p-2 mb-2"
-            style={{ 
-              borderColor: `${theme.colors.border}33`,
-              backgroundColor: `${theme.colors.backgroundElement}80`
-            }}
-          >
-            <div className="text-xs mb-2" style={{ color: theme.colors.primary }}>
-              MENU (Use ↑↓ arrows, ENTER to select)
+      switch (type) {
+        case "menu":
+          return (
+            <div className="border border-green-400/20 rounded p-2 mb-2 bg-black/50">
+              <div className="text-green-400 text-xs mb-2">MENU (Use ↑↓ arrows, ENTER to select)</div>
+              {props.items?.map((item: string, index: number) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "px-2 py-1 font-mono text-sm",
+                    index === opentuiState[0].menuSelection ? "bg-green-400 text-black" : "text-green-400",
+                  )}
+                >
+                  {index === opentuiState[0].menuSelection ? "► " : "  "}
+                  {item}
+                </div>
+              ))}
             </div>
-            {props.items?.map((item: string, index: number) => (
-              <div
-                key={index}
-                className="px-2 py-1 font-mono text-sm"
-                style={{
-                  backgroundColor: index === opentuiState[0].menuSelection ? theme.colors.primary : 'transparent',
-                  color: index === opentuiState[0].menuSelection ? theme.colors.background : theme.colors.text,
-                }}
-              >
-                {index === opentuiState[0].menuSelection ? "► " : "  "}
-                {item}
-              </div>
-            ))}
-          </div>
-        )
-      case "form":
-        return (
-          <div 
-            className="border rounded p-2 mb-2"
-            style={{ 
-              borderColor: `${theme.colors.border}33`,
-              backgroundColor: `${theme.colors.backgroundElement}80`
-            }}
-          >
-            <div className="text-xs mb-2" style={{ color: theme.colors.primary }}>
-              FORM (TAB to navigate, ENTER to submit)
+          )
+        case "form":
+          return (
+            <div className="border border-green-400/20 rounded p-2 mb-2 bg-black/50">
+              <div className="text-green-400 text-xs mb-2">FORM (TAB to navigate, ENTER to submit)</div>
+              {props.fields?.map((field: string, index: number) => (
+                <div key={index} className="mb-2">
+                  <label className="text-green-400 text-sm block mb-1">{field}:</label>
+                  <input
+                    type="text"
+                    className="w-full bg-transparent border border-green-400/20 rounded px-2 py-1 text-green-400 font-mono text-sm focus:border-green-400 outline-none"
+                    placeholder={`Enter ${field}`}
+                  />
+                </div>
+              ))}
             </div>
-            {props.fields?.map((field: string, index: number) => (
-              <div key={index} className="mb-2">
-                <label className="text-sm block mb-1" style={{ color: theme.colors.text }}>
-                  {field}:
-                </label>
-                <input
-                  type="text"
-                  className="w-full bg-transparent border rounded px-2 py-1 font-mono text-sm outline-none"
-                  style={{ 
-                    borderColor: `${theme.colors.border}33`,
-                    color: theme.colors.text,
-                  }}
-                  placeholder={`Enter ${field}`}
-                />
-              </div>
-            ))}
-          </div>
-        )
+          )
         default:
           return null
       }
@@ -796,20 +801,15 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
     return (
       <OpenTUIContext.Provider value={opentuiContext}>
-      <div
-        ref={ref}
-        style={{
-          backgroundColor: theme.colors.background,
-          color: theme.colors.text,
-          borderColor: theme.colors.border,
-        }}
-        className={cn(
-          "font-mono rounded-lg border overflow-hidden",
-          getVariantStyles(),
-          className,
-        )}
-        onClick={(e) => {
-          const target = e.target as HTMLElement
+        <div
+          ref={ref}
+          className={cn(
+            "bg-black text-green-400 font-mono rounded-lg border border-border overflow-hidden",
+            getVariantStyles(),
+            className,
+          )}
+          onClick={(e) => {
+            const target = e.target as HTMLElement
             const isFormInput =
               target.tagName === "INPUT" ||
               target.tagName === "TEXTAREA" ||
@@ -826,17 +826,14 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           }}
           {...props}
         >
-      {variant !== "minimal" && (
-        <div 
-          className="flex items-center justify-between mb-2 pb-2 border-b"
-          style={{ borderColor: `${theme.colors.border}33` }}
-        >
-          <div className="text-xs font-semibold" style={{ color: theme.colors.primary }}>
-            OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
-          </div>
-          <div className="text-xs" style={{ color: theme.colors.textMuted }}>Ctrl+L to clear</div>
-        </div>
-      )}
+          {variant !== "minimal" && (
+            <div className="flex items-center justify-between mb-2 pb-2 border-b border-green-400/20">
+              <div className="text-green-400 text-xs font-semibold">
+                OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
+              </div>
+              <div className="text-green-400/60 text-xs">Ctrl+L to clear</div>
+            </div>
+          )}
 
           <div
             ref={terminalRef}
@@ -861,35 +858,30 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
               }
             }}
           >
-        {lines.map((line) => {
-          const isProgressLine = line.content.includes("Progress:") && line.content.includes("[")
-          
-          let lineColor = theme.colors.text
-          if (line.type === "input") lineColor = theme.colors.textInverse
-          if (line.type === "error") lineColor = theme.colors.error
-          if (line.type === "success") lineColor = theme.colors.success
-          if (line.type === "output") lineColor = theme.colors.text
-          
-          return (
-            <div
-              key={line.id}
-              data-contains-progress={isProgressLine}
-              style={{ color: lineColor }}
-              className={cn(
-                "terminal-line leading-relaxed mb-1",
-                isProgressLine && "font-variant-numeric-tabular",
-                line.type === "input" && "font-semibold",
-              )}
-            >
-              {line.content}
-            </div>
-          )
-        })}
+            {lines.map((line) => {
+              const isProgressLine = line.content.includes("Progress:") && line.content.includes("[")
+              return (
+                <div
+                  key={line.id}
+                  data-contains-progress={isProgressLine}
+                  className={cn(
+                    "terminal-line leading-relaxed mb-1",
+                    isProgressLine && "font-variant-numeric-tabular",
+                    line.type === "input" && "text-white font-semibold",
+                    line.type === "error" && "text-red-400",
+                    line.type === "success" && "text-emerald-400",
+                    line.type === "output" && "text-green-400",
+                  )}
+                >
+                  {line.content}
+                </div>
+              )
+            })}
 
             {renderUIComponent()}
 
-        <div className="flex items-center mt-1 relative" style={{ color: theme.colors.text }}>
-          <span className="mr-2 font-bold shrink-0" style={{ color: theme.colors.promptSymbol }}>{prompt}</span>
+            <div className="flex items-center text-white mt-1 relative">
+              <span className="text-green-400 mr-2 font-bold shrink-0">{prompt}</span>
               <div className="flex-1 relative">
                 <input
                   ref={inputRef}
