@@ -45,13 +45,16 @@ interface TerminalState {
   menuSelection: number
 }
 
-interface OpenTUIContext {
-  state: TerminalState
-  setState: React.Dispatch<React.SetStateAction<TerminalState>>
-  addUIComponent: (component: TerminalUIComponent) => void
-  removeUIComponent: (id: string) => void
-  updateFormData: (key: string, value: any) => void
-}
+  interface OpenTUIContext {
+    state: TerminalState
+    setState: React.Dispatch<React.SetStateAction<TerminalState>>
+    addUIComponent: (component: TerminalUIComponent) => void
+    removeUIComponent: (id: string) => void
+    updateFormData: (key: string, value: any) => void
+    addLine: (content: string, type?: TerminalLine["type"]) => void
+    clearLines: () => void
+    updateLastLine: (content: string, type?: TerminalLine["type"]) => void
+  }
 
 const OpenTUIContext = createContext<OpenTUIContext | null>(null)
 
@@ -66,6 +69,7 @@ export const useOpenTUI = () => {
 const createBuiltInCommands = (
   addLine: (content: string, type?: TerminalLine["type"]) => void,
   clearLines: () => void,
+  updateLastLine: (content: string, type?: TerminalLine["type"]) => void,
   commandHistory: string[],
   opentuiContext?: OpenTUIContext,
 ): TerminalCommand[] => [
@@ -223,15 +227,19 @@ const createBuiltInCommands = (
       const steps = 20
       const stepDuration = duration / steps
 
-      addLine("Starting progress...", "success")
+      addLine("Starting progress...")
 
-      for (let i = 0; i <= steps; i++) {
+      // Add the initial progress line
+      addLine(`Progress: [░░░░░░░░░░░░░░░░░░░░] 0%`)
+
+      for (let i = 1; i <= steps; i++) {
         const percent = Math.round((i / steps) * 100)
         const filled = "█".repeat(i)
         const empty = "░".repeat(steps - i)
         const bar = `[${filled}${empty}] ${percent}%`
 
-        addLine(`Progress: ${bar}`, "output")
+        // Always update the last line - never add a new one
+        updateLastLine(`Progress: ${bar}`)
 
         if (i < steps) {
           await new Promise((resolve) => setTimeout(resolve, stepDuration))
@@ -337,6 +345,45 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       menuSelection: 0,
     })
 
+    const addLine = useCallback(
+      (content: string, type: TerminalLine["type"] = "output") => {
+        const newLine: TerminalLine = {
+          id: `line-${lineIdCounter.current++}`,
+          type,
+          content,
+          timestamp: new Date(),
+        }
+
+        setLines((prev) => {
+          const newLines = [...prev, newLine]
+          return newLines.length > maxLines ? newLines.slice(-maxLines) : newLines
+        })
+      },
+      [maxLines],
+    )
+
+    const updateLastLine = useCallback(
+      (content: string, type?: TerminalLine["type"]) => {
+        setLines((prev) => {
+          if (prev.length === 0) return prev
+          const newLines = [...prev]
+          const lastLine = newLines[newLines.length - 1]
+          newLines[newLines.length - 1] = {
+            ...lastLine,
+            content,
+            type: type || lastLine.type,
+            timestamp: new Date(),
+          }
+          return newLines
+        })
+      },
+      [],
+    )
+
+    const clearLines = useCallback(() => {
+      setLines([])
+    }, [])
+
     const opentuiContext: OpenTUIContext = {
       state: opentuiState[0],
       setState: opentuiState[1],
@@ -358,30 +405,12 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           formData: { ...prev.formData, [key]: value },
         }))
       },
+      addLine,
+      clearLines,
+      updateLastLine,
     }
 
-    const addLine = useCallback(
-      (content: string, type: TerminalLine["type"] = "output") => {
-        const newLine: TerminalLine = {
-          id: `line-${lineIdCounter.current++}`,
-          type,
-          content,
-          timestamp: new Date(),
-        }
-
-        setLines((prev) => {
-          const newLines = [...prev, newLine]
-          return newLines.length > maxLines ? newLines.slice(-maxLines) : newLines
-        })
-      },
-      [maxLines],
-    )
-
-    const clearLines = useCallback(() => {
-      setLines([])
-    }, [])
-
-    const builtInCommands = createBuiltInCommands(addLine, clearLines, commandHistory, opentuiContext)
+    const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext)
     const allCommands = [...builtInCommands, ...Object.values(commands)]
 
     const processCommand = useCallback(
@@ -829,20 +858,25 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
               }
             }}
           >
-            {lines.map((line) => (
-              <div
-                key={line.id}
-                className={cn(
-                  "whitespace-pre-wrap break-words leading-relaxed mb-1",
-                  line.type === "input" && "text-white font-semibold",
-                  line.type === "error" && "text-red-400",
-                  line.type === "success" && "text-emerald-400",
-                  line.type === "output" && "text-green-400",
-                )}
-              >
-                {line.content}
-              </div>
-            ))}
+            {lines.map((line) => {
+              const isProgressLine = line.content.includes("Progress:") && line.content.includes("[")
+              return (
+                <div
+                  key={line.id}
+                  data-contains-progress={isProgressLine}
+                  className={cn(
+                    "terminal-line leading-relaxed mb-1",
+                    isProgressLine && "font-variant-numeric-tabular",
+                    line.type === "input" && "text-white font-semibold",
+                    line.type === "error" && "text-red-400",
+                    line.type === "success" && "text-emerald-400",
+                    line.type === "output" && "text-green-400",
+                  )}
+                >
+                  {line.content}
+                </div>
+              )
+            })}
 
             {renderUIComponent()}
 
