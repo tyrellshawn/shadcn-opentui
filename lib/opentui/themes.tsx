@@ -527,7 +527,13 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 export function useTerminalTheme() {
   const context = useContext(ThemeContext)
   if (!context) {
-    throw new Error("useTerminalTheme must be used within a TerminalThemeProvider")
+    // Return default theme if no provider is present
+    return {
+      theme: matrixTheme,
+      setTheme: () => {},
+      themes: prebuiltThemes,
+      registerTheme: () => {},
+    }
   }
   return context
 }
