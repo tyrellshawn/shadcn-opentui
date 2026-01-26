@@ -162,19 +162,19 @@ export const createUICommands = (): TerminalCommand[] => [
       const steps = 20
       const stepDuration = duration / steps
 
-      context.addLine("Starting progress...", "success")
+      context.addLine("Starting progress...")
 
-      for (let i = 0; i <= steps; i++) {
+      // Add the initial progress line
+      context.addLine(`Progress: [░░░░░░░░░░░░░░░░░░░░] 0%`)
+
+      for (let i = 1; i <= steps; i++) {
         const percent = Math.round((i / steps) * 100)
         const filled = "█".repeat(i)
         const empty = "░".repeat(steps - i)
         const bar = `[${filled}${empty}] ${percent}%`
 
-        if (i === 0) {
-          context.addLine(`Progress: ${bar}`)
-        } else {
-          context.updateLastLine(`Progress: ${bar}`)
-        }
+        // Always update the last line - never add a new one
+        context.updateLastLine(`Progress: ${bar}`)
 
         if (i < steps) {
           await new Promise((resolve) => setTimeout(resolve, stepDuration))

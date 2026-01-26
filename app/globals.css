@@ -146,6 +146,19 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(74, 222, 128, 0.3) transparent;
   }
+
+  /* Progress bar line styling - prevent wrapping */
+  .terminal-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .terminal-line[data-contains-progress="true"] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /* Added animations and effects */
