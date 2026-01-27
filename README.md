@@ -49,8 +49,8 @@ export default function App() {
 \`\`\`bash
 git clone https://github.com/tyrellshawn/shadcn-opentui.git
 cd shadcn-opentui
-pnpm install
-pnpm dev
+bun install
+bun dev
 \`\`\`
 
 ## License
