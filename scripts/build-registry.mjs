@@ -84,6 +84,116 @@ const COMPONENTS = [
   },
 ]
 
+// Plugin components to include in the registry
+const PLUGINS = [
+  {
+    name: 'cli-plugin-types',
+    type: 'registry:lib',
+    title: 'CLI Plugin Types',
+    description: 'Type definitions for the CLI plugin framework supporting Ink v6.6.0+ and Pastel v4.0.0+.',
+    dependencies: [],
+    registryDependencies: [],
+    files: ['lib/opentui/plugins/cli/types.ts'],
+  },
+  {
+    name: 'cli-terminal-bridge',
+    type: 'registry:lib',
+    title: 'CLI Terminal Bridge',
+    description: 'Bridge between CLI apps and OpenTUI terminal I/O.',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types'],
+    files: ['lib/opentui/plugins/cli/cli-terminal-bridge.ts'],
+  },
+  {
+    name: 'cli-version-negotiator',
+    type: 'registry:lib',
+    title: 'CLI Version Negotiator',
+    description: 'Semver-based version compatibility and feature negotiation for CLI plugins.',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types'],
+    files: ['lib/opentui/plugins/cli/adapters/version-negotiator.ts'],
+  },
+  {
+    name: 'cli-base-adapter',
+    type: 'registry:lib',
+    title: 'CLI Base Adapter',
+    description: 'Abstract base class for CLI library adapters.',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types', 'cli-version-negotiator'],
+    files: ['lib/opentui/plugins/cli/adapters/base-adapter.ts'],
+  },
+  {
+    name: 'cli-ink-adapter',
+    type: 'registry:lib',
+    title: 'Ink v6 Adapter',
+    description: 'Adapter for Ink v6.6.0+ CLI components. Bridges Ink apps to OpenTUI terminal.',
+    dependencies: ['ink@^6.6.0'],
+    registryDependencies: ['cli-plugin-types', 'cli-base-adapter', 'cli-version-negotiator'],
+    files: ['lib/opentui/plugins/cli/adapters/ink-adapter.ts'],
+  },
+  {
+    name: 'cli-pastel-adapter',
+    type: 'registry:lib',
+    title: 'Pastel v4 Adapter',
+    description: 'Adapter for Pastel v4.0.0+ CLI components (future implementation).',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types', 'cli-base-adapter', 'cli-version-negotiator'],
+    files: ['lib/opentui/plugins/cli/adapters/pastel-adapter.ts'],
+  },
+  {
+    name: 'cli-adapters',
+    type: 'registry:lib',
+    title: 'CLI Adapters',
+    description: 'All CLI library adapters (Ink, Pastel) with version negotiation.',
+    dependencies: ['ink@^6.6.0'],
+    registryDependencies: ['cli-base-adapter', 'cli-ink-adapter', 'cli-pastel-adapter', 'cli-version-negotiator'],
+    files: ['lib/opentui/plugins/cli/adapters/index.ts'],
+  },
+  {
+    name: 'cli-app-registry',
+    type: 'registry:lib',
+    title: 'CLI App Registry',
+    description: 'Registry for managing CLI application registration and lookup.',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types'],
+    files: ['lib/opentui/plugins/cli/cli-app-registry.ts'],
+  },
+  {
+    name: 'cli-plugin-host',
+    type: 'registry:lib',
+    title: 'CLI Plugin Host',
+    description: 'Host for managing CLI app execution, lifecycle, and adapters.',
+    dependencies: ['ink@^6.6.0'],
+    registryDependencies: ['cli-plugin-types', 'cli-app-registry', 'cli-terminal-bridge', 'cli-ink-adapter'],
+    files: ['lib/opentui/plugins/cli/cli-plugin-host.ts'],
+  },
+  {
+    name: 'cli-app-builder',
+    type: 'registry:lib',
+    title: 'CLI App Builder',
+    description: 'Fluent API for creating CLI applications with type-safe configuration.',
+    dependencies: [],
+    registryDependencies: ['cli-plugin-types'],
+    files: ['lib/opentui/plugins/cli/create-cli-app.ts'],
+  },
+  {
+    name: 'cli-plugin',
+    type: 'registry:lib',
+    title: 'CLI Plugin Framework',
+    description: 'Complete CLI plugin framework for OpenTUI. Supports Ink v6.6.0+ and Pastel v4.0.0+ with version negotiation, app registry, and fluent builder API.',
+    dependencies: ['ink@^6.6.0'],
+    registryDependencies: [
+      'cli-plugin-types',
+      'cli-terminal-bridge', 
+      'cli-adapters',
+      'cli-app-registry',
+      'cli-plugin-host',
+      'cli-app-builder',
+    ],
+    files: ['lib/opentui/plugins/cli/index.ts'],
+  },
+]
+
 // Read file content and encode for registry
 function readComponentFile(filePath) {
   const fullPath = join(ROOT_DIR, filePath)
@@ -123,13 +233,15 @@ function generateRegistryItem(component) {
 
 // Generate the full registry
 function generateRegistry() {
+  const allItems = [...COMPONENTS, ...PLUGINS]
+  
   const registry = {
     $schema: 'https://ui.shadcn.com/schema/registry.json',
     name: REGISTRY_CONFIG.name,
     description: REGISTRY_CONFIG.description,
     homepage: REGISTRY_CONFIG.homepage,
     repository: REGISTRY_CONFIG.repository,
-    items: COMPONENTS.map(generateRegistryItem),
+    items: allItems.map(generateRegistryItem),
   }
 
   return registry
@@ -164,6 +276,7 @@ function build() {
   const manifest = {
     version: '1.0.0',
     components: COMPONENTS.map((c) => c.name),
+    plugins: PLUGINS.map((p) => p.name),
     generatedAt: new Date().toISOString(),
   }
   const manifestPath = join(outputDir, 'manifest.json')

@@ -6,6 +6,63 @@ export * from "./utils"
 export { createTablePlugin, tablePlugin } from "./table-plugin"
 export { createProgressPlugin, progressPlugin, progressManager, ProgressManager } from "./progress-plugin"
 
+// CLI Plugin Framework exports
+export {
+  // Main plugin creator
+  createCLIIntegrationPlugin,
+  
+  // App builder
+  createCLIApp,
+  createCommand,
+  
+  // Plugin host
+  createCLIPluginHost,
+  getCLIPluginHost,
+  registerCLIApp,
+  
+  // Registries
+  createCLIAppRegistry,
+  createCLIAdapterRegistry,
+  
+  // Terminal bridge
+  createCLITerminalBridge,
+  createExtendedCLITerminalBridge,
+  
+  // Adapters
+  InkAdapter,
+  createInkAdapter,
+  PastelAdapter,
+  createPastelAdapter,
+  
+  // Version utilities
+  versionNegotiator,
+  parseVersion,
+  compareVersions,
+  satisfiesRange,
+} from "./cli"
+
+export type {
+  // Core types
+  CLILibrary,
+  VersionRange,
+  CLIAppManifest,
+  CLIAppCapabilities,
+  CLIAppDefinition,
+  CLIAppContext,
+  CLITerminalBridge,
+  CLICommand,
+  CLIAppInstance,
+  CLIPluginHost,
+  CLIAppBuilder,
+  CommandBuilder,
+  
+  // Adapter types
+  ICLIAdapter,
+  CLIFeature,
+  InkAdapterOptions,
+  PastelAdapterOptions,
+} from "./cli"
+
 import type { OpenTUIPluginDefinition, PluginRegistry as IPluginRegistry } from "./types"
 
 // ============================================
@@ -60,10 +117,15 @@ export function definePlugin(definition: OpenTUIPluginDefinition): OpenTUIPlugin
 
 import { tablePlugin } from "./table-plugin"
 import { progressPlugin } from "./progress-plugin"
+import { createCLIIntegrationPlugin } from "./cli"
+
+// Create a default CLI plugin instance
+const cliPlugin = createCLIIntegrationPlugin()
 
 export const builtinPlugins = {
   table: tablePlugin,
   progress: progressPlugin,
+  cli: cliPlugin,
 }
 
 // Register all built-in plugins
