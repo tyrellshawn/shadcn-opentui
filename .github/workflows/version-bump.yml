@@ -1,0 +1,164 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      custom_version:
+        description: 'Custom version (overrides version_type, e.g., 1.2.3)'
+        required: false
+        type: string
+      create_release:
+        description: 'Create release after version bump'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Calculate new version
+        id: bump
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+            NEW_VERSION="${{ github.event.inputs.custom_version }}"
+          else
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MAJOR=${VERSION_PARTS[0]}
+            MINOR=${VERSION_PARTS[1]}
+            PATCH=${VERSION_PARTS[2]}
+            
+            case "${{ github.event.inputs.version_type }}" in
+              major)
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              minor)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              patch)
+                PATCH=$((PATCH + 1))
+                ;;
+            esac
+            
+            NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          fi
+          
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Update package.json version
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = require('./package.json');
+            pkg.version = '${{ steps.bump.outputs.new_version }}';
+            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+      
+      - name: Update registry manifest version
+        run: |
+          node -e "
+            const fs = require('fs');
+            const manifestPath = './public/registry/manifest.json';
+            if (fs.existsSync(manifestPath)) {
+              const manifest = require(manifestPath);
+              manifest.version = '${{ steps.bump.outputs.new_version }}';
+              fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+            }
+          "
+      
+      - name: Build registry with new version
+        run: pnpm registry:build
+      
+      - name: Commit version bump
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          git add package.json public/registry/
+          git commit -m "chore: bump version to v${{ steps.bump.outputs.new_version }}
+
+Version bump type: ${{ github.event.inputs.version_type }}
+Triggered by: @${{ github.actor }}"
+          
+          git push
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.bump.outputs.new_version }}" -m "Release v${{ steps.bump.outputs.new_version }}"
+          git push origin "v${{ steps.bump.outputs.new_version }}"
+      
+      - name: Summary
+        run: |
+          echo "## Version Bump Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**New Version:** v${{ steps.bump.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Updated Files" >> $GITHUB_STEP_SUMMARY
+          echo "- \`package.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`public/registry/manifest.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.create_release }}" == "true" ]; then
+            echo "The release workflow will be triggered automatically by the new tag." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  release:
+    needs: bump
+    if: github.event.inputs.create_release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      version: v${{ needs.bump.outputs.new_version }}
+      prerelease: false
+    permissions:
+      contents: write
