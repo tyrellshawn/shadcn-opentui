@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'registry/**'
-      - 'registry.json'
+      - 'components/ui/terminal*.tsx'
+      - 'scripts/build-registry.mjs'
   workflow_dispatch:
 
 jobs:
@@ -37,8 +37,8 @@ jobs:
       
       - name: Commit and push changes
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git add public/r/
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add public/registry/
           git commit -m "chore: update registry build" || echo "No changes to commit"
           git push
