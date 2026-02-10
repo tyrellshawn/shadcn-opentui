@@ -1,0 +1,22 @@
+{
+  "name": "cli-adapters",
+  "type": "registry:lib",
+  "title": "CLI Adapters",
+  "description": "All CLI library adapters (Ink, Pastel) with version negotiation.",
+  "dependencies": [
+    "ink@^6.6.0"
+  ],
+  "registryDependencies": [
+    "cli-base-adapter",
+    "cli-ink-adapter",
+    "cli-pastel-adapter",
+    "cli-version-negotiator"
+  ],
+  "files": [
+    {
+      "path": "lib/opentui/plugins/cli/adapters/index.ts",
+      "content": "// CLI Plugin Framework Adapters\n// Export all adapter implementations and utilities\n\n// Base adapter\nexport { BaseCLIAdapter, BaseRenderInstance, generateId } from \"./base-adapter\"\n\n// Version negotiator\nexport { \n  VersionNegotiator, \n  versionNegotiator,\n  parseVersion,\n  compareVersions,\n  satisfiesRange,\n} from \"./version-negotiator\"\n\n// Ink adapter\nexport { InkAdapter, createInkAdapter } from \"./ink-adapter\"\nexport type { InkAdapterOptions, InkRenderInstance } from \"./ink-adapter\"\n\n// Pastel adapter (future)\nexport { PastelAdapter, createPastelAdapter } from \"./pastel-adapter\"\nexport type { PastelAdapterOptions, PastelTheme, PastelRenderInstance } from \"./pastel-adapter\"\n",
+      "type": "registry:ui"
+    }
+  ]
+}
