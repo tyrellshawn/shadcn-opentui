@@ -55,12 +55,12 @@ Successfully migrated the entire project from pnpm to Bun for both local develop
 
 All critical commands tested successfully:
 
-```bash
+\`\`\`bash
 ✓ bun install --frozen-lockfile      # Works perfectly
 ✓ bun run registry:build             # Generates all registry files
 ✓ YAML syntax validation             # No errors
 ✓ Workflow validation (actionlint)   # Only minor style warnings
-```
+\`\`\`
 
 ## 📊 Performance Benefits
 
@@ -74,18 +74,18 @@ All critical commands tested successfully:
 ## 🔍 Validation
 
 ### Workflow Validation
-```bash
+\`\`\`bash
 # All workflows validated with actionlint
 docker run --rm -v $(pwd):/repo -w /repo rhysd/actionlint:latest -color
 # Result: ✅ No errors (only style warnings from shellcheck)
-```
+\`\`\`
 
 ### Local Testing
-```bash
+\`\`\`bash
 # Test script created for easy validation
 ./test-workflows.sh
 # Result: ✅ All tests passed
-```
+\`\`\`
 
 ## 📦 Files Changed
 
@@ -101,18 +101,18 @@ docker run --rm -v $(pwd):/repo -w /repo rhysd/actionlint:latest -color
 ### Before Pushing to GitHub:
 
 1. **Test locally one more time:**
-   ```bash
+   \`\`\`bash
    ./test-workflows.sh
-   ```
+   \`\`\`
 
 2. **Review changes:**
-   ```bash
+   \`\`\`bash
    git diff .github/workflows/
    git diff README.md
-   ```
+   \`\`\`
 
 3. **Commit changes:**
-   ```bash
+   \`\`\`bash
    git add .github/workflows/ README.md
    git rm pnpm-lock.yaml
    git commit -m "feat: migrate from pnpm to Bun
@@ -129,13 +129,13 @@ docker run --rm -v $(pwd):/repo -w /repo rhysd/actionlint:latest -color
    - Simpler toolchain (no Node.js + pnpm)
    - Better consistency between local and CI
    - Reduced workflow complexity"
-   ```
+   \`\`\`
 
 4. **Push to a test branch first (recommended):**
-   ```bash
+   \`\`\`bash
    git checkout -b feat/migrate-to-bun
    git push -u origin feat/migrate-to-bun
-   ```
+   \`\`\`
 
 5. **Verify workflows run successfully on GitHub:**
    - Go to Actions tab
@@ -146,7 +146,7 @@ docker run --rm -v $(pwd):/repo -w /repo rhysd/actionlint:latest -color
 
 ### Testing on GitHub (Optional but Recommended):
 
-```bash
+\`\`\`bash
 # Run registry build workflow manually
 gh workflow run registry-build.yml --ref feat/migrate-to-bun
 
@@ -157,7 +157,7 @@ gh run watch
 git checkout main
 git merge feat/migrate-to-bun
 git push
-```
+\`\`\`
 
 ## 🐛 Troubleshooting
 
@@ -172,9 +172,9 @@ If workflows fail on GitHub:
    - If issues, can disable caching temporarily
 
 3. **Rollback if needed:**
-   ```bash
+   \`\`\`bash
    git revert <commit-hash>
-   ```
+   \`\`\`
 
 ## 📚 References
 

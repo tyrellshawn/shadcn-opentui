@@ -1,0 +1,18 @@
+{
+  "name": "cli-plugin",
+  "type": "registry:lib",
+  "title": "CLI Plugin Framework",
+  "description": "Complete CLI plugin framework for OpenTUI. Supports Ink v6.6.0+ and Pastel v4.0.0+ with version negotiation, app registry, and fluent builder API.",
+  "dependencies": [
+    "ink@^6.6.0"
+  ],
+  "registryDependencies": [
+    "cli-plugin-types",
+    "cli-terminal-bridge",
+    "cli-adapters",
+    "cli-app-registry",
+    "cli-plugin-host",
+    "cli-app-builder"
+  ],
+  "files": []
+}

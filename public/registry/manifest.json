@@ -5,5 +5,18 @@
     "terminal-controls",
     "terminal-slider"
   ],
-  "generatedAt": "2026-01-27T01:45:19.821Z"
+  "plugins": [
+    "cli-plugin-types",
+    "cli-terminal-bridge",
+    "cli-version-negotiator",
+    "cli-base-adapter",
+    "cli-ink-adapter",
+    "cli-pastel-adapter",
+    "cli-adapters",
+    "cli-app-registry",
+    "cli-plugin-host",
+    "cli-app-builder",
+    "cli-plugin"
+  ],
+  "generatedAt": "2026-02-10T23:20:55.453Z"
 }

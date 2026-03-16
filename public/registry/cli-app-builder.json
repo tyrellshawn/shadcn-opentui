@@ -1,0 +1,11 @@
+{
+  "name": "cli-app-builder",
+  "type": "registry:lib",
+  "title": "CLI App Builder",
+  "description": "Fluent API for creating CLI applications with type-safe configuration.",
+  "dependencies": [],
+  "registryDependencies": [
+    "cli-plugin-types"
+  ],
+  "files": []
+}
