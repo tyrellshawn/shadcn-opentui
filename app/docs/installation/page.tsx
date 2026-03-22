@@ -2,6 +2,7 @@ import { Package, Download, CheckCircle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CodePreview } from "@/components/docs/code-preview"
+import { Terminal } from "@/components/ui/terminal"
 
 export default function InstallationPage() {
   return (
@@ -103,6 +104,7 @@ export default function TestPage() {
     </div>
   )
 }`}
+            preview={<Terminal welcomeMessage={["Terminal component installed successfully!"]} className="h-64" />}
           />
         </CardContent>
       </Card>

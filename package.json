@@ -7,7 +7,14 @@
     "dev": "bun --bun next dev",
     "lint": "bun --bun  next lint",
     "registry:build": "bun scripts/build-registry.mjs",
-    "start": "bun --bun next start"
+    "start": "bun --bun next start",
+    "test": "bun vitest run",
+    "test:watch": "bun vitest",
+    "test:ui": "bun vitest --ui",
+    "test:integration": "bun vitest run --config vitest.integration.config.ts",
+    "test:integration:update": "UPDATE_SNAPSHOTS=1 bun vitest run --config vitest.integration.config.ts",
+    "test:perf": "bun vitest bench test/perf/*.bench.ts",
+    "test:ci": "bun vitest run --reporter=dot && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "latest",
@@ -20,7 +27,6 @@
     "@vercel/analytics": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cmdk": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.8",
     "next-themes": "latest",
@@ -33,12 +39,25 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.5",
+    "@types/wait-on": "^5.3.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/ui": "^4.1.0",
+    "jsdom": "^29.0.1",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "postcss": "^8.5",
+    "puppeteer": "^24.40.0",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.0",
+    "wait-on": "^9.0.4"
   }
 }

@@ -11,6 +11,112 @@ import { Copy, Code, Eye, Check } from "lucide-react"
 import { toast } from "sonner"
 import { SyntaxHighlighter } from "./syntax-highlighter"
 
+type CodePreviewBackend = "opentui" | "cmdk"
+
+const DEFAULT_BACKENDS: CodePreviewBackend[] = ["opentui"]
+
+const BACKEND_LABELS: Record<CodePreviewBackend, string> = {
+  opentui: "OpenTUI",
+  cmdk: "cmdk",
+}
+
+function buildMissingBackendCode(backend: CodePreviewBackend) {
+  return `// ${BACKEND_LABELS[backend]} example not provided yet.
+// Add ${backend === "cmdk" ? "codeByBackend.cmdk" : `codeByBackend.${backend}`} to this CodePreview
+// so the preview and code stay aligned.`
+}
+
+function MissingBackendPreview({ backend }: { backend: CodePreviewBackend }) {
+  return (
+    <div className="rounded-lg border border-dashed border-emerald-500/20 bg-black/40 p-4 text-sm text-muted-foreground">
+      <p className="font-medium text-white">{BACKEND_LABELS[backend]} preview not provided yet.</p>
+      <p className="mt-2">Add a backend-specific preview so the rendered example matches the selected code.</p>
+    </div>
+  )
+}
+
+function BasicTerminalPreview() {
+  return (
+    <Terminal
+      welcomeMessage={[
+        "Welcome to OpenTUI Terminal",
+        "Type 'help' for available commands",
+      ]}
+      className="h-64"
+    />
+  )
+}
+
+function CustomCommandsPreview() {
+  return (
+    <Terminal
+      commands={{
+        greet: {
+          name: "greet",
+          description: "Greet the user",
+          handler: (args, context) => {
+            const name = args[0] || "World"
+            context?.addLine?.(`Hello, ${name}!`, "success")
+          },
+        },
+        time: {
+          name: "time",
+          description: "Show current time",
+          handler: (_args, context) => {
+            context?.addLine?.(`Current time: ${new Date().toLocaleTimeString()}`, "output")
+          },
+        },
+      }}
+      welcomeMessage={[
+        "Terminal with custom commands",
+        "Try: greet Alex",
+        "Try: time",
+      ]}
+      className="h-64"
+    />
+  )
+}
+
+function TerminalVariantsPreview() {
+  return (
+    <div className="space-y-4">
+      <Terminal variant="default" welcomeMessage={["Default terminal"]} className="h-32" />
+      <Terminal variant="compact" welcomeMessage={["Compact terminal"]} className="h-24" />
+      <Terminal variant="minimal" welcomeMessage={["Minimal terminal"]} className="h-20" />
+    </div>
+  )
+}
+
+function TerminalCommandTypePreview() {
+  return (
+    <Terminal
+      commands={{
+        greet: {
+          name: "greet",
+          description: "Greet the user",
+          handler: (args, context) => {
+            const name = args[0] || "World"
+            context?.addLine?.(`Hello, ${name}!`, "success")
+          },
+        },
+        helpme: {
+          name: "helpme",
+          description: "Show custom command help",
+          handler: (_args, context) => {
+            context?.addLine?.("Custom commands: greet [name], helpme", "output")
+          },
+        },
+      }}
+      welcomeMessage={[
+        "Try these commands:",
+        "greet - Greet with an optional name",
+        "helpme - Show custom help",
+      ]}
+      className="h-48"
+    />
+  )
+}
+
 interface CodePreviewProps {
   title: string
   description: string
@@ -19,6 +125,9 @@ interface CodePreviewProps {
   language?: string
   showLineNumbers?: boolean
   highlightLines?: number[]
+  backendOptions?: CodePreviewBackend[]
+  codeByBackend?: Partial<Record<CodePreviewBackend, string>>
+  previewByBackend?: Partial<Record<CodePreviewBackend, React.ReactNode>>
 }
 
 export function CodePreview({
@@ -29,13 +138,36 @@ export function CodePreview({
   language = "tsx",
   showLineNumbers = true,
   highlightLines = [],
+  backendOptions,
+  codeByBackend,
+  previewByBackend,
 }: CodePreviewProps) {
+  const providedBackends = ["opentui", "cmdk"].filter(
+    (backend) => codeByBackend?.[backend as CodePreviewBackend] || previewByBackend?.[backend as CodePreviewBackend],
+  ) as CodePreviewBackend[]
+
+  const availableBackends = backendOptions ?? (providedBackends.length > 0 ? providedBackends : DEFAULT_BACKENDS)
+
+  const normalizedBackends = availableBackends.length > 0 ? availableBackends : DEFAULT_BACKENDS
+  const showBackendPicker = normalizedBackends.length > 1
   const [activeTab, setActiveTab] = useState(preview ? "preview" : "code")
+  const [activeBackend, setActiveBackend] = useState<CodePreviewBackend>(
+    normalizedBackends.includes("opentui") ? "opentui" : normalizedBackends[0],
+  )
   const [copied, setCopied] = useState(false)
+
+  const resolvedCode =
+    codeByBackend?.[activeBackend] ??
+    (activeBackend === "opentui" ? code : undefined) ??
+    buildMissingBackendCode(activeBackend)
+  const resolvedPreview =
+    previewByBackend?.[activeBackend] ??
+    (activeBackend === "opentui" ? preview : undefined) ??
+    <MissingBackendPreview backend={activeBackend} />
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(code)
+      await navigator.clipboard.writeText(resolvedCode)
       setCopied(true)
       toast.success("Code copied to clipboard!")
       setTimeout(() => setCopied(false), 2000)
@@ -56,6 +188,25 @@ export function CodePreview({
             <CardDescription>{description}</CardDescription>
           </div>
           <div className="flex items-center gap-2">
+            {showBackendPicker && (
+              <div className="flex items-center gap-1 rounded-md border border-emerald-500/20 bg-black/50 p-1">
+                {normalizedBackends.map((backend) => (
+                  <Button
+                    key={backend}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActiveBackend(backend)}
+                    className={
+                      activeBackend === backend
+                        ? "bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200"
+                        : "text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-300"
+                    }
+                  >
+                    {BACKEND_LABELS[backend]}
+                  </Button>
+                ))}
+              </div>
+            )}
             <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
               {language}
             </Badge>
@@ -82,7 +233,7 @@ export function CodePreview({
       </CardHeader>
       <CardContent className="p-0">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          {preview && (
+          {resolvedPreview && (
             <TabsList className="grid w-full grid-cols-2 rounded-none border-b border-emerald-500/10 bg-transparent h-auto p-0">
               <TabsTrigger
                 value="preview"
@@ -101,16 +252,16 @@ export function CodePreview({
             </TabsList>
           )}
 
-          {preview && (
+          {resolvedPreview && (
             <TabsContent value="preview" className="mt-0 p-4">
-              <div className="rounded-lg border border-emerald-500/10 bg-background/50 p-4">{preview}</div>
+              <div className="rounded-lg border border-emerald-500/10 bg-background/50 p-4">{resolvedPreview}</div>
             </TabsContent>
           )}
 
           <TabsContent value="code" className="mt-0">
             <div className="bg-black/60 p-4 overflow-x-auto max-h-[500px] overflow-y-auto terminal-scrollbar">
               <SyntaxHighlighter
-                code={code}
+                code={resolvedCode}
                 language={language}
                 showLineNumbers={showLineNumbers}
                 highlightLines={highlightLines}
@@ -135,42 +286,37 @@ export function BasicTerminal() {
     <Terminal
       welcomeMessage={[
         "Welcome to OpenTUI Terminal",
-        "Type 'help' for available commands"
+        "Type 'help' for available commands",
       ]}
       className="h-64"
     />
   )
 }`,
-    preview: (
-      <Terminal
-        welcomeMessage={["Welcome to OpenTUI Terminal", "Type 'help' for available commands"]}
-        className="h-64"
-      />
-    ),
+    preview: <BasicTerminalPreview />,
   },
 
   customCommands: {
     title: "Custom Commands",
     description: "Terminal with custom command handlers",
-    code: `import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
+    code: `import { Terminal } from "@/components/ui/terminal"
 
-const customCommands: TerminalCommand[] = [
-  {
+const customCommands = {
+  greet: {
     name: "greet",
     description: "Greet the user",
-    handler: (args) => {
+    handler: (args, context) => {
       const name = args[0] || "World"
-      return \`Hello, \${name}!\`
+      context?.addLine?.(\`Hello, \${name}!\`, "success")
     },
   },
-  {
+  time: {
     name: "time",
     description: "Show current time",
-    handler: () => {
-      return new Date().toLocaleTimeString()
+    handler: (_args, context) => {
+      context?.addLine?.(\`Current time: \${new Date().toLocaleTimeString()}\`, "output")
     },
   },
-]
+}
 
 export function CustomCommandsTerminal() {
   return (
@@ -178,35 +324,14 @@ export function CustomCommandsTerminal() {
       commands={customCommands}
       welcomeMessage={[
         "Terminal with custom commands",
-        "Try: greet John, time"
+        "Try: greet Alex",
+        "Try: time",
       ]}
       className="h-64"
     />
   )
 }`,
-    preview: (
-      <Terminal
-        commands={[
-          {
-            name: "greet",
-            description: "Greet the user",
-            handler: (args) => {
-              const name = args[0] || "World"
-              return `Hello, ${name}!`
-            },
-          },
-          {
-            name: "time",
-            description: "Show current time",
-            handler: () => {
-              return new Date().toLocaleTimeString()
-            },
-          },
-        ]}
-        welcomeMessage={["Terminal with custom commands", "Try: greet John, time"]}
-        className="h-64"
-      />
-    ),
+    preview: <CustomCommandsPreview />,
   },
 
   variants: {
@@ -217,21 +342,16 @@ export function CustomCommandsTerminal() {
 export function TerminalVariants() {
   return (
     <div className="space-y-4">
-      {/* Default variant */}
       <Terminal
         variant="default"
         welcomeMessage={["Default terminal"]}
         className="h-48"
       />
-      
-      {/* Compact variant */}
       <Terminal
         variant="compact"
         welcomeMessage={["Compact terminal"]}
         className="h-32"
       />
-      
-      {/* Minimal variant */}
       <Terminal
         variant="minimal"
         welcomeMessage={["Minimal terminal"]}
@@ -240,56 +360,31 @@ export function TerminalVariants() {
     </div>
   )
 }`,
-    preview: (
-      <div className="space-y-4">
-        <Terminal variant="default" welcomeMessage={["Default terminal"]} className="h-32" />
-        <Terminal variant="compact" welcomeMessage={["Compact terminal"]} className="h-24" />
-        <Terminal variant="minimal" welcomeMessage={["Minimal terminal"]} className="h-20" />
-      </div>
-    ),
+    preview: <TerminalVariantsPreview />,
   },
 
   terminalCommandType: {
     title: "TerminalCommand Type",
     description: "TypeScript interface for defining custom commands",
     language: "typescript",
-    code: `interface TerminalCommand {
+    code: `import type { CommandHandler } from "@/lib/types"
+
+interface TerminalCommand extends CommandHandler {
   name: string                    // Command name (e.g., "help")
   description: string             // Help text description
-  handler: (args: string[]) => Promise<void> | void | string
+  handler: (args: string[], context?: any) => Promise<void> | void
 }
 
-// Example usage
-const customCommands: TerminalCommand[] = [
-  {
+const customCommands: Record<string, TerminalCommand> = {
+  greet: {
     name: "greet",
     description: "Greet the user",
-    handler: (args) => {
+    handler: (args, context) => {
       const name = args[0] || "World"
-      return \`Hello, \${name}!\`
+      context?.addLine?.(\`Hello, \${name}!\`, "success")
     },
   },
-]`,
-    preview: (
-      <Terminal
-        commands={[
-          {
-            name: "greet",
-            description: "Greet the user",
-            handler: (args: string[]) => {
-              const name = args[0] || "World"
-              return `Hello, ${name}!`
-            },
-          },
-          {
-            name: "help",
-            description: "Show available commands",
-            handler: () => "Available commands: greet [name], help",
-          },
-        ]}
-        welcomeMessage={["Try these commands:", "greet - Greet with optional name", "help - Show available commands"]}
-        className="h-48"
-      />
-    ),
+}`,
+    preview: <TerminalCommandTypePreview />,
   },
 }
