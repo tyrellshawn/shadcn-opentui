@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Terminal as TerminalComponent } from "@/components/ui/terminal"
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 
 export default function DocsPage() {
   return (
@@ -44,6 +45,7 @@ export default function DocsPage() {
             </Link>
           </Button>
         </div>
+        <OpenTUIRuntimeStatusCard />
       </div>
 
       {/* Interactive Demo */}

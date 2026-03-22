@@ -11,10 +11,11 @@
     "test": "bun vitest run",
     "test:watch": "bun vitest",
     "test:ui": "bun vitest --ui",
+    "test:opentui": "bun scripts/verify-opentui.ts",
     "test:integration": "bun vitest run --config vitest.integration.config.ts",
     "test:integration:update": "UPDATE_SNAPSHOTS=1 bun vitest run --config vitest.integration.config.ts",
     "test:perf": "bun vitest bench test/perf/*.bench.ts",
-    "test:ci": "bun vitest run --reporter=dot && bun vitest run --config vitest.integration.config.ts --reporter=dot"
+    "test:ci": "bun vitest run --reporter=dot && bun scripts/verify-opentui.ts && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
     "@opentui/core": "^0.1.90",

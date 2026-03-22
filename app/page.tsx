@@ -22,6 +22,7 @@ import {
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -184,9 +185,9 @@ function RegistrySetupBlock() {
       description: "Install the main OpenTUI terminal component",
     },
     {
-      title: "Add terminal controls",
-      command: "bunx shadcn@latest add terminal-controls terminal-slider",
-      description: "Add interactive UI components for terminal control panels",
+      title: "Install official OpenTUI packages",
+      command: "bun add @opentui/core @opentui/react",
+      description: "Keep the browser terminal aligned with the official OpenTUI package boundary.",
     },
   ]
 
@@ -254,7 +255,7 @@ export default function Home() {
   const demoScript1 = [
     {
       command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-      output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+      output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
       delay: 2000,
     },
     {
@@ -380,6 +381,10 @@ export default function Home() {
                 generic command palette or stock slider UI.
               </div>
 
+              <div className="mx-auto max-w-3xl text-left">
+                <OpenTUIRuntimeStatusCard />
+              </div>
+
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up-delay-3">
                 <Button
                   size="lg"
@@ -432,7 +437,7 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               <OpenTUITerminalDemo title="Installation" script={[{
                 command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-                output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+                output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
                 delay: 2000,
               }, {
                 command: "npm run dev",
@@ -591,7 +596,7 @@ export default function Home() {
               <FeatureCard
                 icon={Layers}
                 title="UI Components"
-                description="Built-in forms, menus, sliders, and progress bars for interactive terminal UIs."
+                description="Built-in forms, menus, tables, and progress flows for interactive terminal UIs."
               />
               <FeatureCard
                 icon={Code2}

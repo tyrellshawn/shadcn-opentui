@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { CodePreview } from "@/components/docs/code-preview"
 import { Terminal } from "@/components/ui/terminal"
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 
 export default function InstallationPage() {
   return (
@@ -79,6 +80,8 @@ export default function InstallationPage() {
           </CardContent>
         </Card>
 
+        <OpenTUIRuntimeStatusCard />
+
       {/* Verification */}
       <Card>
         <CardHeader>
@@ -120,8 +123,8 @@ export default function TestPage() {
             <div>
               <h4 className="font-semibold text-sm">Nothing appears or garbled output</h4>
               <p className="text-sm text-muted-foreground">
-                Make sure your terminal supports ANSI escape codes and you're running in a real terminal, not a web
-                environment.
+                Confirm your app is rendering the browser terminal wrapper and that your CSS variables/theme tokens are
+                loaded correctly.
               </p>
             </div>
             <div>
