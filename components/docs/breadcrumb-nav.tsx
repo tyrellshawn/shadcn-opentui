@@ -38,7 +38,7 @@ export function BreadcrumbNav() {
             breadcrumbs.push({ label: pageName, href: `/docs/opentui/${segments[2]}` })
           }
         } else if (segments[1] === "examples") {
-          breadcrumbs.push({ label: "Examples", href: "/docs/examples" })
+          breadcrumbs.push({ label: "Examples", href: "/docs/components/examples" })
           if (segments[2]) {
             const exampleName = segments[2].charAt(0).toUpperCase() + segments[2].slice(1)
             breadcrumbs.push({ label: exampleName, href: `/docs/examples/${segments[2]}` })

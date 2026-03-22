@@ -73,7 +73,7 @@ const OpenTUITerminal = React.forwardRef<HTMLDivElement, OpenTUITerminalProps>(
         } else if (command === "opentui") {
           addLine("OpenTUI Terminal Component")
           addLine("Built with @opentui/react")
-          addLine("GitHub: https://github.com/sst/opentui")
+          addLine("GitHub: https://github.com/anomalyco/opentui")
         } else if (onCommand) {
           await onCommand(command)
         } else {

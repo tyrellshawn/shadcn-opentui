@@ -17,6 +17,8 @@
     "test:ci": "bun vitest run --reporter=dot && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
+    "@opentui/core": "^0.1.90",
+    "@opentui/react": "^0.1.90",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-popover": "latest",
     "@radix-ui/react-separator": "latest",
