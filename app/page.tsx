@@ -62,7 +62,7 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function OpenTUITerminalDemo({
+function HelloVladTerminalDemo({
   title,
   script,
 }: {
@@ -118,7 +118,7 @@ function OpenTUITerminalDemo({
 
   return (
     <div className="bg-black border border-primary/30 rounded-lg overflow-hidden shadow-lg shadow-primary/10">
-      {/* OpenTUI Terminal Header */}
+      {/* Hello Vlad Terminal Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-primary/20 bg-black/80">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
@@ -126,7 +126,7 @@ function OpenTUITerminalDemo({
             <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
             <div className="w-3 h-3 rounded-full bg-green-500/80" />
           </div>
-          <span className="text-xs text-primary font-mono font-semibold ml-2">OpenTUI Terminal</span>
+          <span className="text-xs text-primary font-mono font-semibold ml-2">Hello Vlad Terminal</span>
         </div>
         <span className="text-xs text-primary/50 font-mono">{title}</span>
       </div>
@@ -137,7 +137,7 @@ function OpenTUITerminalDemo({
           <div key={i} className="leading-relaxed">
             {line.type === "command" ? (
               <span>
-                <span className="text-primary font-bold">user@opentui:~$</span>{" "}
+                <span className="text-primary font-bold">user@hellvlad:~$</span>{" "}
                 <span className="text-white">{line.content}</span>
               </span>
             ) : (
@@ -147,14 +147,14 @@ function OpenTUITerminalDemo({
         ))}
         {isTyping && (
           <div className="leading-relaxed">
-            <span className="text-primary font-bold">user@opentui:~$</span>{" "}
+            <span className="text-primary font-bold">user@hellvlad:~$</span>{" "}
             <span className="text-white">{typedCommand}</span>
             <span className="animate-pulse text-primary">█</span>
           </div>
         )}
         {!isTyping && currentStep < script.length && (
           <div className="leading-relaxed">
-            <span className="text-primary font-bold">user@opentui:~$</span>
+            <span className="text-primary font-bold">user@hellvlad:~$</span>
             <span className="animate-pulse text-primary ml-1">█</span>
           </div>
         )}
@@ -197,14 +197,14 @@ function RegistrySetupBlock() {
 
   const steps = [
     {
-      title: "Initialize shadcn with OpenTUI registry",
-      command: "bunx shadcn@latest init -r https://opentui.vercel.app/api/registry",
-      description: "Set up shadcn/ui with the OpenTUI registry for seamless component integration",
+      title: "Initialize shadcn with Hello Vlad registry",
+      command: "bunx shadcn@latest init -r https://hellvlad.vercel.app/api/registry",
+      description: "Set up shadcn/ui with the Hello Vlad registry for seamless component integration",
     },
     {
       title: "Add terminal component",
       command: "bunx shadcn@latest add terminal",
-      description: "Install the main OpenTUI terminal component",
+      description: "Install the main Hello Vlad terminal component",
     },
     {
       title: "Add terminal controls",
@@ -260,8 +260,8 @@ export default function Home() {
 
   const demoScript1 = [
     {
-      command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-      output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+                command: "npx shadcn@latest add https://hellvlad.vercel.app/r/terminal.json",
+                output: ["Downloading @shadcn-hellvlad/terminal...", "✓ Terminal component installed"],
       delay: 2000,
     },
     {
@@ -316,7 +316,7 @@ export default function Home() {
               <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <TerminalIcon className="w-4 h-4 text-primary" />
               </div>
-              <span className="font-semibold text-lg text-primary">OpenTUI</span>
+              <span className="font-semibold text-lg text-primary">Hello Vlad</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -337,7 +337,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
-                <Link href="https://github.com/sst/opentui" target="_blank">
+                  <Link href="https://github.com/sst/hellvlad" target="_blank">
                   <Github className="w-4 h-4" />
                 </Link>
               </Button>
@@ -359,10 +359,10 @@ export default function Home() {
         <section className="pt-32 pb-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="max-w-4xl mx-auto text-center space-y-8">
-              {/* Glowing OpenTUI Title */}
+               {/* Glowing Hello Vlad Title */}
               <div className="fade-in-up">
                 <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4 font-mono">
-                  <span className="text-primary glow-text-strong">OpenTUI</span>
+                  <span className="text-primary glow-text-strong">Hello Vlad</span>
                 </h1>
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-black/40 text-sm">
                   <Sparkles className="w-4 h-4 text-primary" />
@@ -377,7 +377,7 @@ export default function Home() {
               </h2>
 
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto fade-in-up-delay-2 text-balance leading-relaxed">
-                A powerful, customizable terminal interface built with OpenTUI and React. Command history, tab
+                A powerful, customizable terminal interface built with Hello Vlad and React. Command history, tab
                 completion, interactive UI components, and full TypeScript support.
               </p>
 
@@ -398,7 +398,7 @@ export default function Home() {
                   className="px-8 bg-black/40 border-border/50 hover:bg-black/60"
                   asChild
                 >
-                  <Link href="https://github.com/sst/opentui" target="_blank">
+                <Link href="https://github.com/sst/hellvlad" target="_blank">
                     <Github className="w-4 h-4 mr-2" />
                     View on GitHub
                   </Link>
@@ -409,8 +409,8 @@ export default function Home() {
               <div className="pt-4 fade-in-up-delay-3">
                 <div className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-black/60 border border-primary/30 font-mono text-sm backdrop-blur-sm">
                   <span className="text-primary">$</span>
-                  <span className="text-foreground">npx shadcn@latest add https://opentui.vercel.app/r/terminal.json</span>
-                  <CopyButton text="npx shadcn@latest add https://opentui.vercel.app/r/terminal.json" />
+                  <span className="text-foreground">npx shadcn@latest add https://hellvlad.vercel.app/r/terminal.json</span>
+                  <CopyButton text="npx shadcn@latest add https://hellvlad.vercel.app/r/terminal.json" />
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground text-center">
                   Compatible with npm, yarn, pnpm, and bun
@@ -420,28 +420,28 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Animated Demos - Using OpenTUI Terminal */}
+         {/* Animated Demos - Using Hello Vlad Terminal */}
         <section className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">See it in action</h2>
               <p className="text-muted-foreground text-lg">
-                Watch automated demos showcasing OpenTUI terminal features
+                Watch automated demos showcasing Hello Vlad terminal features
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-              <OpenTUITerminalDemo title="Installation" script={[{
-                command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-                output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+              <HelloVladTerminalDemo title="Installation" script={[{
+      command: "npx shadcn@latest add https://hellvlad.vercel.app/r/terminal.json",
+      output: ["Downloading @shadcn-hellvlad/terminal...", "✓ Terminal component installed"],
                 delay: 2000,
               }, {
                 command: "npm run dev",
                 output: ["Starting development server...", "✓ Ready on localhost:3000"],
                 delay: 2500,
               }]} />
-              <OpenTUITerminalDemo title="UI Components" script={demoScript2} />
-              <OpenTUITerminalDemo title="Built-in Commands" script={demoScript3} />
+              <HelloVladTerminalDemo title="UI Components" script={demoScript2} />
+              <HelloVladTerminalDemo title="Built-in Commands" script={demoScript3} />
             </div>
           </div>
         </section>
@@ -449,9 +449,9 @@ export default function Home() {
         <section className="py-20 px-6 border-y border-primary/10 bg-black/20">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">OpenTUI Components</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Hello Vlad Components</h2>
               <p className="text-muted-foreground text-lg">
-                Interactive terminal UI components from the @shadcn-opentui registry
+                Interactive terminal UI components from the @shadcn-hellvlad registry
               </p>
             </div>
 
@@ -460,7 +460,7 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-mono text-primary">
                   <SlidersHorizontal className="w-4 h-4" />
-                  <span>@shadcn-opentui/terminal-controls</span>
+                  <span>@shadcn-hellvlad/terminal-controls</span>
                 </div>
                 <TerminalControls className="bg-black/80" onCommand={(cmd) => console.log("Command:", cmd)} />
                 <p className="text-xs text-muted-foreground">
@@ -472,7 +472,7 @@ export default function Home() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-mono text-primary">
                   <Gauge className="w-4 h-4" />
-                  <span>@shadcn-opentui/terminal-slider</span>
+                  <span>@shadcn-hellvlad/terminal-slider</span>
                 </div>
                 <div className="p-6 border border-primary/20 rounded bg-black/50 space-y-6">
                   <TerminalSlider label="CPU Usage" defaultValue={[65]} unit="%" max={100} />
@@ -530,14 +530,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Interactive Demo - Using actual OpenTUI Terminal */}
+         {/* Interactive Demo - Using actual Hello Vlad Terminal */}
         <section className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-start">
               <div className="space-y-6">
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground">Try it yourself</h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Experience the full power of the OpenTUI terminal component. Type commands, use tab completion, and
+                  Experience the full power of the Hello Vlad terminal component. Type commands, use tab completion, and
                   explore the built-in functionality including interactive UI modes.
                 </p>
 
@@ -563,10 +563,10 @@ export default function Home() {
 
               <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
                 <Terminal
-                  prompt="demo@opentui:~$"
+                  prompt="demo@hellvlad:~$"
                   commands={customCommands}
                   welcomeMessage={[
-                    "🚀 Welcome to OpenTUI Terminal",
+                    "🚀 Welcome to Hello Vlad Terminal",
                     "",
                     "Type 'help' to see available commands.",
                     "Use ↑/↓ for history, Tab for completion.",
@@ -585,7 +585,7 @@ export default function Home() {
             <div className="p-12 rounded-2xl border border-primary/20 bg-black/40 backdrop-blur-sm">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Ready to get started?</h2>
               <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-                Add the OpenTUI terminal component to your project using the @shadcn-opentui registry.
+                Add the Hello Vlad terminal component to your project using the @shadcn-hellvlad registry.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
@@ -614,14 +614,14 @@ export default function Home() {
                 <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center">
                   <TerminalIcon className="w-3 h-3 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground">OpenTUI - Built with shadcn/ui</span>
+                <span className="text-sm text-muted-foreground">Hello Vlad - Built with shadcn/ui</span>
               </div>
               <div className="flex items-center gap-6">
                 <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Documentation
                 </Link>
                 <Link
-                  href="https://github.com/sst/opentui"
+                  href="https://github.com/sst/hellvlad"
                   target="_blank"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
