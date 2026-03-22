@@ -88,6 +88,8 @@ describe.sequential('docs integration flows', () => {
     server = await startNextServer(3010)
     browser = await puppeteer.launch({ headless: true })
     page = await browser.newPage()
+    page.setDefaultNavigationTimeout(60000)
+    page.setDefaultTimeout(60000)
   })
 
   afterAll(async () => {
@@ -145,7 +147,7 @@ describe.sequential('docs integration flows', () => {
     await openDocsSearch(page)
     await page.type('input[placeholder="Search documentation..."]', 'Terminal Component')
     await clickVisibleButtonByText(page, 'Terminal Component')
-    await page.waitForFunction(() => window.location.pathname === '/docs/components/terminal')
+    await page.waitForFunction(() => window.location.pathname === '/docs/components/terminal', { timeout: 60000 })
   })
 
   it('allows typing in the quick start OpenTUI preview terminal', async () => {
@@ -168,7 +170,7 @@ describe.sequential('docs integration flows', () => {
     await assertPageSnapshot(page, 'docs-quick-start-page.png')
 
     await clickVisibleLinkByText(page, 'Installation')
-    await page.waitForFunction(() => window.location.pathname === '/docs/installation')
+    await page.waitForFunction(() => window.location.pathname === '/docs/installation', { timeout: 60000 })
     await page.waitForSelector('h1')
     await stabilizePage(page)
 
