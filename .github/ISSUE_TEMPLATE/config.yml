@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://opentui.vercel.app/docs
+    about: Check our comprehensive documentation for usage guides and API references
+  - name: 💬 GitHub Discussions
+    url: https://github.com/tyrellshawn/shadcn-opentui/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🛠️ OpenTUI Website
+    url: https://opentui.vercel.app
+    about: Explore components and examples on our main website

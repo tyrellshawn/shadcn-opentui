@@ -32,19 +32,50 @@ Thank you for your interest in contributing to the Shadcn OpenTUI Terminal Compo
 
 ### Reporting Issues
 
+When reporting bugs, please use our [Bug Report template](https://github.com/tyrellshawn/shadcn-opentui/issues/new?assignees=&labels=bug%2Ctriage&projects=&template=bug_report.yml) which will guide you through providing:
+
+- Clear description of the problem and expected behavior
+- Steps to reproduce the issue
+- Environment details (React/Next.js version, browser, OS, Node.js version)
+- Minimal code reproduction
+- Additional context like screenshots or error messages
+
 Before creating an issue, please:
-- Check if the issue already exists
-- Provide a clear description of the problem
-- Include steps to reproduce the issue
-- Add screenshots or code examples when helpful
+- Search existing issues to avoid duplicates
+- Check our documentation for known solutions
+- Ensure you're using the latest version of shadcn-opentui
 
 ### Suggesting Features
 
-We welcome feature suggestions! Please:
-- Check existing feature requests first
-- Clearly describe the feature and its benefits
-- Provide use cases and examples
-- Consider the scope and complexity
+We welcome feature suggestions! Please use our [Feature Request template](https://github.com/tyrellshawn/shadcn-opentui/issues/new?assignees=&labels=enhancement%2Ctriage&projects=&template=feature_request.yml) which will help you provide:
+
+- Problem statement and proposed solution
+- Use cases and benefits for the community
+- Component type (Terminal, Interactive Element, etc.)
+- Priority level and estimated complexity
+- API design ideas (optional)
+- Alternative solutions you've considered
+
+Before submitting a feature request:
+- Search existing feature requests to avoid duplicates
+- Check our documentation to ensure the feature doesn't already exist
+- Consider if you'd be interested in contributing the implementation
+
+### Issue Template Guidelines
+
+Our issue templates are designed to gather the information needed for effective triage and resolution:
+
+- **Complete all required fields** - this helps maintainers understand and prioritize your issue
+- **Provide minimal reproductions** - include CodeSandbox, StackBlitz, or code snippets that demonstrate the issue
+- **Be specific about your environment** - version numbers, browser details, and OS information help identify compatibility issues
+- **Use clear, descriptive titles** - this helps other users find similar issues
+- **Add relevant labels** - our templates will auto-assign appropriate labels for initial triage
+
+Quality issue reports help us:
+- Reproduce problems faster
+- Understand user needs better
+- Prioritize work effectively
+- Provide better support to the community
 
 ### Code Contributions
 
