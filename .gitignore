@@ -28,3 +28,4 @@ next-env.d.ts
 
 # test artifacts
 /test/artifacts/
+node_modules/

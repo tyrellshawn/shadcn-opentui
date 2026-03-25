@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenTUI Web Core (WASM)</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #161b22;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            margin-top: 0;
+            color: #58a6ff;
+            font-size: 1.5rem;
+        }
+        pre {
+            background: #010409;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid #30363d;
+        }
+        button {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #2ea043;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OpenTUI Web WASM Core</h1>
+        <p>Testing Zig WebAssembly loading in the browser.</p>
+        
+        <div>
+            <button id="run-btn" disabled>Loading WASM...</button>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <strong>Output:</strong>
+            <pre id="output">Initializing...</pre>
+        </div>
+    </div>
+
+    <script type="module">
+        const outputEl = document.getElementById('output');
+        const btnEl = document.getElementById('run-btn');
+
+        function log(msg) {
+            outputEl.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        class BrowserOpenTUIWebCore {
+            wasmModule = null;
+            memory = null;
+
+            async init(wasmUrl) {
+                // Fetch and instantiate streaming for the browser
+                const response = await fetch(wasmUrl);
+                const wasmSource = await WebAssembly.instantiateStreaming(response, {
+                    env: {
+                        memory: new WebAssembly.Memory({ initial: 256 })
+                    }
+                });
+
+                this.wasmModule = wasmSource.instance;
+                this.memory = this.wasmModule.exports.memory;
+            }
+
+            add(a, b) {
+                const addFunc = this.wasmModule.exports.add;
+                return addFunc(a, b);
+            }
+
+            getHelloMessage() {
+                const exports = this.wasmModule.exports;
+                const alloc = exports.alloc;
+                const free = exports.free;
+                const writeHello = exports.writeHello;
+
+                const capacity = 100;
+                const ptr = alloc(capacity);
+                
+                try {
+                    const len = writeHello(ptr, capacity);
+                    const buffer = new Uint8Array(this.memory.buffer, ptr, len);
+                    return new TextDecoder().decode(buffer);
+                } finally {
+                    free(ptr, capacity);
+                }
+            }
+        }
+
+        async function main() {
+            try {
+                const core = new BrowserOpenTUIWebCore();
+                // Load the built WASM file
+                await core.init('/main.wasm');
+                
+                outputEl.textContent = "WASM Loaded Successfully!\n\n";
+                btnEl.textContent = "Run Zig Functions";
+                btnEl.disabled = false;
+
+                btnEl.addEventListener('click', () => {
+                    log(`Executing Add(10, 25): ${core.add(10, 25)}`);
+                    log(`Message from Zig: ${core.getHelloMessage()}`);
+                });
+
+            } catch (err) {
+                outputEl.textContent = `Error loading WASM: ${err.message}`;
+                console.error(err);
+            }
+        }
+
+        main();
+    </script>
+</body>
+</html>

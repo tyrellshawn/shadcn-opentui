@@ -1,0 +1,15 @@
+{
+  "name": "@opentui/web-core",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build:wasm": "mkdir -p dist && zig build-exe src/zig/main.zig -target wasm32-freestanding -fno-entry -rdynamic -O ReleaseSmall -femit-bin=dist/main.wasm",
+    "build": "bun run build:wasm && tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "typescript": "^5.0.0"
+  }
+}
