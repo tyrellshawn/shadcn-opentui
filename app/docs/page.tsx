@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Terminal as TerminalComponent } from "@/components/ui/terminal"
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 
 export default function DocsPage() {
   return (
@@ -21,6 +22,14 @@ export default function DocsPage() {
           A beautiful, interactive terminal component built with shadcn/ui and React. Create rich terminal user
           interfaces with familiar React patterns, complete command handling, and customizable styling.
         </p>
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-muted-foreground">
+          <div className="mb-2 font-semibold text-emerald-300">Who this is for</div>
+          <p>
+            This library is for <span className="font-medium text-foreground">React and Next.js teams</span> who want
+            a browser-rendered terminal UI that fits shadcn patterns. It is not a Python CLI framework or a native TUI
+            runtime.
+          </p>
+        </div>
         <div className="flex items-center gap-4 pt-4">
           <Button asChild>
             <Link href="/docs/installation">
@@ -29,13 +38,14 @@ export default function DocsPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="https://github.com/shadcn-opentui/terminal" target="_blank">
+            <Link href="https://github.com/anomalyco/opentui" target="_blank">
               <Github className="mr-2 h-4 w-4" />
               View on GitHub
               <ExternalLink className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
+        <OpenTUIRuntimeStatusCard />
       </div>
 
       {/* Interactive Demo */}
@@ -53,7 +63,7 @@ export default function DocsPage() {
           <TerminalComponent
             variant="default"
             className="h-64"
-            initialOutput={["Welcome to Shadcn OpenTUI Terminal!", "Type 'help' to see available commands.", ""]}
+            welcomeMessage={["Welcome to Shadcn OpenTUI Terminal!", "Type 'help' to see available commands.", ""]}
           />
         </CardContent>
       </Card>
@@ -121,19 +131,23 @@ npx shadcn@latest add https://opentui.vercel.app/api/registry/terminal`}
           </div>
           <div className="bg-muted rounded-lg p-4">
             <code className="text-sm">
-              {`import { Terminal } from "@/components/ui/terminal"
+{`import { Terminal } from "@/components/ui/terminal"
 
 function App() {
+  const commands = {
+    hello: {
+      name: "hello",
+      description: "Say hello",
+      handler: (_args, context) => {
+        context?.addLine?.("Hello, World!", "success")
+      },
+    },
+  }
+
   return (
     <Terminal
       welcomeMessage={["Welcome to my app!"]}
-      commands={[
-        {
-          name: "hello",
-          description: "Say hello",
-          handler: () => "Hello, World!"
-        }
-      ]}
+      commands={commands}
     />
   )
 }`}
@@ -167,13 +181,13 @@ function App() {
 
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle className="text-lg">Component Reference</CardTitle>
-            <CardDescription>Explore all available components and their APIs</CardDescription>
+            <CardTitle className="text-lg">Interactive Examples</CardTitle>
+            <CardDescription>See real demos before you implement anything in your app</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="ghost" className="p-0 h-auto">
-              <Link href="/docs/components/terminal" className="flex items-center gap-2">
-                Browse components
+              <Link href="/docs/components/examples" className="flex items-center gap-2">
+                Browse examples
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

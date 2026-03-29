@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, type ReactNode } from "react"
+import { mergeThemes } from "@/lib/opentui/theme-utils"
 
 // ============================================================================
 // TYPES
@@ -543,7 +544,7 @@ export function TerminalThemeProvider({
   defaultTheme = "matrix",
   customThemes = [],
 }: TerminalThemeProviderProps) {
-  const allThemes = [...prebuiltThemes, ...customThemes]
+  const allThemes = mergeThemes(prebuiltThemes, customThemes)
   const [currentTheme, setCurrentTheme] = useState<ThemeConfig>(
     allThemes.find((t) => t.name === defaultTheme) || matrixTheme,
   )

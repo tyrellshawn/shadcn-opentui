@@ -10,39 +10,41 @@ import { Terminal } from "@/components/ui/terminal"
 
 const installationCode = `npx shadcn@latest add https://opentui.com/r/terminal.json`
 
-const importCode = `import { Terminal, type TerminalCommand } from "@/components/ui/terminal"`
+const importCode = `import { Terminal } from "@/components/ui/terminal"
+import type { CommandHandler } from "@/lib/types"`
 
-const advancedUsageCode = `import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
+const advancedUsageCode = `import { Terminal } from "@/components/ui/terminal"
+import type { CommandHandler } from "@/lib/types"
 import { useState } from "react"
 
 export function AdvancedTerminal() {
   const [logs, setLogs] = useState<string[]>([])
 
-  const commands: TerminalCommand[] = [
-    {
+  const commands: Record<string, CommandHandler> = {
+    fetch: {
       name: "fetch",
       description: "Fetch data from an API",
-      handler: async (args) => {
+      handler: async (args, context) => {
         const url = args[0] || "https://api.example.com"
         try {
           const response = await fetch(url)
           const data = await response.json()
-          return JSON.stringify(data, null, 2)
+          context?.addLine?.(JSON.stringify(data, null, 2), "success")
         } catch (error) {
-          return \`Error: Failed to fetch from \${url}\`
+          context?.addLine?.(\`Error: Failed to fetch from \${url}\`, "error")
         }
       },
     },
-    {
+    log: {
       name: "log",
       description: "Add a log entry",
-      handler: (args) => {
+      handler: (args, context) => {
         const message = args.join(" ")
         setLogs((prev) => [...prev, message])
-        return \`Logged: \${message}\`
+        context?.addLine?.(\`Logged: \${message}\`, "success")
       },
     },
-  ]
+  }
 
   return (
     <Terminal
@@ -314,12 +316,12 @@ export default function TerminalComponentPage() {
                     <td className="p-3">
                       <code className="text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">commands</code>
                     </td>
-                    <td className="p-3">
-                      <code className="text-purple-400">TerminalCommand[]</code>
-                    </td>
-                    <td className="p-3">
-                      <code className="text-amber-400">[]</code>
-                    </td>
+                     <td className="p-3">
+                       <code className="text-purple-400">Record&lt;string, CommandHandler&gt;</code>
+                     </td>
+                     <td className="p-3">
+                       <code className="text-amber-400">{`{}`}</code>
+                     </td>
                     <td className="p-3">Custom command handlers</td>
                   </tr>
                   <tr className="border-b border-emerald-500/10">

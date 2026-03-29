@@ -3,27 +3,18 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import type { DialogProps } from "@radix-ui/react-dialog"
-import { Command as CommandPrimitive } from "cmdk"
 import { Search, File, Terminal, BookOpen, Code, Zap, Settings, FileText, Play } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { filterSearchItems, groupSearchItems, type SearchItem } from "@/lib/opentui/search-utils"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
-// Search data structure
-interface SearchItem {
-  id: string
-  title: string
-  description?: string
-  href: string
-  category: string
+interface SearchUIItem extends SearchItem {
   icon?: React.ComponentType<{ className?: string }>
-  keywords?: string[]
 }
 
-// Mock search data - in a real app, this would come from your CMS or be generated at build time
-const searchData: SearchItem[] = [
-  // Getting Started
+const searchData: SearchUIItem[] = [
   {
     id: "intro",
     title: "Introduction",
@@ -51,7 +42,6 @@ const searchData: SearchItem[] = [
     icon: Play,
     keywords: ["quick", "start", "tutorial", "example", "hello world"],
   },
-  // Components
   {
     id: "terminal-component",
     title: "Terminal Component",
@@ -79,7 +69,6 @@ const searchData: SearchItem[] = [
     icon: Zap,
     keywords: ["examples", "demo", "interactive", "live"],
   },
-  // OpenTUI Integration
   {
     id: "opentui-concepts",
     title: "Core Concepts",
@@ -116,7 +105,6 @@ const searchData: SearchItem[] = [
     icon: Zap,
     keywords: ["custom", "extend", "components", "renderable"],
   },
-  // Examples
   {
     id: "login-example",
     title: "Login Form",
@@ -155,18 +143,18 @@ export function CommandDialog({ onOpenChange, ...props }: CommandDialogProps) {
   const [search, setSearch] = React.useState("")
 
   React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
+    const down = (event: KeyboardEvent) => {
+      if ((event.key === "k" && (event.metaKey || event.ctrlKey)) || event.key === "/") {
         if (
-          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
-          e.target instanceof HTMLInputElement ||
-          e.target instanceof HTMLTextAreaElement ||
-          e.target instanceof HTMLSelectElement
+          (event.target instanceof HTMLElement && event.target.isContentEditable) ||
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLSelectElement
         ) {
           return
         }
 
-        e.preventDefault()
+        event.preventDefault()
         onOpenChange?.(true)
       }
     }
@@ -178,80 +166,67 @@ export function CommandDialog({ onOpenChange, ...props }: CommandDialogProps) {
   const runCommand = React.useCallback(
     (command: () => unknown) => {
       onOpenChange?.(false)
+      setSearch("")
       command()
     },
     [onOpenChange],
   )
 
-  const filteredItems = React.useMemo(() => {
-    if (!search) return searchData
-
-    const query = search.toLowerCase()
-    return searchData.filter((item) => {
-      const titleMatch = item.title.toLowerCase().includes(query)
-      const descriptionMatch = item.description?.toLowerCase().includes(query)
-      const keywordMatch = item.keywords?.some((keyword) => keyword.toLowerCase().includes(query))
-      const categoryMatch = item.category.toLowerCase().includes(query)
-
-      return titleMatch || descriptionMatch || keywordMatch || categoryMatch
-    })
+  const groupedItems = React.useMemo(() => {
+    return groupSearchItems(filterSearchItems(searchData, search))
   }, [search])
 
-  const groupedItems = React.useMemo(() => {
-    const groups: Record<string, SearchItem[]> = {}
-    filteredItems.forEach((item) => {
-      if (!groups[item.category]) {
-        groups[item.category] = []
-      }
-      groups[item.category].push(item)
-    })
-    return groups
-  }, [filteredItems])
+  const hasResults = Object.values(groupedItems).some((items) => items.length > 0)
 
   return (
     <Dialog {...props} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <CommandPrimitive className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
-          <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <CommandPrimitive.Input
+      <DialogContent className="overflow-hidden border-emerald-500/20 bg-black/95 p-0 text-emerald-100 shadow-lg">
+        <div className="border-b border-emerald-500/10 px-3 py-3">
+          <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-black/70 px-3 py-2">
+            <Search className="h-4 w-4 shrink-0 text-emerald-300/70" />
+            <input
               value={search}
-              onValueChange={setSearch}
-              className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={(event) => setSearch(event.target.value)}
+              className="h-7 w-full bg-transparent text-sm outline-none placeholder:text-emerald-200/40"
               placeholder="Search documentation..."
+              autoFocus
             />
           </div>
-          <CommandPrimitive.List className="max-h-[300px] overflow-y-auto overflow-x-hidden">
-            <CommandPrimitive.Empty className="py-6 text-center text-sm">No results found.</CommandPrimitive.Empty>
-            {Object.entries(groupedItems).map(([category, items]) => (
-              <CommandPrimitive.Group key={category} heading={category}>
-                {items.map((item) => {
-                  const Icon = item.icon || File
-                  return (
-                    <CommandPrimitive.Item
-                      key={item.id}
-                      value={`${item.title} ${item.description} ${item.keywords?.join(" ")}`}
-                      onSelect={() => {
-                        runCommand(() => router.push(item.href))
-                      }}
-                      className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none group-hover:bg-accent group-hover:text-accent-foreground aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                    >
-                      <Icon className="mr-2 h-4 w-4" />
-                      <div className="flex flex-col">
-                        <span className="group-hover:font-medium aria-selected:font-medium">{item.title}</span>
-                        {item.description && (
-                          <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
-                            {item.description}
-                          </span>
-                        )}
-                      </div>
-                    </CommandPrimitive.Item>
-                  )
-                })}
-              </CommandPrimitive.Group>
-            ))}
-          </CommandPrimitive.List>
-        </CommandPrimitive>
+        </div>
+
+        <div className="max-h-[320px] overflow-y-auto px-2 py-2">
+          {!hasResults ? (
+            <div className="py-8 text-center text-sm text-emerald-100/60">No results found.</div>
+          ) : (
+            Object.entries(groupedItems).map(([category, items]) => (
+              <div key={category} className="pb-3 last:pb-0">
+                <div className="px-2 pb-2 pt-1 text-xs font-medium uppercase tracking-[0.18em] text-emerald-300/50">
+                  {category}
+                </div>
+                <div className="space-y-1">
+                  {items.map((item) => {
+                    const Icon = item.icon || File
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => runCommand(() => router.push(item.href))}
+                        className="flex w-full items-start gap-3 rounded-md border border-transparent px-3 py-2 text-left transition-colors hover:border-emerald-500/10 hover:bg-emerald-500/10 focus-visible:border-emerald-500/20 focus-visible:bg-emerald-500/10 focus-visible:outline-none"
+                      >
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300/80" />
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-emerald-50">{item.title}</div>
+                          {item.description && <div className="text-xs text-emerald-200/55">{item.description}</div>}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -270,8 +245,8 @@ export function SearchButton() {
         onClick={() => setOpen(true)}
       >
         <Search className="mr-2 h-4 w-4 shrink-0" />
-        <span className="hidden lg:inline-flex truncate">Search documentation...</span>
-        <span className="inline-flex lg:hidden truncate">Search...</span>
+        <span className="hidden truncate lg:inline-flex">Search documentation...</span>
+        <span className="inline-flex truncate lg:hidden">Search...</span>
         <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span className="text-xs">⌘</span>K
         </kbd>

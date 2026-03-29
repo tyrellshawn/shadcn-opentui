@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Play, TerminalIcon, Code, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -7,6 +8,63 @@ import { Badge } from "@/components/ui/badge"
 import { CodePreview } from "@/components/docs/code-preview"
 import { Terminal as TerminalComponent } from "@/components/ui/terminal"
 import Link from "next/link"
+
+function ProfileSetupTerminal() {
+  const [completedProfile, setCompletedProfile] = useState<Record<string, string> | null>(null)
+
+  return (
+    <div className="space-y-3">
+      {completedProfile && (
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-sm text-emerald-200">
+          Saved profile: {completedProfile.name} - {completedProfile.role}
+        </div>
+      )}
+      <TerminalComponent
+        commands={{
+          profile: {
+            name: "profile",
+            description: "Open a profile form",
+            handler: (_args, context) => {
+              context?.setState?.((prev: { formData: Record<string, string> }) => ({
+                ...prev,
+                formData: {},
+                mode: "form",
+                activeComponent: {
+                  id: `profile-${Date.now()}`,
+                  type: "form",
+                  props: { fields: ["name", "role"] },
+                  active: true,
+                },
+              }))
+              context?.addLine?.("Profile form ready. Fill in name and role, then press Enter.", "success")
+            },
+          },
+          save: {
+            name: "save",
+            description: "Save the latest profile values",
+            handler: (_args, context) => {
+              const formData = context?.state?.formData as Record<string, string> | undefined
+
+              if (!formData?.name || !formData?.role) {
+                context?.addLine?.("Run 'profile' and submit the form before saving.", "error")
+                return
+              }
+
+              setCompletedProfile(formData)
+              context?.addLine?.(`Saved profile for ${formData.name} (${formData.role}).`, "success")
+            },
+          },
+        }}
+        welcomeMessage={[
+          "Profile Setup Demo",
+          "Run 'profile' to open a real interactive form.",
+          "After submitting, run 'save' to persist the values above.",
+        ]}
+        className="h-72"
+      />
+    </div>
+  )
+}
 
 export default function QuickStartPage() {
   return (
@@ -42,21 +100,17 @@ export default function MyTerminal() {
     <Terminal
       welcomeMessage={[
         "Welcome to my application!",
-        "Type 'help' to see available commands."
+        "Type 'help' to see available commands.",
       ]}
       className="h-64"
     />
   )
 }`}
           preview={
-            <div className="bg-black text-green-400 font-mono p-4 rounded-lg">
-              <div>Welcome to my application!</div>
-              <div>Type 'help' to see available commands.</div>
-              <div className="mt-2">
-                <span className="text-green-500">user@terminal:~$ </span>
-                <span className="bg-green-400 w-2 h-4 inline-block animate-pulse"></span>
-              </div>
-            </div>
+            <TerminalComponent
+              welcomeMessage={["Welcome to my application!", "Type 'help' to see available commands."]}
+              className="h-64"
+            />
           }
         />
 
@@ -103,46 +157,58 @@ export default function MyTerminal() {
           description="Add your own commands with custom handlers"
           code={`import { Terminal } from "@/components/ui/terminal"
 
-const customCommands = [
-  {
+const customCommands = {
+  greet: {
     name: "greet",
     description: "Greet the user",
-    handler: (args: string[]) => {
+    handler: (args, context) => {
       const name = args[0] || "World"
-      return \`Hello, \${name}! 👋\`
-    }
+      context?.addLine?.(\`Hello, \${name}! 👋\`, "success")
+    },
   },
-  {
+  time: {
     name: "time",
     description: "Show current time",
-    handler: () => {
-      return \`Current time: \${new Date().toLocaleTimeString()}\`
-    }
-  }
-]
+    handler: (_args, context) => {
+      context?.addLine?.(\`Current time: \${new Date().toLocaleTimeString()}\`, "output")
+    },
+  },
+}
 
 export default function CustomTerminal() {
   return (
     <Terminal
       commands={customCommands}
-      welcomeMessage={["Try: greet [name], time, help"]}
+      welcomeMessage={[
+        "Try: greet [name]",
+        "Try: time",
+      ]}
       className="h-64"
     />
   )
 }`}
           preview={
-            <div className="bg-black text-green-400 font-mono p-4 rounded-lg">
-              <div>Try: greet [name], time, help</div>
-              <div className="mt-2">
-                <span className="text-green-500">user@terminal:~$ </span>
-                <span>greet Alice</span>
-              </div>
-              <div>Hello, Alice! 👋</div>
-              <div className="mt-1">
-                <span className="text-green-500">user@terminal:~$ </span>
-                <span className="bg-green-400 w-2 h-4 inline-block ml-1 animate-pulse"></span>
-              </div>
-            </div>
+            <TerminalComponent
+              commands={{
+                greet: {
+                  name: "greet",
+                  description: "Greet the user",
+                  handler: (args, context) => {
+                    const name = args[0] || "World"
+                    context?.addLine?.(`Hello, ${name}!`, "success")
+                  },
+                },
+                time: {
+                  name: "time",
+                  description: "Show current time",
+                  handler: (_, context) => {
+                    context?.addLine?.(`Current time: ${new Date().toLocaleTimeString()}`, "output")
+                  },
+                },
+              }}
+              welcomeMessage={["Try: greet [name]", "Try: time"]}
+              className="h-64"
+            />
           }
         />
       </div>
@@ -152,47 +218,60 @@ export default function CustomTerminal() {
         <h2 className="text-2xl font-bold">Handling User Input</h2>
 
         <CodePreview
-          title="Simple Input Form"
-          description="Capture and display user input with OpenTUI's input component"
-          code={`import { render } from "@opentui/react"
-import { useState } from "react"
+          title="Terminal-Driven Form"
+          description="Open a real form inside the terminal and persist the submitted data"
+          code={`import { useState } from "react"
+ import { Terminal } from "@/components/ui/terminal"
 
-function InputForm() {
-  const [name, setName] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+ export default function ProfileSetupTerminal() {
+   const [completedProfile, setCompletedProfile] = useState(null)
 
-  return (
-    <box title="User Input" padding={2}>
-      {!submitted ? (
-        <>
-          <text>Enter your name:</text>
-          <input
-            placeholder="Type here..."
-            focused={true}
-            onInput={setName}
-            onSubmit={() => setSubmitted(true)}
-          />
-        </>
-      ) : (
-        <text fg="#00FF00">Hello, {name}!</text>
-      )}
-    </box>
-  )
-}
+   return (
+     <Terminal
+       commands={{
+         profile: {
+           name: "profile",
+           description: "Open a profile form",
+           handler: (_args, context) => {
+              context?.setState?.((prev) => ({
+                ...prev,
+                formData: {},
+                mode: "form",
+                activeComponent: {
+                  id: \`profile-\${Date.now()}\`,
+                 type: "form",
+                 props: { fields: ["name", "role"] },
+                 active: true,
+               },
+             }))
+             context?.addLine?.("Profile form ready. Fill in name and role, then press Enter.", "success")
+           },
+         },
+         save: {
+           name: "save",
+           description: "Save the latest profile values",
+           handler: (_args, context) => {
+             const formData = context?.state?.formData
+             if (!formData?.name || !formData?.role) {
+               context?.addLine?.("Run 'profile' and submit the form before saving.", "error")
+               return
+             }
 
-render(<InputForm />)`}
-          preview={
-            <div className="bg-black text-green-400 font-mono p-4 rounded-lg">
-              <div className="border border-green-400/30 p-2 rounded">
-                <div className="text-xs text-green-400/70 mb-1">User Input</div>
-                <div>Enter your name:</div>
-                <div className="bg-gray-800 px-2 py-1 mt-1 rounded">
-                  <span className="text-gray-400">Type here...</span>
-                  <span className="bg-green-400 w-2 h-4 inline-block ml-1 animate-pulse"></span>
-                </div>
-              </div>
-            </div>
-          }
+              setCompletedProfile(formData)
+              context?.addLine?.(\`Saved profile for \${formData.name} (\${formData.role}).\`, "success")
+            },
+          },
+        }}
+       welcomeMessage={[
+         "Profile Setup Demo",
+         "Run 'profile' to open a real interactive form.",
+         "After submitting, run 'save' to persist the values above.",
+       ]}
+       className="h-72"
+     />
+   )
+ }`}
+          preview={<ProfileSetupTerminal />}
         />
       </div>
 

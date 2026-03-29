@@ -6,6 +6,21 @@
 
 Terminal UI components for React built with shadcn/ui and OpenTUI.
 
+## 🚀 Future Vision: True Web OpenTUI Runtime
+
+This project is evolving from a React/DOM wrapper into a real, native OpenTUI WASM environment for the browser. Currently, `shadcn-opentui` uses a "dom-wrapper" strategy where components mimic the terminal using DOM elements (divs, spans). 
+
+The new architecture introduces a true Zig-to-WASM rendering core so any OpenTUI app—not just terminal components—can run natively in the browser.
+
+### The Turborepo Packages
+We are restructuring into a monorepo to separate the native web renderer from the shadcn integration:
+- `packages/web-core`: The OpenTUI Zig core compiled to `wasm32-freestanding` with a JS interop layer.
+- `packages/web-renderer`: The canvas-based WebAssembly renderer that executes OpenTUI draw commands natively.
+- `packages/web-react`: The React reconciler target for the browser renderer (similar to `@opentui/react` but for web surfaces).
+- `apps/docs`: The shadcn UI wrapper and documentation site you see today.
+
+*Status: The Zig WASM proof-of-concept is built and running. Rendering surface APIs are under active development.*
+
 ## Features
 
 - Interactive terminal with command history and keyboard shortcuts
@@ -52,6 +67,15 @@ cd shadcn-opentui
 bun install
 bun dev
 \`\`\`
+
+### Run the WASM runtime demo
+
+\`\`\`bash
+bun run build:web-runtime
+bun run dev:web-runtime
+\`\`\`
+
+Open `http://localhost:8090/packages/web-renderer/demo/index.html`.
 
 ## License
 
