@@ -26,3 +26,5 @@ See `packages/docs/milestones` for detailed architectural decisions and implemen
 From the monorepo root:
 - `bun run build:web-core`: Compiles the Zig code to WASM and builds the TS wrapper.
 - `bun run dev:web-core`: Starts a local HTTP server to test the WASM initialization in the browser.
+- `bun run build:web-runtime`: Builds `web-core`, `web-renderer`, and `web-react`.
+- `bun run dev:web-runtime`: Serves the monorepo for the full runtime demo at `packages/web-renderer/demo/index.html`.

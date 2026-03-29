@@ -13,14 +13,12 @@ export interface OpenTUIBrowserCapability {
 
 export function getOpenTUIBrowserCapability(): OpenTUIBrowserCapability {
   return {
-    renderer: "dom-wrapper",
-    browserRuntimeAvailable: false,
+    renderer: "zig-wasm",
+    browserRuntimeAvailable: true,
     packages: OPENTUI_PACKAGE_NAMES,
     shadcnCompatible: true,
-    reason:
-      "Official OpenTUI packages are installed, but the public project ships a native Zig core rather than a browser-ready WASM renderer today.",
-    recommendation:
-      "Use the shadcn-friendly DOM terminal wrapper in the browser now, while keeping the package/runtime boundary ready for a future Zig-to-WASM engine.",
+    reason: "The browser runtime now uses the Zig core compiled to WebAssembly and rendered through a canvas cell buffer.",
+    recommendation: "Use the WASM runtime path for terminal UI in browser experiences; keep the DOM wrapper only as fallback.",
   }
 }
 

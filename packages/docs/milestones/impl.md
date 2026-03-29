@@ -6,6 +6,25 @@
     - Initialize `@opentui/web-core`, `@opentui/web-renderer`, `@opentui/web-react`.
     - Create a minimal `main.zig` compiling to `wasm32-freestanding`.
     - Build a minimal JS wrapper inside `web-core` to load the WASM bytes and execute functions in the browser (`http-server`).
+- [x] **Milestone 2: Core WASM Interop Bridge (`packages/web-core`)**
+    - Added browser-first `OpenTUIWebCore` initialization via `WebAssembly.instantiateStreaming` with fetch fallback.
+    - Implemented exported Zig bridge functions for terminal sizing, shared cell buffer pointers, and key input forwarding.
+    - Added JS string serialization over `alloc(ptr,len)` and direct shared-memory cell reads.
+- [x] **Milestone 3: Canvas Rendering Engine (`packages/web-renderer`)**
+    - `CanvasTerminal` now consumes `@opentui/web-core`, renders the shared WASM cell buffer to `<canvas>`, and uses an invalidation-based `requestAnimationFrame` loop.
+    - Browser keyboard events are forwarded to WASM (`handleKeyInput`) with newline/backspace support.
+    - Added cursor blinking, basic text-style mapping (bold/dim), and resize-driven canvas metric recalculation.
+
+- [~] **Milestone 4: Web-React Reconciler (`packages/web-react`)**
+    - Added a `react-reconciler` host renderer with `createRoot(renderer)` / `render` / `unmount` root flow.
+    - Host instances now commit terminal output from reconciled trees, instead of direct element traversal.
+    - Remaining: richer primitive mapping parity with upstream `@opentui/react` component semantics.
+
+- [~] **Milestone 5: Shadcn-OpenTUI Integration**
+    - Added a cross-package browser demo (`packages/web-renderer/demo/index.html`) that runs core + renderer + web-react together.
+    - Added `WasmTerminal` app integration in `app/page.tsx`, loading `/opentui/main.wasm` and rendering through `@opentui/web-renderer` + `@opentui/web-react`.
+    - Runtime scripts now copy the built WASM binary into `public/opentui/main.wasm` for Next.js static serving.
+    - Remaining: migrate the rest of docs/examples from the DOM wrapper to the WASM runtime path.
 
 ## Upcoming Milestones
 

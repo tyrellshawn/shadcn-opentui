@@ -23,6 +23,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
+import { WasmTerminal } from "@/components/opentui/wasm-terminal"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -639,18 +640,7 @@ export default function Home() {
               </div>
 
               <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
-                <Terminal
-                  prompt="demo@opentui:~$"
-                  commands={customCommands}
-                  welcomeMessage={[
-                    "🚀 Welcome to OpenTUI Terminal",
-                    "",
-                    "Type 'help' to see available commands.",
-                    "Use ↑/↓ for history, Tab for completion.",
-                    "Try 'ui menu' or 'form' for interactive modes!",
-                  ]}
-                  className="h-[500px] bg-black"
-                />
+                <WasmTerminal className="h-[500px] bg-black" />
               </div>
             </div>
           </div>

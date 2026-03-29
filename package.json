@@ -8,6 +8,8 @@
     "dev:docs": "bun --bun next dev",
     "dev:web-core": "bun run --cwd packages/web-core serve",
     "build:web-core": "bun run --cwd packages/web-core build",
+    "build:web-runtime": "bun run --cwd packages/web-core build && bun run --cwd packages/web-renderer build && bun run --cwd packages/web-react build && mkdir -p public/opentui && cp packages/web-core/dist/main.wasm public/opentui/main.wasm",
+    "dev:web-runtime": "bun run build:web-runtime && bunx --bun http-server . -p 8090 -c-1",
     "lint": "bun --bun  next lint",
     "registry:build": "bun scripts/build-registry.mjs",
     "start": "bun --bun next start",
@@ -21,6 +23,8 @@
     "test:ci": "bun vitest run --reporter=dot && bun scripts/verify-opentui.ts && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
+    "@opentui/web-react": "workspace:*",
+    "@opentui/web-renderer": "workspace:*",
     "@opentui/core": "^0.1.90",
     "@opentui/react": "^0.1.90",
     "@radix-ui/react-dialog": "latest",

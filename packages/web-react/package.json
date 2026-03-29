@@ -1,5 +1,5 @@
 {
-  "name": "@opentui/web-renderer",
+  "name": "@opentui/web-react",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -8,9 +8,12 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@opentui/web-core": "workspace:*"
+    "@opentui/web-renderer": "workspace:*",
+    "react": "^19.0.0",
+    "react-reconciler": "^0.31.0"
   },
   "devDependencies": {
+    "@types/react-reconciler": "^0.32.0",
     "typescript": "^5.0.0"
   }
 }
