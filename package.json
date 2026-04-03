@@ -5,11 +5,28 @@
   "scripts": {
     "build": "bun --bun next build",
     "dev": "bun --bun next dev",
+    "dev:docs": "bun --bun next dev",
+    "dev:web-core": "bun run --cwd packages/web-core serve",
+    "build:web-core": "bun run --cwd packages/web-core build",
+    "build:web-runtime": "bun run --cwd packages/web-core build && bun run --cwd packages/web-renderer build && bun run --cwd packages/web-react build && mkdir -p public/opentui && cp packages/web-core/dist/main.wasm public/opentui/main.wasm",
+    "dev:web-runtime": "bun run build:web-runtime && bunx --bun http-server . -p 8090 -c-1",
     "lint": "bun --bun  next lint",
     "registry:build": "bun scripts/build-registry.mjs",
-    "start": "bun --bun next start"
+    "start": "bun --bun next start",
+    "test": "bun vitest run",
+    "test:watch": "bun vitest",
+    "test:ui": "bun vitest --ui",
+    "test:opentui": "bun scripts/verify-opentui.ts",
+    "test:integration": "bun vitest run --config vitest.integration.config.ts",
+    "test:integration:update": "UPDATE_SNAPSHOTS=1 bun vitest run --config vitest.integration.config.ts",
+    "test:perf": "bun vitest bench test/perf/*.bench.ts",
+    "test:ci": "bun vitest run --reporter=dot && bun scripts/verify-opentui.ts && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
+    "@opentui/web-react": "workspace:*",
+    "@opentui/web-renderer": "workspace:*",
+    "@opentui/core": "^0.1.90",
+    "@opentui/react": "^0.1.90",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-popover": "latest",
     "@radix-ui/react-separator": "latest",
@@ -20,7 +37,6 @@
     "@vercel/analytics": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cmdk": "latest",
     "lucide-react": "^0.454.0",
     "next": "15.2.8",
     "next-themes": "latest",
@@ -29,16 +45,35 @@
     "react-dom": "19.0.0",
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "turbo": "^2.8.20"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.5",
+    "@types/wait-on": "^5.3.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/ui": "^4.1.0",
+    "jsdom": "^29.0.1",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "postcss": "^8.5",
+    "puppeteer": "^24.40.0",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
-    "typescript": "^5"
-  }
+    "typescript": "^5",
+    "vitest": "^4.1.0",
+    "wait-on": "^9.0.4"
+  },
+  "packageManager": "bun@1.3.6",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
 }

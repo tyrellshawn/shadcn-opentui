@@ -45,6 +45,12 @@ interface TerminalState {
   menuSelection: number
 }
 
+interface CommandCompletion {
+  name: string
+  description: string
+  category?: TerminalCommand["category"]
+}
+
   interface OpenTUIContext {
     state: TerminalState
     setState: React.Dispatch<React.SetStateAction<TerminalState>>
@@ -64,6 +70,26 @@ export const useOpenTUI = () => {
     throw new Error("useOpenTUI must be used within an OpenTUI provider")
   }
   return context
+}
+
+const getInputParts = (value: string) => {
+  const trimmedStart = value.trimStart()
+  const leadingWhitespaceLength = value.length - trimmedStart.length
+  const firstSpaceIndex = trimmedStart.indexOf(" ")
+
+  if (firstSpaceIndex === -1) {
+    return {
+      leadingWhitespaceLength,
+      commandPart: trimmedStart,
+      argsPart: "",
+    }
+  }
+
+  return {
+    leadingWhitespaceLength,
+    commandPart: trimmedStart.slice(0, firstSpaceIndex),
+    argsPart: trimmedStart.slice(firstSpaceIndex),
+  }
 }
 
 const createBuiltInCommands = (
@@ -124,7 +150,7 @@ const createBuiltInCommands = (
     handler: () => {
       addLine("🚀 OpenTUI Terminal Component", "success")
       addLine("Built with React and shadcn/ui")
-      addLine("GitHub: https://github.com/sst/opentui")
+      addLine("GitHub: https://github.com/anomalyco/opentui")
       addLine("Type 'help' for available commands")
     },
   },
@@ -326,6 +352,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const [historyIndex, setHistoryIndex] = useState(-1)
     const [cursorPosition, setCursorPosition] = useState(0)
     const [userScrolledUp, setUserScrolledUp] = useState(false)
+    const [activeCompletionIndex, setActiveCompletionIndex] = useState(0)
 
     const inputRef = useRef<HTMLInputElement>(null)
     const terminalRef = useRef<HTMLDivElement>(null)
@@ -415,11 +442,79 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
     const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext)
     const allCommands = [...builtInCommands, ...Object.values(commands)]
+    const commandNames = allCommands.map((command) => command.name)
+    const commandMap = new Map(allCommands.map((command) => [command.name, command]))
+
+    const { commandPart, argsPart, leadingWhitespaceLength } = getInputParts(currentInput)
+    const currentPlaceholder = isProcessing
+      ? "Processing..."
+      : opentuiState[0].mode !== "command"
+        ? `${opentuiState[0].mode.toUpperCase()} mode - ESC to exit`
+        : "Type a command..."
+    const canShowCompletions =
+      opentuiState[0].mode === "command" && !isProcessing && currentInput.trim().length > 0 && argsPart.length === 0
+    const completionSuggestions: CommandCompletion[] = canShowCompletions
+      ? allCommands
+          .filter((command) => command.name.startsWith(commandPart))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .slice(0, 8)
+          .map((command) => ({
+            name: command.name,
+            description: command.description,
+            category: command.category,
+          }))
+      : []
+
+    const applyCompletion = useCallback(
+      (completionName: string) => {
+        const nextValue = `${currentInput.slice(0, leadingWhitespaceLength)}${completionName} `
+        const nextCursorPosition = nextValue.length
+
+        setCurrentInput(nextValue)
+        setCursorPosition(nextCursorPosition)
+
+        requestAnimationFrame(() => {
+          if (inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.setSelectionRange(nextCursorPosition, nextCursorPosition)
+          }
+        })
+      },
+      [currentInput, leadingWhitespaceLength],
+    )
+
+    const renderHighlightedInput = useCallback(() => {
+      if (!currentInput) {
+        return <span className="text-green-400/40">{currentPlaceholder}</span>
+      }
+
+      const leadingWhitespace = currentInput.slice(0, leadingWhitespaceLength)
+      const hasExactCommandMatch = commandMap.has(commandPart)
+      const hasPartialCommandMatch = commandNames.some((name) => name.startsWith(commandPart))
+
+      const commandClass = hasExactCommandMatch
+        ? "text-emerald-300"
+        : hasPartialCommandMatch
+          ? "text-amber-300"
+          : "text-red-300"
+
+      return (
+        <>
+          <span className="text-transparent">{leadingWhitespace}</span>
+          <span className={commandClass}>{commandPart}</span>
+          <span className="text-cyan-200">{argsPart}</span>
+        </>
+      )
+    }, [argsPart, commandMap, commandNames, commandPart, currentInput, currentPlaceholder, leadingWhitespaceLength])
+
+    useEffect(() => {
+      setActiveCompletionIndex(0)
+    }, [currentInput])
 
     const processCommand = useCallback(
       async (input: string) => {
         const [commandName, ...args] = input.trim().split(/\s+/)
-        const command = allCommands.find((cmd) => cmd.name === commandName)
+        const command = commandMap.get(commandName)
 
         if (command) {
           try {
@@ -441,7 +536,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           addLine("Type 'help' for available commands")
         }
       },
-      [onCommand, addLine],
+      [commandMap, onCommand, addLine],
     )
 
     const handleCommand = async (command: string) => {
@@ -514,33 +609,51 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         e.preventDefault()
         handleCommand(currentInput)
       } else if (e.key === "ArrowUp") {
+        if (completionSuggestions.length > 0) {
+          e.preventDefault()
+          setActiveCompletionIndex((prev) =>
+            prev <= 0 ? completionSuggestions.length - 1 : prev - 1,
+          )
+          return
+        }
+
         e.preventDefault()
         if (commandHistory.length > 0) {
           const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1)
+          const nextCommand = commandHistory[newIndex]
           setHistoryIndex(newIndex)
-          setCurrentInput(commandHistory[newIndex])
+          setCurrentInput(nextCommand)
+          setCursorPosition(nextCommand.length)
         }
       } else if (e.key === "ArrowDown") {
+        if (completionSuggestions.length > 0) {
+          e.preventDefault()
+          setActiveCompletionIndex((prev) =>
+            prev >= completionSuggestions.length - 1 ? 0 : prev + 1,
+          )
+          return
+        }
+
         e.preventDefault()
         if (historyIndex !== -1) {
           const newIndex = historyIndex + 1
           if (newIndex >= commandHistory.length) {
             setHistoryIndex(-1)
             setCurrentInput("")
+            setCursorPosition(0)
           } else {
+            const nextCommand = commandHistory[newIndex]
             setHistoryIndex(newIndex)
-            setCurrentInput(commandHistory[newIndex])
+            setCurrentInput(nextCommand)
+            setCursorPosition(nextCommand.length)
           }
         }
       } else if (e.key === "Tab") {
         e.preventDefault()
-        const commandNames = allCommands.map((cmd) => cmd.name)
-        const matches = commandNames.filter((cmd) => cmd.startsWith(currentInput))
+        const selectedCompletion = completionSuggestions[activeCompletionIndex] ?? completionSuggestions[0]
 
-        if (matches.length === 1) {
-          setCurrentInput(matches[0])
-        } else if (matches.length > 1) {
-          addLine(`Available completions: ${matches.join(", ")}`, "success")
+        if (selectedCompletion) {
+          applyCompletion(selectedCompletion.name)
         }
       } else if (e.key === "l" && e.ctrlKey) {
         e.preventDefault()
@@ -670,22 +783,22 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case "compact":
-          return "p-2 text-xs"
+          return "p-2 text-xs sm:text-sm"
         case "minimal":
           return "p-3 border-0 shadow-none"
         default:
-          return "p-4 text-sm shadow-2xl shadow-green-400/10"
+          return "p-3 text-xs shadow-2xl shadow-green-400/10 sm:p-4 sm:text-sm"
       }
     }
 
     const getHeightClass = () => {
       switch (variant) {
         case "compact":
-          return "h-64"
+          return "h-[22rem] sm:h-64"
         case "minimal":
-          return "h-48"
+          return "h-48 sm:h-52"
         default:
-          return "h-96"
+          return "h-[55vh] min-h-72 max-h-[36rem] sm:h-96"
       }
     }
 
@@ -905,7 +1018,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           {...props}
         >
           {variant !== "minimal" && (
-            <div className="flex items-center justify-between mb-2 pb-2 border-b border-green-400/20">
+            <div className="mb-2 flex flex-col gap-1 border-b border-green-400/20 pb-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-green-400 text-xs font-semibold">
                 OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
               </div>
@@ -943,7 +1056,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   key={line.id}
                   data-contains-progress={isProgressLine}
                   className={cn(
-                    "terminal-line leading-relaxed mb-1",
+                    "terminal-line mb-1 break-words leading-relaxed",
                     isProgressLine && "font-variant-numeric-tabular",
                     line.type === "input" && "text-white font-semibold",
                     line.type === "error" && "text-red-400",
@@ -958,9 +1071,15 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
             {renderUIComponent()}
 
-            <div className="flex items-center text-white mt-1 relative">
+            <div className="relative mt-1 flex items-start text-white">
               <span className="text-green-400 mr-2 font-bold shrink-0">{prompt}</span>
-              <div className="flex-1 relative">
+              <div className="relative min-w-0 flex-1">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words font-mono text-sm sm:text-base"
+                >
+                  {renderHighlightedInput()}
+                </div>
                 <input
                   ref={inputRef}
                   type="text"
@@ -981,16 +1100,10 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                     }
                   }}
                   disabled={isProcessing}
-                  className="w-full bg-transparent border-none outline-none text-white font-mono caret-transparent"
+                  className="w-full bg-transparent border-none font-mono text-sm text-transparent caret-transparent outline-none sm:text-base"
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder={
-                    isProcessing
-                      ? "Processing..."
-                      : opentuiState[0].mode !== "command"
-                        ? `${opentuiState[0].mode.toUpperCase()} mode - ESC to exit`
-                        : "Type a command..."
-                  }
+                  placeholder={currentPlaceholder}
                 />
                 <div
                   className="absolute top-0 w-2 h-5 bg-green-400 pointer-events-none animate-terminal-blink"
@@ -998,6 +1111,41 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                     left: `${cursorPosition * 0.6}em`,
                   }}
                 />
+
+                {completionSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded border border-green-400/20 bg-black/95 shadow-lg">
+                    <div className="max-h-40 overflow-y-auto terminal-scrollbar">
+                      {completionSuggestions.map((suggestion, index) => (
+                        <button
+                          key={suggestion.name}
+                          type="button"
+                          className={cn(
+                            "w-full border-b border-green-400/10 px-3 py-2 text-left text-xs last:border-b-0 sm:text-sm",
+                            index === activeCompletionIndex
+                              ? "bg-green-400/20 text-green-200"
+                              : "text-green-400 hover:bg-green-400/10",
+                          )}
+                          onMouseDown={(event) => {
+                            event.preventDefault()
+                            setActiveCompletionIndex(index)
+                            applyCompletion(suggestion.name)
+                          }}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="font-semibold">{suggestion.name}</span>
+                            {suggestion.category && (
+                              <span className="text-[10px] uppercase tracking-wide text-green-400/60">{suggestion.category}</span>
+                            )}
+                          </div>
+                          <div className="truncate text-[11px] text-green-400/70">{suggestion.description}</div>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="border-t border-green-400/10 px-3 py-1.5 text-[10px] text-green-400/60">
+                      Tab to complete, arrows to navigate
+                    </div>
+                  </div>
+                )}
               </div>
               {isProcessing && <span className="ml-2 text-yellow-400 animate-pulse">⚡</span>}
             </div>

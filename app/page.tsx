@@ -1,10 +1,9 @@
 "use client"
 
 import type React from "react"
-import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
-import { TerminalControls } from "@/components/ui/terminal-controls"
-import { TerminalSlider } from "@/components/ui/terminal-slider"
+import { Terminal } from "@/components/ui/terminal"
 import { Command } from "@/components/command"
+import type { CommandHandler } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import {
   ArrowRight,
@@ -17,34 +16,14 @@ import {
   Sparkles,
   Copy,
   Check,
-  SlidersHorizontal,
-  Gauge,
+  LayoutPanelTop,
+  WandSparkles,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
-
-function TypewriterText({ text, delay = 50 }: { text: string; delay?: number }) {
-  const [displayText, setDisplayText] = useState("")
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayText((prev) => prev + text[currentIndex])
-        setCurrentIndex((prev) => prev + 1)
-      }, delay)
-      return () => clearTimeout(timer)
-    }
-  }, [currentIndex, text, delay])
-
-  return (
-    <span>
-      {displayText}
-      <span className="animate-pulse">|</span>
-    </span>
-  )
-}
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
+import { WasmTerminal } from "@/components/opentui/wasm-terminal"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -207,9 +186,9 @@ function RegistrySetupBlock() {
       description: "Install the main OpenTUI terminal component",
     },
     {
-      title: "Add terminal controls",
-      command: "bunx shadcn@latest add terminal-controls terminal-slider",
-      description: "Add interactive UI components for terminal control panels",
+      title: "Install official OpenTUI packages",
+      command: "bun add @opentui/core @opentui/react",
+      description: "Keep the browser terminal aligned with the official OpenTUI package boundary.",
     },
   ]
 
@@ -246,22 +225,38 @@ function RegistrySetupBlock() {
 }
 
 export default function Home() {
-  const customCommands: TerminalCommand[] = [
-    { name: "echo", description: "Echo text to output", handler: () => {} },
-    { name: "whoami", description: "Display current user", handler: () => {} },
-    { name: "pwd", description: "Print working directory", handler: () => {} },
-    { name: "ls", description: "List directory contents", handler: () => {} },
-    { name: "ui", description: "Enter UI mode", handler: () => {} },
-    { name: "form", description: "Create interactive form", handler: () => {} },
-    { name: "menu", description: "Create interactive menu", handler: () => {} },
-    { name: "progress", description: "Show progress bar", handler: () => {} },
-    { name: "ascii", description: "Generate ASCII art", handler: () => {} },
-  ]
+  const customCommands: Record<string, CommandHandler> = {
+    echo: {
+      name: "echo",
+      description: "Echo text to output",
+      handler: (args, context) => context?.addLine?.(args.join(" ") || "Nothing to echo", "success"),
+    },
+    whoami: {
+      name: "whoami",
+      description: "Display current user",
+      handler: (_args, context) => context?.addLine?.("guest@opentui", "output"),
+    },
+    pwd: {
+      name: "pwd",
+      description: "Print working directory",
+      handler: (_args, context) => context?.addLine?.("/workspace/opentui-demo", "output"),
+    },
+    ls: {
+      name: "ls",
+      description: "List directory contents",
+      handler: (_args, context) => context?.addLine?.("app  components  lib  public", "output"),
+    },
+    ui: { name: "ui", description: "Enter UI mode", handler: () => {} },
+    form: { name: "form", description: "Create interactive form", handler: () => {} },
+    menu: { name: "menu", description: "Create interactive menu", handler: () => {} },
+    progress: { name: "progress", description: "Show progress bar", handler: () => {} },
+    ascii: { name: "ascii", description: "Generate ASCII art", handler: () => {} },
+  }
 
   const demoScript1 = [
     {
       command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-      output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+      output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
       delay: 2000,
     },
     {
@@ -329,7 +324,7 @@ export default function Home() {
                 Components
               </Link>
               <Link
-                href="/docs/examples"
+                href="/docs/components/examples"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Examples
@@ -337,7 +332,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
-                <Link href="https://github.com/sst/opentui" target="_blank">
+                <Link href="https://github.com/anomalyco/opentui" target="_blank">
                   <Github className="w-4 h-4" />
                 </Link>
               </Button>
@@ -381,6 +376,16 @@ export default function Home() {
                 completion, interactive UI components, and full TypeScript support.
               </p>
 
+              <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-black/40 px-5 py-4 text-sm text-muted-foreground">
+                Built for <span className="font-semibold text-foreground">React and Next.js apps in the browser</span>
+                . The goal is a terminal-native web experience that keeps shadcn ergonomics without falling back to a
+                generic command palette or stock slider UI.
+              </div>
+
+              <div className="mx-auto max-w-3xl text-left">
+                <OpenTUIRuntimeStatusCard />
+              </div>
+
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up-delay-3">
                 <Button
                   size="lg"
@@ -398,7 +403,7 @@ export default function Home() {
                   className="px-8 bg-black/40 border-border/50 hover:bg-black/60"
                   asChild
                 >
-                  <Link href="https://github.com/sst/opentui" target="_blank">
+                  <Link href="https://github.com/anomalyco/opentui" target="_blank">
                     <Github className="w-4 h-4 mr-2" />
                     View on GitHub
                   </Link>
@@ -433,7 +438,7 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               <OpenTUITerminalDemo title="Installation" script={[{
                 command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-                output: ["Downloading @shadcn-opentui/terminal...", "✓ Terminal component installed"],
+                output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
                 delay: 2000,
               }, {
                 command: "npm run dev",
@@ -449,37 +454,110 @@ export default function Home() {
         <section className="py-20 px-6 border-y border-primary/10 bg-black/20">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">OpenTUI Components</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Terminal-native patterns</h2>
               <p className="text-muted-foreground text-lg">
-                Interactive terminal UI components from the @shadcn-opentui registry
+                Reusable OpenTUI interaction systems that stay inside the terminal instead of drifting into generic UI.
               </p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Terminal Controls Demo */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-mono text-primary">
-                  <SlidersHorizontal className="w-4 h-4" />
-                  <span>@shadcn-opentui/terminal-controls</span>
+                  <LayoutPanelTop className="w-4 h-4" />
+                  <span>In-terminal workflows</span>
                 </div>
-                <TerminalControls className="bg-black/80" onCommand={(cmd) => console.log("Command:", cmd)} />
-                <p className="text-xs text-muted-foreground">
-                  Pre-built control panel with sliders and buttons for terminal settings
-                </p>
+                <TerminalScenarioCard
+                  title="Forms and menus as first-class terminal flows"
+                  description="Drive onboarding, settings, and command routing from one reusable OpenTUI surface."
+                  commands={{
+                    profile: {
+                      name: "profile",
+                      description: "Open a profile form",
+                      handler: (_args, context) => {
+                        context?.setState?.((prev: { menuSelection: number }) => ({
+                          ...prev,
+                          mode: "form",
+                          formData: {},
+                          activeComponent: {
+                            id: `profile-${Date.now()}`,
+                            type: "form",
+                            props: { fields: ["name", "role"] },
+                            active: true,
+                          },
+                        }))
+                      },
+                    },
+                    menu: {
+                      name: "menu",
+                      description: "Open a workspace menu",
+                      handler: (_args, context) => {
+                        context?.setState?.((prev: { menuSelection: number }) => ({
+                          ...prev,
+                          mode: "ui",
+                          menuSelection: 0,
+                          activeComponent: {
+                            id: `workspace-${Date.now()}`,
+                            type: "menu",
+                            props: { items: ["Workspace", "Deployments", "Themes", "Logs"] },
+                            active: true,
+                          },
+                        }))
+                      },
+                    },
+                  }}
+                  welcomeMessage={[
+                    "Run 'profile' for a form.",
+                    "Run 'menu' for a keyboard-driven menu.",
+                  ]}
+                />
               </div>
 
-              {/* Terminal Slider Demo */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-mono text-primary">
-                  <Gauge className="w-4 h-4" />
-                  <span>@shadcn-opentui/terminal-slider</span>
+                  <WandSparkles className="w-4 h-4" />
+                  <span>Terminal dashboards</span>
                 </div>
-                <div className="p-6 border border-primary/20 rounded bg-black/50 space-y-6">
-                  <TerminalSlider label="CPU Usage" defaultValue={[65]} unit="%" max={100} />
-                  <TerminalSlider label="Memory" defaultValue={[42]} unit=" GB" max={64} ascii width={20} />
-                  <TerminalSlider label="Network Speed" defaultValue={[850]} unit=" Mbps" max={1000} />
-                </div>
-                <p className="text-xs text-muted-foreground">Terminal-styled sliders with ASCII visualization mode</p>
+                <TerminalScenarioCard
+                  title="Dashboards that still feel like a terminal"
+                  description="Show progress, system status, and generated output without falling back to stock sliders."
+                  commands={{
+                    status: {
+                      name: "status",
+                      description: "Show environment status",
+                      handler: (_args, context) => {
+                        context?.addLine?.("CPU: 42%", "success")
+                        context?.addLine?.("Memory: 6.1 GB / 16 GB", "output")
+                        context?.addLine?.("Network: 842 Mbps", "output")
+                      },
+                    },
+                    progress: {
+                      name: "progress",
+                      description: "Animate a deploy progress bar",
+                      handler: async (_args, context) => {
+                        context?.addLine?.("Deploying preview environment...", "success")
+                        context?.addLine?.("Deploy: [.....] 0%", "output")
+                        for (let step = 1; step <= 5; step += 1) {
+                          context?.updateLastLine?.(`Deploy: [${"#".repeat(step)}${".".repeat(5 - step)}] ${step * 20}%`)
+                          await new Promise((resolve) => setTimeout(resolve, 180))
+                        }
+                        context?.addLine?.("Preview deploy complete.", "success")
+                      },
+                    },
+                    banner: {
+                      name: "banner",
+                      description: "Render a launch banner",
+                      handler: (_args, context) => {
+                        context?.addLine?.("+------------------+", "success")
+                        context?.addLine?.("| OPEN TUI READY   |", "success")
+                        context?.addLine?.("+------------------+", "success")
+                      },
+                    },
+                  }}
+                  welcomeMessage={[
+                    "Run 'status' for a live readout.",
+                    "Run 'progress' or 'banner' for richer terminal output.",
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -519,7 +597,7 @@ export default function Home() {
               <FeatureCard
                 icon={Layers}
                 title="UI Components"
-                description="Built-in forms, menus, sliders, and progress bars for interactive terminal UIs."
+                description="Built-in forms, menus, tables, and progress flows for interactive terminal UIs."
               />
               <FeatureCard
                 icon={Code2}
@@ -562,18 +640,7 @@ export default function Home() {
               </div>
 
               <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
-                <Terminal
-                  prompt="demo@opentui:~$"
-                  commands={customCommands}
-                  welcomeMessage={[
-                    "🚀 Welcome to OpenTUI Terminal",
-                    "",
-                    "Type 'help' to see available commands.",
-                    "Use ↑/↓ for history, Tab for completion.",
-                    "Try 'ui menu' or 'form' for interactive modes!",
-                  ]}
-                  className="h-[500px] bg-black"
-                />
+                <WasmTerminal className="h-[500px] bg-black" />
               </div>
             </div>
           </div>
@@ -621,7 +688,7 @@ export default function Home() {
                   Documentation
                 </Link>
                 <Link
-                  href="https://github.com/sst/opentui"
+                  href="https://github.com/anomalyco/opentui"
                   target="_blank"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
@@ -639,6 +706,28 @@ export default function Home() {
           </div>
         </footer>
       </div>
+    </div>
+  )
+}
+
+function TerminalScenarioCard({
+  title,
+  description,
+  commands,
+  welcomeMessage,
+}: {
+  title: string
+  description: string
+  commands: Record<string, CommandHandler>
+  welcomeMessage: string[]
+}) {
+  return (
+    <div className="space-y-4 rounded-2xl border border-primary/20 bg-black/50 p-5">
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </div>
+      <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-64 bg-black" />
     </div>
   )
 }
