@@ -5,6 +5,7 @@ import { Terminal, type TerminalCommand } from "@/components/ui/terminal"
 import { TerminalControls } from "@/components/ui/terminal-controls"
 import { TerminalSlider } from "@/components/ui/terminal-slider"
 import { Command } from "@/components/command"
+import type { CommandHandler } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import {
   ArrowRight,
@@ -19,10 +20,14 @@ import {
   Check,
   SlidersHorizontal,
   Gauge,
+  LayoutPanelTop,
+  WandSparkles,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
+import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
+import { WasmTerminal } from "@/components/opentui/wasm-terminal"
 
 function TypewriterText({ text, delay = 50 }: { text: string; delay?: number }) {
   const [displayText, setDisplayText] = useState("")
@@ -246,17 +251,33 @@ function RegistrySetupBlock() {
 }
 
 export default function Home() {
-  const customCommands: TerminalCommand[] = [
-    { name: "echo", description: "Echo text to output", handler: () => {} },
-    { name: "whoami", description: "Display current user", handler: () => {} },
-    { name: "pwd", description: "Print working directory", handler: () => {} },
-    { name: "ls", description: "List directory contents", handler: () => {} },
-    { name: "ui", description: "Enter UI mode", handler: () => {} },
-    { name: "form", description: "Create interactive form", handler: () => {} },
-    { name: "menu", description: "Create interactive menu", handler: () => {} },
-    { name: "progress", description: "Show progress bar", handler: () => {} },
-    { name: "ascii", description: "Generate ASCII art", handler: () => {} },
-  ]
+  const customCommands: Record<string, CommandHandler> = {
+    echo: {
+      name: "echo",
+      description: "Echo text to output",
+      handler: (args, context) => context?.addLine?.(args.join(" ") || "Nothing to echo", "success"),
+    },
+    whoami: {
+      name: "whoami",
+      description: "Display current user",
+      handler: (_args, context) => context?.addLine?.("guest@hellvlad", "output"),
+    },
+    pwd: {
+      name: "pwd",
+      description: "Print working directory",
+      handler: (_args, context) => context?.addLine?.("/workspace/hellvlad-demo", "output"),
+    },
+    ls: {
+      name: "ls",
+      description: "List directory contents",
+      handler: (_args, context) => context?.addLine?.("app  components  lib  public", "output"),
+    },
+    ui: { name: "ui", description: "Enter UI mode", handler: () => {} },
+    form: { name: "form", description: "Create interactive form", handler: () => {} },
+    menu: { name: "menu", description: "Create interactive menu", handler: () => {} },
+    progress: { name: "progress", description: "Show progress bar", handler: () => {} },
+    ascii: { name: "ascii", description: "Generate ASCII art", handler: () => {} },
+  }
 
   const demoScript1 = [
     {

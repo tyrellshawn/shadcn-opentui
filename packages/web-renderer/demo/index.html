@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenTUI Web Runtime Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at 20% 0%, #26314a 0%, #0c0f16 45%, #080a0f 100%);
+        color: #dce8ff;
+        font-family: "Iosevka", "JetBrains Mono", ui-monospace, monospace;
+        display: grid;
+        place-items: center;
+      }
+
+      .shell {
+        width: min(980px, 94vw);
+        border: 1px solid #32446d;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background: linear-gradient(180deg, #1a2438 0%, #131b2c 100%);
+        border-bottom: 1px solid #2f4064;
+      }
+
+      .toolbar button {
+        border: 1px solid #3f5788;
+        background: #1d2b46;
+        color: #dce8ff;
+        border-radius: 8px;
+        font-family: inherit;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .toolbar button:hover {
+        background: #25365a;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="toolbar">
+        <strong>OpenTUI WASM Runtime</strong>
+        <button id="rerender">Re-render React Scene</button>
+      </div>
+      <canvas id="terminal"></canvas>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@opentui/web-core": "/packages/web-core/dist/index.js",
+          "@opentui/web-renderer": "/packages/web-renderer/dist/index.js",
+          "@opentui/web-react": "/packages/web-react/dist/index.js",
+          "react": "https://esm.sh/react@19"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import React from "react";
+      import { CanvasTerminal } from "@opentui/web-renderer";
+      import { createRoot } from "@opentui/web-react";
+
+      const canvas = document.getElementById("terminal");
+      const rerenderButton = document.getElementById("rerender");
+
+      const terminal = new CanvasTerminal(canvas, {
+        cols: 90,
+        rows: 26,
+        fontSize: 16,
+        lineHeight: 1.25,
+      });
+
+      await terminal.init("/packages/web-core/dist/main.wasm");
+
+      const root = createRoot(terminal);
+
+      function scene() {
+        return React.createElement(
+          "box",
+          null,
+          React.createElement("text", null, "OpenTUI web-react createRoot()"),
+          React.createElement("br"),
+          React.createElement("text", null, "- Zig core compiled to wasm32-freestanding"),
+          React.createElement("br"),
+          React.createElement("text", null, "- Canvas renderer reads shared WASM memory"),
+          React.createElement("br"),
+          React.createElement("text", null, "- React scene converted into terminal buffer")
+        );
+      }
+
+      root.render(scene());
+      rerenderButton.addEventListener("click", () => root.render(scene()));
+    </script>
+  </body>
+</html>
