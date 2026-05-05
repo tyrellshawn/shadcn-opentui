@@ -152,7 +152,13 @@ export class CanvasTerminal {
             return;
         if (event.key === "Backspace") {
             event.preventDefault();
-            this.core.handleKeyInput("\b");
+            this.core.handleKeyInput("\x7f");
+            this.requestRender();
+            return;
+        }
+        if (event.key === "Delete") {
+            event.preventDefault();
+            this.core.handleKeyInput("\x1b[3~");
             this.requestRender();
             return;
         }

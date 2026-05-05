@@ -1,4 +1,4 @@
-import { Package, Download, CheckCircle } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CodePreview } from "@/components/docs/code-preview"
@@ -10,12 +10,9 @@ export default function InstallationPage() {
     <div className="space-y-8">
       <div className="space-y-4">
         <h1 className="text-4xl font-bold tracking-tight">Installation</h1>
-          <p className="text-xl text-muted-foreground">
-            Get started with the shadcn terminal component using a single command.
-          </p>
-        </div>
+        <p className="text-xl text-muted-foreground">Get started with the shadcn terminal component using a single command.</p>
+      </div>
 
-        {/* Prerequisites */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -31,7 +28,6 @@ export default function InstallationPage() {
           </CardContent>
         </Card>
 
-        {/* Prerequisites */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -82,6 +78,22 @@ export default function InstallationPage() {
 
         <OpenTUIRuntimeStatusCard />
 
+      <details className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4">
+        <summary className="cursor-pointer list-none font-medium text-foreground">
+          Experimental runtime packages (optional)
+        </summary>
+        <div className="mt-3 space-y-3 text-sm text-muted-foreground">
+          <p>
+            Stable shadcn component usage is the default path for production apps. Use the runtime lane only if you want to
+            experiment with the Zig/WASM browser core.
+          </p>
+          <div className="bg-background/70 rounded-md p-3 border border-amber-500/20">
+            <code className="text-sm block">bun add @opentui/core @opentui/react</code>
+          </div>
+          <p>These packages are intentionally labeled experimental because the rendering APIs are still evolving.</p>
+        </div>
+      </details>
+
       {/* Verification */}
       <Card>
         <CardHeader>
@@ -130,13 +142,14 @@ export default function TestPage() {
             <div>
               <h4 className="font-semibold text-sm">JSX element errors</h4>
               <p className="text-sm text-muted-foreground">
-                Ensure your tsconfig.json has the correct jsxImportSource setting pointing to "@opentui/react".
+                If you are only using shadcn components, you do not need a custom jsxImportSource. Keep your default Next.js setup.
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm">Module not found errors</h4>
               <p className="text-sm text-muted-foreground">
-                Verify all required packages are installed: @opentui/react, @opentui/core, and react.
+                For stable component usage, ensure your registry install completed. For experimental runtime usage, also install
+                @opentui/react and @opentui/core.
               </p>
             </div>
           </div>

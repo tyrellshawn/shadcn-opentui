@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import { Terminal } from "@/components/ui/terminal"
 import { Command } from "@/components/command"
 import type { CommandHandler } from "@/lib/types"
 import { Button } from "@/components/ui/button"
@@ -20,10 +19,10 @@ import {
   WandSparkles,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
-import { WasmTerminal } from "@/components/opentui/wasm-terminal"
+import { Terminal } from "@/components/ui/terminal"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -41,103 +40,25 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function OpenTUITerminalDemo({
+function TerminalDemoCard({
   title,
-  script,
+  description,
+  commands,
+  welcomeMessage,
 }: {
   title: string
-  script: Array<{ command: string; output: string[]; delay: number }>
+  description: string
+  commands: Record<string, CommandHandler>
+  welcomeMessage: string[]
 }) {
-  const [lines, setLines] = useState<Array<{ type: string; content: string }>>([])
-  const [currentStep, setCurrentStep] = useState(0)
-  const [typedCommand, setTypedCommand] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-
-  useEffect(() => {
-    if (currentStep >= script.length) {
-      const resetTimer = setTimeout(() => {
-        setLines([])
-        setCurrentStep(0)
-        setTypedCommand("")
-      }, 5000)
-      return () => clearTimeout(resetTimer)
-    }
-
-    const step = script[currentStep]
-    setIsTyping(true)
-    setTypedCommand("")
-
-    let charIndex = 0
-    const typeInterval = setInterval(() => {
-      if (charIndex < step.command.length) {
-        setTypedCommand(step.command.slice(0, charIndex + 1))
-        charIndex++
-      } else {
-        clearInterval(typeInterval)
-        setIsTyping(false)
-
-        setTimeout(() => {
-          setLines((prev) => [...prev, { type: "command", content: step.command }])
-          step.output.forEach((output, i) => {
-            setTimeout(() => {
-              setLines((prev) => [
-                ...prev,
-                { type: output.startsWith("✓") || output.startsWith("✔") ? "success" : "output", content: output },
-              ])
-            }, i * 150)
-          })
-          setTypedCommand("")
-          setTimeout(() => setCurrentStep((prev) => prev + 1), step.delay)
-        }, 200)
-      }
-    }, 50)
-
-    return () => clearInterval(typeInterval)
-  }, [currentStep, script])
-
   return (
-    <div className="bg-black border border-primary/30 rounded-lg overflow-hidden shadow-lg shadow-primary/10">
-      {/* OpenTUI Terminal Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-primary/20 bg-black/80">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/80" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-            <div className="w-3 h-3 rounded-full bg-green-500/80" />
-          </div>
-          <span className="text-xs text-primary font-mono font-semibold ml-2">OpenTUI Terminal</span>
-        </div>
-        <span className="text-xs text-primary/50 font-mono">{title}</span>
+    <div className="rounded-lg border border-primary/30 bg-black shadow-lg shadow-primary/10 overflow-hidden">
+      <div className="flex items-center justify-between border-b border-primary/20 bg-black/80 px-4 py-2.5">
+        <span className="text-xs font-mono font-semibold text-primary">shadcn OpenTUI</span>
+        <span className="text-xs font-mono text-primary/50">{title}</span>
       </div>
-
-      {/* Terminal Body */}
-      <div className="p-4 font-mono text-sm h-[260px] overflow-hidden bg-black">
-        {lines.map((line, i) => (
-          <div key={i} className="leading-relaxed">
-            {line.type === "command" ? (
-              <span>
-                <span className="text-primary font-bold">user@opentui:~$</span>{" "}
-                <span className="text-white">{line.content}</span>
-              </span>
-            ) : (
-              <span className={line.type === "success" ? "text-primary" : "text-primary/70"}>{line.content}</span>
-            )}
-          </div>
-        ))}
-        {isTyping && (
-          <div className="leading-relaxed">
-            <span className="text-primary font-bold">user@opentui:~$</span>{" "}
-            <span className="text-white">{typedCommand}</span>
-            <span className="animate-pulse text-primary">█</span>
-          </div>
-        )}
-        {!isTyping && currentStep < script.length && (
-          <div className="leading-relaxed">
-            <span className="text-primary font-bold">user@opentui:~$</span>
-            <span className="animate-pulse text-primary ml-1">█</span>
-          </div>
-        )}
-      </div>
+      <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-[260px] bg-black" />
+      <div className="border-t border-primary/20 bg-black/80 px-4 py-2 text-xs text-primary/70">{description}</div>
     </div>
   )
 }
@@ -186,9 +107,9 @@ function RegistrySetupBlock() {
       description: "Install the main OpenTUI terminal component",
     },
     {
-      title: "Install official OpenTUI packages",
+      title: "Optional: install experimental runtime",
       command: "bun add @opentui/core @opentui/react",
-      description: "Keep the browser terminal aligned with the official OpenTUI package boundary.",
+      description: "Only needed when testing the Zig/WASM runtime lane. Not required for standard shadcn component usage.",
     },
   ]
 
@@ -225,78 +146,6 @@ function RegistrySetupBlock() {
 }
 
 export default function Home() {
-  const customCommands: Record<string, CommandHandler> = {
-    echo: {
-      name: "echo",
-      description: "Echo text to output",
-      handler: (args, context) => context?.addLine?.(args.join(" ") || "Nothing to echo", "success"),
-    },
-    whoami: {
-      name: "whoami",
-      description: "Display current user",
-      handler: (_args, context) => context?.addLine?.("guest@opentui", "output"),
-    },
-    pwd: {
-      name: "pwd",
-      description: "Print working directory",
-      handler: (_args, context) => context?.addLine?.("/workspace/opentui-demo", "output"),
-    },
-    ls: {
-      name: "ls",
-      description: "List directory contents",
-      handler: (_args, context) => context?.addLine?.("app  components  lib  public", "output"),
-    },
-    ui: { name: "ui", description: "Enter UI mode", handler: () => {} },
-    form: { name: "form", description: "Create interactive form", handler: () => {} },
-    menu: { name: "menu", description: "Create interactive menu", handler: () => {} },
-    progress: { name: "progress", description: "Show progress bar", handler: () => {} },
-    ascii: { name: "ascii", description: "Generate ASCII art", handler: () => {} },
-  }
-
-  const demoScript1 = [
-    {
-      command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-      output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
-      delay: 2000,
-    },
-    {
-      command: "npm run dev",
-      output: ["Starting development server...", "✓ Ready on localhost:3000"],
-      delay: 2500,
-    },
-  ]
-
-  const demoScript2 = [
-    {
-      command: "ui menu Dashboard Settings Logout",
-      output: ["Creating menu with options...", "► Dashboard", "  Settings", "  Logout"],
-      delay: 2500,
-    },
-    {
-      command: "form username email password",
-      output: ["Creating form...", "✓ Form ready - TAB to navigate"],
-      delay: 2000,
-    },
-  ]
-
-  const demoScript3 = [
-    {
-      command: "ascii HELLO",
-      output: [
-        "Generating ASCII art...",
-        "██   ██ ███████ ██      ██       ██████",
-        "██   ██ ██      ██      ██      ██    ██",
-        "███████ █████   ██      ██      ██    ██",
-      ],
-      delay: 3000,
-    },
-    {
-      command: "progress 2000",
-      output: ["[████████████░░░░░░░░] 60%", "✓ Progress complete!"],
-      delay: 2500,
-    },
-  ]
-
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Matrix Rain Background */}
@@ -425,31 +274,72 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Animated Demos - Using OpenTUI Terminal */}
+        {/* Animated Demos - Using the shadcn OpenTUI Terminal */}
         <section className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">See it in action</h2>
-              <p className="text-muted-foreground text-lg">
-                Watch automated demos showcasing OpenTUI terminal features
-              </p>
-            </div>
+                <p className="text-muted-foreground text-lg">Live shadcn terminal components running in the browser</p>
+              </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <OpenTUITerminalDemo title="Installation" script={[{
-                command: "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
-                output: ["Installing @opentui/core and @opentui/react...", "✓ Browser wrapper wired to OpenTUI packages"],
-                delay: 2000,
-              }, {
-                command: "npm run dev",
-                output: ["Starting development server...", "✓ Ready on localhost:3000"],
-                delay: 2500,
-              }]} />
-              <OpenTUITerminalDemo title="UI Components" script={demoScript2} />
-              <OpenTUITerminalDemo title="Built-in Commands" script={demoScript3} />
+              <div className="grid md:grid-cols-3 gap-6">
+                <TerminalDemoCard
+                  title="Installation"
+                  description="Install and validate the stable shadcn terminal component."
+                  commands={{
+                    install: {
+                      name: "install",
+                      description: "Show install command",
+                      handler: (_args, context) => {
+                        context?.addLine?.("bunx shadcn@latest add terminal", "success")
+                        context?.addLine?.("Registry component ready.")
+                      },
+                    },
+                  }}
+                  welcomeMessage={["Install demo", "Try: install"]}
+                />
+                <TerminalDemoCard
+                  title="UI Components"
+                  description="Open forms and menus inside the stable terminal surface."
+                  commands={{
+                    menu: {
+                      name: "menu",
+                      description: "Open a menu",
+                      handler: (_args, context) => {
+                        context?.setState?.((prev: { menuSelection: number }) => ({
+                          ...prev,
+                          mode: "ui",
+                          menuSelection: 0,
+                          activeComponent: {
+                            id: `demo-menu-${Date.now()}`,
+                            type: "menu",
+                            props: { items: ["Dashboard", "Projects", "Settings"] },
+                            active: true,
+                          },
+                        }))
+                      },
+                    },
+                  }}
+                  welcomeMessage={["UI demo", "Try: menu"]}
+                />
+                <TerminalDemoCard
+                  title="Built-in Commands"
+                  description="Command history, completions, async handlers, and terminal output."
+                  commands={{
+                    status: {
+                      name: "status",
+                      description: "Show status",
+                      handler: (_args, context) => {
+                        context?.addLine?.("Terminal mounted", "success")
+                        context?.addLine?.("Commands active: help, clear, status")
+                      },
+                    },
+                  }}
+                  welcomeMessage={["Commands demo", "Try: status", "Try: help"]}
+                />
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
         <section className="py-20 px-6 border-y border-primary/10 bg-black/20">
           <div className="max-w-7xl mx-auto">
@@ -640,7 +530,10 @@ export default function Home() {
               </div>
 
               <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
-                <WasmTerminal className="h-[500px] bg-black" />
+                <Terminal
+                  className="h-[500px] bg-black"
+                  welcomeMessage={["Interactive shadcn terminal", "Try: help", "Try: menu Dashboard Projects Settings"]}
+                />
               </div>
             </div>
           </div>
@@ -728,6 +621,11 @@ function TerminalScenarioCard({
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
       <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-64 bg-black" />
+      <div className="space-y-1 border-t border-primary/10 pt-3 text-xs text-primary/70">
+        {welcomeMessage.map((message) => (
+          <p key={message}>{message}</p>
+        ))}
+      </div>
     </div>
   )
 }

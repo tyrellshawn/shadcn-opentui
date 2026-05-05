@@ -6,6 +6,7 @@ on:
     paths:
       - 'components/ui/terminal*.tsx'
       - 'scripts/build-registry.mjs'
+      - 'scripts/check-registry-boundaries.mjs'
   workflow_dispatch:
 
 permissions:
@@ -36,6 +37,9 @@ jobs:
       
       - name: Install dependencies
         run: bun install
+
+      - name: Check registry boundaries
+        run: bun run registry:check-boundaries
       
       - name: Build registry
         run: bun run registry:build

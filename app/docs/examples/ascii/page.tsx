@@ -2,12 +2,21 @@
 
 import Link from "next/link"
 import { ArrowRight, ImageIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CodePreview } from "@/components/docs/code-preview"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Terminal as TerminalComponent } from "@/components/ui/terminal"
+
+const animationFrames = ["-", ".", "|", "/"]
+
+const asciiTemplates: Record<string, string[]> = {
+  rocket: ["   /|", "  /_|", " | ==|", " |___|"],
+  cat: [" /_/ ", "(o.o)", " >^< "],
+  ship: ["   |   ", " __|__ ", "/____/ "],
+}
 
 function AsciiPreview() {
   return (
@@ -29,19 +38,59 @@ function AsciiPreview() {
           description: "Show a predefined icon",
           handler: (args, context) => {
             const kind = args[0] || "rocket"
-            const icons: Record<string, string[]> = {
-              rocket: ["   /\\", "  /  \\", " | 🚀 |", " |____|"],
-              cat: [" /\_/\\", "( o.o )", " > ^ <"],
-            }
-            ;(icons[kind] || icons.rocket).forEach((line) => context?.addLine?.(line, "output"))
+            ;(asciiTemplates[kind] || asciiTemplates.rocket).forEach((line) => context?.addLine?.(line, "output"))
           },
         },
       }}
+      welcomeMessage={["ASCII Art Demo", "Try: ascii launch", "Try: art rocket"]}
+    />
+  )
+}
+
+function AnimatedStatusPreview() {
+  const [frameIndex, setFrameIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setFrameIndex((current) => (current + 1) % animationFrames.length)
+    }, 180)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return (
+    <TerminalComponent
+      key={frameIndex}
       welcomeMessage={[
-        "ASCII Art Demo",
-        "Try: ascii launch",
-        "Try: art rocket",
+        "Animated Status Demo",
+        `Rendering animation frame: ${animationFrames[frameIndex]}`,
+        `[${animationFrames[frameIndex]}] Building terminal animation...`,
       ]}
+      className="h-56"
+    />
+  )
+}
+
+function TemplateGalleryPreview() {
+  const [lastTemplate, setLastTemplate] = useState("rocket")
+
+  return (
+    <TerminalComponent
+      commands={{
+        art: {
+          name: "art",
+          description: "Render a predefined icon",
+          handler: (args, context) => {
+            const template = args[0] || "rocket"
+            const lines = asciiTemplates[template] || asciiTemplates.rocket
+            setLastTemplate(template)
+            context?.addLine?.(`Loaded template: ${template}`, "success")
+            lines.forEach((line) => context?.addLine?.(line, "output"))
+          },
+        },
+      }}
+      welcomeMessage={[`Last template: ${lastTemplate}`, "Try: art cat", "Try: art ship"]}
+      className="h-56"
     />
   )
 }
@@ -72,13 +121,14 @@ export function BannerTerminal() {
 const animationCode = `import { useEffect, useState } from "react"
 import { Terminal } from "@/components/ui/terminal"
 
+const animationFrames = ["-", ".", "|", "/"]
+
 export function AnimatedStatusTerminal() {
-  const frames = ["-", "\\", "|", "/"]
   const [frameIndex, setFrameIndex] = useState(0)
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setFrameIndex((current) => (current + 1) % frames.length)
+      setFrameIndex((current) => (current + 1) % animationFrames.length)
     }, 180)
 
     return () => window.clearInterval(timer)
@@ -86,7 +136,12 @@ export function AnimatedStatusTerminal() {
 
   return (
     <Terminal
-      welcomeMessage={[\`Rendering animation frame: \${frames[frameIndex]}\`]}
+      key={frameIndex}
+      welcomeMessage={[
+        "Animated Status Demo",
+        \`Rendering animation frame: \${animationFrames[frameIndex]}\`,
+        \`[\${animationFrames[frameIndex]}] Building terminal animation...\`,
+      ]}
       className="h-56"
     />
   )
@@ -94,6 +149,12 @@ export function AnimatedStatusTerminal() {
 
 const interactiveCode = `import { useState } from "react"
 import { Terminal } from "@/components/ui/terminal"
+
+const asciiTemplates = {
+  rocket: ["   /|", "  /_|", " | ==|", " |___|"],
+  cat: [" /_/ ", "(o.o)", " >^< "],
+  ship: ["   |   ", " __|__ ", "/____/ "],
+}
 
 export function TemplateGalleryTerminal() {
   const [lastTemplate, setLastTemplate] = useState("rocket")
@@ -106,12 +167,14 @@ export function TemplateGalleryTerminal() {
           description: "Render a predefined icon",
           handler: (args, context) => {
             const template = args[0] || "rocket"
+            const lines = asciiTemplates[template] || asciiTemplates.rocket
             setLastTemplate(template)
             context?.addLine?.(\`Loaded template: \${template}\`, "success")
+            lines.forEach((line) => context?.addLine?.(line, "output"))
           },
         },
       }}
-      welcomeMessage={[\`Last template: \${lastTemplate}\`, "Try: art cat"]}
+      welcomeMessage={[\`Last template: \${lastTemplate}\`, "Try: art cat", "Try: art ship"]}
       className="h-56"
     />
   )
@@ -154,15 +217,30 @@ export default function AsciiExamplePage() {
             </TabsList>
 
             <TabsContent value="generator">
-              <CodePreview title="ASCII Text Generator" description="Render banners directly from a terminal command." code={generatorCode} preview={<AsciiPreview />} />
+              <CodePreview
+                title="ASCII Text Generator"
+                description="Render banners directly from a terminal command."
+                code={generatorCode}
+                preview={<AsciiPreview />}
+              />
             </TabsContent>
 
             <TabsContent value="animations">
-              <CodePreview title="Animated Status" description="Use React state to rotate simple ASCII frames." code={animationCode} />
+              <CodePreview
+                title="Animated Status"
+                description="Use React state to rotate simple ASCII frames."
+                code={animationCode}
+                preview={<AnimatedStatusPreview />}
+              />
             </TabsContent>
 
             <TabsContent value="interactive">
-              <CodePreview title="Template Gallery" description="Track reusable art templates in React state and render them from commands." code={interactiveCode} />
+              <CodePreview
+                title="Template Gallery"
+                description="Track reusable art templates in React state and render them from commands."
+                code={interactiveCode}
+                preview={<TemplateGalleryPreview />}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -57,6 +57,13 @@ const navigation = [
       { title: "ASCII Art", href: "/docs/examples/ascii", icon: Terminal },
     ],
   },
+  {
+    title: "Experimental",
+    items: [
+      { title: "WASM Runtime", href: "/docs/labs/wasm-runtime", icon: Zap },
+      { title: "Experimental Overview", href: "/docs/labs", icon: FileText },
+    ],
+  },
 ]
 
 export default function DocsLayout({
