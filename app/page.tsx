@@ -97,9 +97,9 @@ function RegistrySetupBlock() {
       description: "Install the main OpenTUI terminal component",
     },
     {
-      title: "Install official OpenTUI packages",
+      title: "Optional: install experimental runtime",
       command: "bun add @opentui/core @opentui/react",
-      description: "Keep the browser terminal aligned with the official OpenTUI package boundary.",
+      description: "Only needed when testing the Zig/WASM runtime lane. Not required for standard shadcn component usage.",
     },
   ]
 
@@ -269,7 +269,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">See it in action</h2>
-                <p className="text-muted-foreground text-lg">Live OpenTUI WASM terminals running in the browser</p>
+                <p className="text-muted-foreground text-lg">Live OpenTUI WASM terminals running in the browser (experimental lane)</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">

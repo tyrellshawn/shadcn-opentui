@@ -193,6 +193,21 @@ function App() {
             </Button>
           </CardContent>
         </Card>
+
+        <Card className="hover:shadow-md transition-shadow border-amber-500/20 bg-amber-500/5">
+          <CardHeader>
+            <CardTitle className="text-lg">Experimental Runtime</CardTitle>
+            <CardDescription>Zig/WASM internals and browser runtime experiments</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="ghost" className="p-0 h-auto">
+              <Link href="/docs/labs" className="flex items-center gap-2">
+                Explore labs
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

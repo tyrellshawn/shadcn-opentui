@@ -43,6 +43,15 @@ export function BreadcrumbNav() {
             const exampleName = segments[2].charAt(0).toUpperCase() + segments[2].slice(1)
             breadcrumbs.push({ label: exampleName, href: `/docs/examples/${segments[2]}` })
           }
+        } else if (segments[1] === "labs") {
+          breadcrumbs.push({ label: "Experimental", href: "/docs/labs" })
+          if (segments[2]) {
+            const pageName = segments[2]
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+            breadcrumbs.push({ label: pageName, href: `/docs/labs/${segments[2]}` })
+          }
         } else {
           // Handle direct pages like installation, quick-start
           const pageName = segments[1]

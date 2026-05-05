@@ -116,6 +116,10 @@ export default function MyTerminal() {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">What's included?</h3>
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-muted-foreground">
+            This quick start uses the <strong className="text-foreground">stable shadcn component lane</strong>. The Zig/WASM runtime
+            packages are optional and intended for experimental builds.
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>

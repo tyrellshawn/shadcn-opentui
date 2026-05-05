@@ -6,9 +6,16 @@
 
 Terminal UI components for React built with shadcn/ui and OpenTUI.
 
-## 🚀 Future Vision: True Web OpenTUI Runtime
+## Product Lanes
 
-This project is evolving from a React/DOM wrapper into a real, native OpenTUI WASM environment for the browser. Currently, `shadcn-opentui` uses a "dom-wrapper" strategy where components mimic the terminal using DOM elements (divs, spans). 
+- **Stable lane (default):** shadcn-installable components from the OpenTUI registry (`terminal`, `terminal-slider`, `terminal-controls`, CLI plugin helpers).
+- **Experimental lane (opt-in):** Zig + WASM runtime packages in `packages/web-core`, `packages/web-renderer`, and `packages/web-react`.
+
+If you are shipping an app, start with the stable shadcn lane. The WASM runtime is for experimentation and architecture validation.
+
+## Experimental: True Web OpenTUI Runtime
+
+This project is evolving from a React/DOM wrapper into a real, native OpenTUI WASM environment for the browser. Currently, `shadcn-opentui` uses a "dom-wrapper" strategy where components mimic the terminal using DOM elements (divs, spans).
 
 The new architecture introduces a true Zig-to-WASM rendering core so any OpenTUI app—not just terminal components—can run natively in the browser.
 
@@ -19,7 +26,7 @@ We are restructuring into a monorepo to separate the native web renderer from th
 - `packages/web-react`: The React reconciler target for the browser renderer (similar to `@opentui/react` but for web surfaces).
 - `apps/docs`: The shadcn UI wrapper and documentation site you see today.
 
-*Status: The Zig WASM proof-of-concept is built and running. Rendering surface APIs are under active development.*
+*Status: The Zig WASM proof-of-concept is built and running. Rendering surface APIs are under active development and should be treated as experimental.*
 
 ## Features
 
@@ -30,6 +37,8 @@ We are restructuring into a monorepo to separate the native web renderer from th
 - Theme support for light and dark modes
 
 ## Installation
+
+### Stable shadcn components (recommended)
 
 Add the registry to your `components.json`:
 
@@ -43,6 +52,14 @@ Install components:
 
 \`\`\`bash
 npx shadcn@latest add terminal
+\`\`\`
+
+### Experimental runtime packages (optional)
+
+Only needed if you are building against the WASM runtime directly:
+
+\`\`\`bash
+bun add @opentui/core @opentui/react
 \`\`\`
 
 ## Usage
@@ -68,7 +85,7 @@ bun install
 bun dev
 \`\`\`
 
-### Run the WASM runtime demo
+### Run the experimental WASM runtime demo
 
 \`\`\`bash
 bun run build:web-runtime
