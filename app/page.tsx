@@ -22,7 +22,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
-import { WasmTerminal } from "@/components/opentui/wasm-terminal"
+import { Terminal } from "@/components/ui/terminal"
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -40,14 +40,24 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function WasmDemoCard({ title, description }: { title: string; description: string }) {
+function TerminalDemoCard({
+  title,
+  description,
+  commands,
+  welcomeMessage,
+}: {
+  title: string
+  description: string
+  commands: Record<string, CommandHandler>
+  welcomeMessage: string[]
+}) {
   return (
     <div className="rounded-lg border border-primary/30 bg-black shadow-lg shadow-primary/10 overflow-hidden">
       <div className="flex items-center justify-between border-b border-primary/20 bg-black/80 px-4 py-2.5">
-        <span className="text-xs font-mono font-semibold text-primary">OpenTUI WASM</span>
+        <span className="text-xs font-mono font-semibold text-primary">shadcn OpenTUI</span>
         <span className="text-xs font-mono text-primary/50">{title}</span>
       </div>
-      <WasmTerminal className="h-[260px] bg-black" />
+      <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-[260px] bg-black" />
       <div className="border-t border-primary/20 bg-black/80 px-4 py-2 text-xs text-primary/70">{description}</div>
     </div>
   )
@@ -264,18 +274,69 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Animated Demos - Using OpenTUI Terminal */}
+        {/* Animated Demos - Using the shadcn OpenTUI Terminal */}
         <section className="py-20 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">See it in action</h2>
-                <p className="text-muted-foreground text-lg">Live OpenTUI WASM terminals running in the browser (experimental lane)</p>
+                <p className="text-muted-foreground text-lg">Live shadcn terminal components running in the browser</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
-                <WasmDemoCard title="Installation" description="Core + renderer + React reconciler wired to wasm32 runtime." />
-                <WasmDemoCard title="UI Components" description="Interactive terminal primitives rendered from the shared buffer." />
-                <WasmDemoCard title="Built-in Commands" description="Canvas cells are driven directly by the OpenTUI wasm core." />
+                <TerminalDemoCard
+                  title="Installation"
+                  description="Install and validate the stable shadcn terminal component."
+                  commands={{
+                    install: {
+                      name: "install",
+                      description: "Show install command",
+                      handler: (_args, context) => {
+                        context?.addLine?.("bunx shadcn@latest add terminal", "success")
+                        context?.addLine?.("Registry component ready.")
+                      },
+                    },
+                  }}
+                  welcomeMessage={["Install demo", "Try: install"]}
+                />
+                <TerminalDemoCard
+                  title="UI Components"
+                  description="Open forms and menus inside the stable terminal surface."
+                  commands={{
+                    menu: {
+                      name: "menu",
+                      description: "Open a menu",
+                      handler: (_args, context) => {
+                        context?.setState?.((prev: { menuSelection: number }) => ({
+                          ...prev,
+                          mode: "ui",
+                          menuSelection: 0,
+                          activeComponent: {
+                            id: `demo-menu-${Date.now()}`,
+                            type: "menu",
+                            props: { items: ["Dashboard", "Projects", "Settings"] },
+                            active: true,
+                          },
+                        }))
+                      },
+                    },
+                  }}
+                  welcomeMessage={["UI demo", "Try: menu"]}
+                />
+                <TerminalDemoCard
+                  title="Built-in Commands"
+                  description="Command history, completions, async handlers, and terminal output."
+                  commands={{
+                    status: {
+                      name: "status",
+                      description: "Show status",
+                      handler: (_args, context) => {
+                        context?.addLine?.("Terminal mounted", "success")
+                        context?.addLine?.("Commands active: help, clear, status")
+                      },
+                    },
+                  }}
+                  welcomeMessage={["Commands demo", "Try: status", "Try: help"]}
+                />
               </div>
             </div>
           </section>
@@ -469,7 +530,10 @@ export default function Home() {
               </div>
 
               <div className="rounded-xl border border-primary/20 overflow-hidden shadow-xl shadow-primary/10">
-                <WasmTerminal className="h-[500px] bg-black" />
+                <Terminal
+                  className="h-[500px] bg-black"
+                  welcomeMessage={["Interactive shadcn terminal", "Try: help", "Try: menu Dashboard Projects Settings"]}
+                />
               </div>
             </div>
           </div>
@@ -542,7 +606,7 @@ export default function Home() {
 function TerminalScenarioCard({
   title,
   description,
-  commands: _commands,
+  commands,
   welcomeMessage,
 }: {
   title: string
@@ -556,7 +620,7 @@ function TerminalScenarioCard({
         <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
-      <WasmTerminal className="h-64 bg-black" />
+      <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-64 bg-black" />
       <div className="space-y-1 border-t border-primary/10 pt-3 text-xs text-primary/70">
         {welcomeMessage.map((message) => (
           <p key={message}>{message}</p>
