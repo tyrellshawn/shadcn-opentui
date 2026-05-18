@@ -13,6 +13,8 @@
     "lint": "bun --bun  next lint",
     "registry:build": "bun scripts/build-registry.mjs",
     "registry:check-boundaries": "bun scripts/check-registry-boundaries.mjs",
+    "grammar:generate": "bunx antlr-ng -Dlanguage=TypeScript -o lib/opentui-codegen/generated --generate-visitor grammars/OpenTUIProgram.g4",
+    "codegen:hunk": "bun scripts/generate-shadcn-from-opentui.ts",
     "start": "bun --bun next start",
     "test": "bun vitest run",
     "test:watch": "bun vitest",

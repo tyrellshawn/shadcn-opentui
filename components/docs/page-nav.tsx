@@ -24,8 +24,9 @@ const navigationOrder: NavItem[] = [
   { title: "Login Form Example", href: "/docs/examples/login" },
   { title: "Interactive Menu Example", href: "/docs/examples/menu" },
   { title: "ASCII Art Example", href: "/docs/examples/ascii" },
-  { title: "Experimental Overview", href: "/docs/labs" },
-  { title: "WASM Runtime", href: "/docs/labs/wasm-runtime" },
+  { title: "Codegen Overview", href: "/docs/labs" },
+  { title: "Runtime Research", href: "/docs/labs/wasm-runtime" },
+  { title: "Hunk Web Example", href: "/docs/examples/hunk" },
 ]
 
 export function PageNav() {

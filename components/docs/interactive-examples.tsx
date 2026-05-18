@@ -263,8 +263,8 @@ export function InteractiveExamples() {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold tracking-tight">Interactive Examples</h1>
         <p className="max-w-3xl text-muted-foreground">
-          Explore OpenTUI React capabilities through these interactive terminal examples. Each demo uses the stable shadcn
-          terminal component and showcases a different terminal UI pattern.
+          Explore OpenTUI-inspired terminal patterns through these interactive examples. Each demo uses the stable shadcn
+          terminal component and showcases a different browser-rendered terminal UI pattern.
         </p>
       </div>
 

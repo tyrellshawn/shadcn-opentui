@@ -80,17 +80,17 @@ export default function InstallationPage() {
 
       <details className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4">
         <summary className="cursor-pointer list-none font-medium text-foreground">
-          Experimental runtime packages (optional)
+          Future runtime research packages
         </summary>
         <div className="mt-3 space-y-3 text-sm text-muted-foreground">
           <p>
-            Stable shadcn component usage is the default path for production apps. Use the runtime lane only if you want to
-            experiment with the Zig/WASM browser core.
+            Stable shadcn component usage and the OpenTUI-to-shadcn codegen track are the default paths. Use these packages
+            only if you are working on the parked browser-native runtime research.
           </p>
           <div className="bg-background/70 rounded-md p-3 border border-amber-500/20">
             <code className="text-sm block">bun add @opentui/core @opentui/react</code>
           </div>
-          <p>These packages are intentionally labeled experimental because the rendering APIs are still evolving.</p>
+          <p>These packages are intentionally not part of the normal install path.</p>
         </div>
       </details>
 
@@ -148,8 +148,8 @@ export default function TestPage() {
             <div>
               <h4 className="font-semibold text-sm">Module not found errors</h4>
               <p className="text-sm text-muted-foreground">
-                For stable component usage, ensure your registry install completed. For experimental runtime usage, also install
-                @opentui/react and @opentui/core.
+                For stable component usage, ensure your registry install completed. Runtime research packages are separate
+                and not needed for normal shadcn web components.
               </p>
             </div>
           </div>

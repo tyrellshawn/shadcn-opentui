@@ -76,7 +76,7 @@ export default function QuickStartPage() {
          </p>
          <div className="bg-muted rounded-lg p-4">
            <p className="text-sm">
-             <strong>Prerequisites:</strong> Add the OpenTUI registry to your components.json:
+              <strong>Prerequisites:</strong> Add the Shadcn OpenTUI registry to your components.json:
            </p>
            <code className="text-xs block mt-2">
 {`"registries": [
@@ -117,8 +117,8 @@ export default function MyTerminal() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">What's included?</h3>
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-muted-foreground">
-            This quick start uses the <strong className="text-foreground">stable shadcn component lane</strong>. The Zig/WASM runtime
-            packages are optional and intended for experimental builds.
+            This quick start uses the <strong className="text-foreground">stable shadcn component path</strong>. The future
+            Zig/WASM runtime research code is not required for normal web component usage.
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>

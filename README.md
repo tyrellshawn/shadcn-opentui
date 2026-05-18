@@ -4,95 +4,85 @@
 [![Release](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/release.yml/badge.svg)](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Terminal UI components for React built with shadcn/ui and OpenTUI.
+Independent shadcn/ui experiments for bringing OpenTUI-style terminal applications to the web.
 
-## Product Lanes
+This is not the official OpenTUI project. It started as a one-day experiment to explore an OpenTUI web adapter with React in mind, and is now focused on translating OpenTUI TypeScript applications into inspectable shadcn web code.
 
-- **Stable lane (default):** shadcn-installable components from the OpenTUI registry (`terminal`, `terminal-slider`, `terminal-controls`, CLI plugin helpers).
-- **Experimental lane (opt-in):** Zig + WASM runtime packages in `packages/web-core`, `packages/web-renderer`, and `packages/web-react`.
+Upstream OpenTUI lives at [anomalyco/opentui](https://github.com/anomalyco/opentui).
 
-If you are shipping an app, start with the stable shadcn lane. The WASM runtime is for experimentation and architecture validation.
+## Current Focus
 
-## Experimental: True Web OpenTUI Runtime
+- **Stable shadcn components:** installable components from the Shadcn OpenTUI registry (`terminal`, `terminal-slider`, `terminal-controls`, CLI plugin helpers).
+- **OpenTUI-to-shadcn codegen:** a parser and generator track for turning OpenTUI TypeScript/TSX programs into shadcn web components.
+- **Future runtime research:** Zig/WASM code remains in-tree for a later browser-native runtime integration, but it is not the main product path today.
 
-This project is evolving from a React/DOM wrapper into a real, native OpenTUI WASM environment for the browser. Currently, `shadcn-opentui` uses a "dom-wrapper" strategy where components mimic the terminal using DOM elements (divs, spans).
+## Why Hunk Matters
 
-The new architecture introduces a true Zig-to-WASM rendering core so any OpenTUI app—not just terminal components—can run natively in the browser.
+The north-star validation example is [Hunk](https://github.com/modem-dev/hunk), a review-first terminal diff viewer built on OpenTUI. A good outcome for this project is being able to view a Hunk-like OpenTUI app on the web as generated shadcn code.
 
-### The Turborepo Packages
-We are restructuring into a monorepo to separate the native web renderer from the shadcn integration:
-- `packages/web-core`: The OpenTUI Zig core compiled to `wasm32-freestanding` with a JS interop layer.
-- `packages/web-renderer`: The canvas-based WebAssembly renderer that executes OpenTUI draw commands natively.
-- `packages/web-react`: The React reconciler target for the browser renderer (similar to `@opentui/react` but for web surfaces).
-- `apps/docs`: The shadcn UI wrapper and documentation site you see today.
-
-*Status: The Zig WASM proof-of-concept is built and running. Rendering surface APIs are under active development and should be treated as experimental.*
+The first Hunk target is a static browser-viewable diff review example. Later milestones can parse more of Hunk's `src/opentui` components directly.
 
 ## Features
 
 - Interactive terminal with command history and keyboard shortcuts
-- OpenTUI integration for forms, menus, and progress indicators
+- OpenTUI-inspired forms, menus, and progress indicators
 - Terminal-style sliders and controls
 - TypeScript support with full type definitions
 - Theme support for light and dark modes
 
 ## Installation
 
-### Stable shadcn components (recommended)
+### Stable shadcn components
 
 Add the registry to your `components.json`:
 
-\`\`\`json
+```json
 {
   "registries": ["https://opentui.vercel.app/registry/index.json"]
 }
-\`\`\`
+```
 
 Install components:
 
-\`\`\`bash
+```bash
 npx shadcn@latest add terminal
-\`\`\`
-
-### Experimental runtime packages (optional)
-
-Only needed if you are building against the WASM runtime directly:
-
-\`\`\`bash
-bun add @opentui/core @opentui/react
-\`\`\`
+```
 
 ## Usage
 
-\`\`\`tsx
+```tsx
 import { Terminal } from "@/components/ui/terminal"
 
 export default function App() {
   return <Terminal title="My Terminal" />
 }
-\`\`\`
+```
 
-## Documentation
+## Codegen Track
 
-[https://opentui.vercel.app/docs](https://opentui.vercel.app/docs)
+The OpenTUI-to-shadcn generator starts with a custom grammar and an intermediate representation. The initial goal is to translate a practical OpenTUI TSX subset into readable shadcn/React components, not to emulate the full OpenTUI runtime.
+
+See `lib/opentui-codegen/README.md` and `grammars/OpenTUIProgram.g4` for the current scaffold.
 
 ## Development
 
-\`\`\`bash
+```bash
 git clone https://github.com/tyrellshawn/shadcn-opentui.git
 cd shadcn-opentui
 bun install
 bun dev
-\`\`\`
+```
 
-### Run the experimental WASM runtime demo
+## Future Runtime Research
 
-\`\`\`bash
+The Zig/WASM code in `packages/web-core`, `packages/web-renderer`, and `packages/web-react` is kept for a later browser-native runtime integration. It is not required for the current shadcn component or codegen workflow.
+
+```bash
 bun run build:web-runtime
 bun run dev:web-runtime
-\`\`\`
+```
 
-Open `http://localhost:8090/packages/web-renderer/demo/index.html`.
+Open `http://localhost:8090/packages/web-renderer/demo/index.html` when working on that research track.
 
 ## License
 
