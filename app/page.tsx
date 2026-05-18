@@ -97,19 +97,19 @@ function RegistrySetupBlock() {
 
   const steps = [
     {
-      title: "Initialize shadcn with OpenTUI registry",
+      title: "Initialize shadcn with the Shadcn OpenTUI registry",
       command: "bunx shadcn@latest init -r https://opentui.vercel.app/api/registry",
-      description: "Set up shadcn/ui with the OpenTUI registry for seamless component integration",
+      description: "Set up shadcn/ui with the independent Shadcn OpenTUI registry.",
     },
     {
       title: "Add terminal component",
       command: "bunx shadcn@latest add terminal",
-      description: "Install the main OpenTUI terminal component",
+      description: "Install the main shadcn terminal component.",
     },
     {
-      title: "Optional: install experimental runtime",
-      command: "bun add @opentui/core @opentui/react",
-      description: "Only needed when testing the Zig/WASM runtime lane. Not required for standard shadcn component usage.",
+      title: "Explore codegen direction",
+      command: "open lib/opentui-codegen/README.md",
+      description: "Review the OpenTUI-to-shadcn generator scaffold and Hunk validation target.",
     },
   ]
 
@@ -160,7 +160,7 @@ export default function Home() {
               <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
                 <TerminalIcon className="w-4 h-4 text-primary" />
               </div>
-              <span className="font-semibold text-lg text-primary">OpenTUI</span>
+              <span className="font-semibold text-lg text-primary">Shadcn OpenTUI</span>
             </Link>
             <div className="hidden md:flex items-center gap-8">
               <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -206,11 +206,11 @@ export default function Home() {
               {/* Glowing OpenTUI Title */}
               <div className="fade-in-up">
                 <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4 font-mono">
-                  <span className="text-primary glow-text-strong">OpenTUI</span>
+                  <span className="text-primary glow-text-strong">Shadcn OpenTUI</span>
                 </h1>
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-black/40 text-sm">
                   <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-primary/80">Built with shadcn/ui</span>
+                  <span className="text-primary/80">Independent OpenTUI-inspired web experiment</span>
                 </div>
               </div>
 
@@ -221,14 +221,13 @@ export default function Home() {
               </h2>
 
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto fade-in-up-delay-2 text-balance leading-relaxed">
-                A powerful, customizable terminal interface built with OpenTUI and React. Command history, tab
-                completion, interactive UI components, and full TypeScript support.
+                An independent shadcn/ui project for bringing OpenTUI-style terminal applications to the web with
+                inspectable React code, command handling, and TypeScript support.
               </p>
 
               <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-black/40 px-5 py-4 text-sm text-muted-foreground">
-                Built for <span className="font-semibold text-foreground">React and Next.js apps in the browser</span>
-                . The goal is a terminal-native web experience that keeps shadcn ergonomics without falling back to a
-                generic command palette or stock slider UI.
+                Built for <span className="font-semibold text-foreground">React and Next.js apps in the browser</span>.
+                This is not the official OpenTUI project; upstream OpenTUI remains at anomalyco/opentui.
               </div>
 
               <div className="mx-auto max-w-3xl text-left">
@@ -254,7 +253,7 @@ export default function Home() {
                 >
                   <Link href="https://github.com/anomalyco/opentui" target="_blank">
                     <Github className="w-4 h-4 mr-2" />
-                    View on GitHub
+                    Upstream OpenTUI
                   </Link>
                 </Button>
               </div>
@@ -346,7 +345,7 @@ export default function Home() {
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Terminal-native patterns</h2>
               <p className="text-muted-foreground text-lg">
-                Reusable OpenTUI interaction systems that stay inside the terminal instead of drifting into generic UI.
+                Reusable OpenTUI-inspired interaction systems that stay inside the terminal instead of drifting into generic UI.
               </p>
             </div>
 
@@ -358,7 +357,7 @@ export default function Home() {
                 </div>
                 <TerminalScenarioCard
                   title="Forms and menus as first-class terminal flows"
-                  description="Drive onboarding, settings, and command routing from one reusable OpenTUI surface."
+                  description="Drive onboarding, settings, and command routing from one reusable terminal surface."
                   commands={{
                     profile: {
                       name: "profile",
@@ -505,7 +504,7 @@ export default function Home() {
               <div className="space-y-6">
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground">Try it yourself</h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Experience the full power of the OpenTUI terminal component. Type commands, use tab completion, and
+                  Experience the Shadcn OpenTUI terminal component. Type commands, use tab completion, and
                   explore the built-in functionality including interactive UI modes.
                 </p>
 
@@ -545,7 +544,7 @@ export default function Home() {
             <div className="p-12 rounded-2xl border border-primary/20 bg-black/40 backdrop-blur-sm">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Ready to get started?</h2>
               <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-                Add the OpenTUI terminal component to your project using the @shadcn-opentui registry.
+                Add the Shadcn OpenTUI terminal component to your project using the @shadcn-opentui registry.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
@@ -574,7 +573,7 @@ export default function Home() {
                 <div className="w-6 h-6 rounded bg-primary/20 border border-primary/30 flex items-center justify-center">
                   <TerminalIcon className="w-3 h-3 text-primary" />
                 </div>
-                <span className="text-sm text-muted-foreground">OpenTUI - Built with shadcn/ui</span>
+                <span className="text-sm text-muted-foreground">Shadcn OpenTUI - independent OpenTUI-inspired project</span>
               </div>
               <div className="flex items-center gap-6">
                 <Link href="/docs" className="text-sm text-muted-foreground hover:text-primary transition-colors">

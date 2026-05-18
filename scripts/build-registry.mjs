@@ -174,7 +174,7 @@ const PLUGINS = [
     description: 'Fluent API for creating CLI applications with type-safe configuration.',
     dependencies: [],
     registryDependencies: ['cli-plugin-types'],
-    files: ['lib/opentui/plugins/cli/create-cli-app.ts'],
+    files: ['lib/opentui/plugins/cli/create-cli-app.tsx'],
   },
   {
     name: 'cli-plugin',
@@ -190,7 +190,7 @@ const PLUGINS = [
       'cli-plugin-host',
       'cli-app-builder',
     ],
-    files: ['lib/opentui/plugins/cli/index.ts'],
+    files: ['lib/opentui/plugins/cli/index.tsx'],
   },
 ]
 

@@ -1,6 +1,6 @@
 export const OPENTUI_PACKAGE_NAMES = ["@opentui/core", "@opentui/react"] as const
 
-export type OpenTUIBrowserRenderer = "dom-wrapper" | "zig-wasm"
+export type OpenTUIBrowserRenderer = "shadcn-web" | "future-zig-wasm"
 
 export interface OpenTUIBrowserCapability {
   renderer: OpenTUIBrowserRenderer
@@ -13,12 +13,12 @@ export interface OpenTUIBrowserCapability {
 
 export function getOpenTUIBrowserCapability(): OpenTUIBrowserCapability {
   return {
-    renderer: "zig-wasm",
-    browserRuntimeAvailable: true,
+    renderer: "shadcn-web",
+    browserRuntimeAvailable: false,
     packages: OPENTUI_PACKAGE_NAMES,
     shadcnCompatible: true,
-    reason: "The browser runtime now uses the Zig core compiled to WebAssembly and rendered through a canvas cell buffer.",
-    recommendation: "Use the WASM runtime path for terminal UI in browser experiences; keep the DOM wrapper only as fallback.",
+    reason: "Shadcn OpenTUI is an independent web adapter experiment, not the official OpenTUI project. The current product path is inspectable shadcn/React code.",
+    recommendation: "Use the registry components and the OpenTUI-to-shadcn codegen track today. Treat the Zig/WASM packages as parked future runtime research.",
   }
 }
 

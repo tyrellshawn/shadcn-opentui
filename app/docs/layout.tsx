@@ -60,8 +60,9 @@ const navigation = [
   {
     title: "Experimental",
     items: [
-      { title: "WASM Runtime", href: "/docs/labs/wasm-runtime", icon: Zap },
-      { title: "Experimental Overview", href: "/docs/labs", icon: FileText },
+      { title: "Codegen Overview", href: "/docs/labs", icon: FileText },
+      { title: "Runtime Research", href: "/docs/labs/wasm-runtime", icon: Zap },
+      { title: "Hunk Web Example", href: "/docs/examples/hunk", icon: Code },
     ],
   },
 ]

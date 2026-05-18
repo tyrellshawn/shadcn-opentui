@@ -19,15 +19,15 @@ export default function DocsPage() {
           </Badge>
         </div>
         <p className="text-xl text-muted-foreground max-w-2xl">
-          A beautiful, interactive terminal component built with shadcn/ui and React. Create rich terminal user
-          interfaces with familiar React patterns, complete command handling, and customizable styling.
+          An independent shadcn/ui project for bringing OpenTUI-style terminal applications to the web with familiar
+          React patterns, complete command handling, and customizable styling.
         </p>
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-muted-foreground">
           <div className="mb-2 font-semibold text-emerald-300">Who this is for</div>
           <p>
             This library is for <span className="font-medium text-foreground">React and Next.js teams</span> who want
-            a browser-rendered terminal UI that fits shadcn patterns. It is not a Python CLI framework or a native TUI
-            runtime.
+            a browser-rendered terminal UI that fits shadcn patterns. It is not the official OpenTUI project, a Python CLI
+            framework, or a native TUI runtime.
           </p>
         </div>
         <div className="flex items-center gap-4 pt-4">
@@ -40,7 +40,7 @@ export default function DocsPage() {
           <Button variant="outline" asChild>
             <Link href="https://github.com/anomalyco/opentui" target="_blank">
               <Github className="mr-2 h-4 w-4" />
-              View on GitHub
+              Upstream OpenTUI
               <ExternalLink className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -196,13 +196,13 @@ function App() {
 
         <Card className="hover:shadow-md transition-shadow border-amber-500/20 bg-amber-500/5">
           <CardHeader>
-            <CardTitle className="text-lg">Experimental Runtime</CardTitle>
-            <CardDescription>Zig/WASM internals and browser runtime experiments</CardDescription>
+            <CardTitle className="text-lg">OpenTUI-to-shadcn Codegen</CardTitle>
+            <CardDescription>Parser and generator work for turning real OpenTUI apps into shadcn web code</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="ghost" className="p-0 h-auto">
-              <Link href="/docs/labs" className="flex items-center gap-2">
-                Explore labs
+              <Link href="/docs/examples/hunk" className="flex items-center gap-2">
+                View Hunk example
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
