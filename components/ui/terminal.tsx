@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect } from "react"
+import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
+import { useOptionalTerminalTheme, getThemeCSS } from "@/lib/opentui/themes"
 
 interface TerminalLine {
   id: string
@@ -322,6 +323,20 @@ const createBuiltInCommands = (
   },
 ]
 
+function parseCSSVars(css: string): Record<string, string> {
+  const vars: Record<string, string> = {}
+  for (const line of css.split("\n")) {
+    const trimmed = line.trim()
+    if (!trimmed || !trimmed.endsWith(";")) continue
+    const colonIdx = trimmed.indexOf(":")
+    if (colonIdx === -1) continue
+    const key = trimmed.slice(0, colonIdx).trim()
+    const value = trimmed.slice(colonIdx + 1, -1).trim()
+    vars[key] = value
+  }
+  return vars
+}
+
 const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
   (
     {
@@ -368,6 +383,18 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const velocityRef = useRef<number>(0)
     const isAnimatingRef = useRef<boolean>(false)
     const targetScrollRef = useRef<number>(0)
+
+    const themeCtx = useOptionalTerminalTheme()
+
+    const themeCSSVars = useMemo(() => {
+      if (!themeCtx) return {}
+      return parseCSSVars(getThemeCSS(themeCtx.theme))
+    }, [themeCtx])
+
+    const combinedTheme = useMemo(() => ({
+      ...themeCSSVars,
+      ...theme,
+    }), [themeCSSVars, theme])
 
     const opentuiState = useState<TerminalState>({
       mode: "command",
@@ -1005,7 +1032,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
             getVariantStyles(),
             className,
           )}
-          style={{ ...theme, ...props.style } as React.CSSProperties}
+          style={{ ...combinedTheme, ...props.style } as React.CSSProperties}
           onClick={(e) => {
             const target = e.target as HTMLElement
             const isFormInput =

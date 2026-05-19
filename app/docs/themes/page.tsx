@@ -1,22 +1,23 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import { Palette, Copy, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Terminal, type OpenTUIContext } from "@/components/ui/terminal"
 import { ThemePicker } from "@/components/theme-picker"
-import { prebuiltThemes, type ThemeConfig } from "@/lib/opentui/themes"
+import { TerminalThemeProvider, useTerminalTheme, prebuiltThemes } from "@/lib/opentui/themes"
 
 export default function ThemesPage() {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeConfig>(prebuiltThemes[0])
-  const [copied, setCopied] = useState(false)
+  return (
+    <TerminalThemeProvider>
+      <ThemesPageContent />
+    </TerminalThemeProvider>
+  )
+}
 
-  const handleThemeChange = useCallback((themeName: string) => {
-    const theme = prebuiltThemes.find((t) => t.name === themeName)
-    if (theme) {
-      setSelectedTheme(theme)
-    }
-  }, [])
+function ThemesPageContent() {
+  const { theme: selectedTheme, setTheme } = useTerminalTheme()
+  const [copied, setCopied] = useState(false)
 
   const configCode = `{
   "theme": "${selectedTheme.name}"
@@ -28,9 +29,8 @@ export default function ThemesPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Custom commands for themed terminal demo
-  const themeCommands = {
-    theme: async (args: string[], context: OpenTUIContext) => {
+  const themeCommands: Record<string, (args: string[], context: OpenTUIContext) => Promise<void>> = {
+    theme: async (args, context) => {
       const themeName = args[0]
       if (!themeName) {
         context.addLines([
@@ -43,7 +43,7 @@ export default function ThemesPage() {
       }
       const found = prebuiltThemes.find((t) => t.name === themeName)
       if (found) {
-        setSelectedTheme(found)
+        setTheme(found.name)
         context.addLines([
           `Theme changed to: ${found.displayName}`,
           `Description: ${found.description}`,
@@ -53,7 +53,7 @@ export default function ThemesPage() {
         context.addLines([`Theme "${themeName}" not found. Run 'theme' to see available themes.`])
       }
     },
-    colors: async (args: string[], context: OpenTUIContext) => {
+    colors: async (_args, context) => {
       context.addLines([
         `Current Theme: ${selectedTheme.displayName}`,
         "",
@@ -68,9 +68,8 @@ export default function ThemesPage() {
         `  Warning:    ${selectedTheme.colors.warning}`,
       ])
     },
-    demo: async (args: string[], context: OpenTUIContext) => {
+    demo: async (_args, context) => {
       context.addLines(["Syntax Highlighting Demo:", ""])
-      // Simulate typed code
       await new Promise((r) => setTimeout(r, 100))
       context.addLines([`const theme = "${selectedTheme.name}";`])
       await new Promise((r) => setTimeout(r, 100))
@@ -119,7 +118,7 @@ export default function ThemesPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <ThemePicker value={selectedTheme.name} onValueChange={handleThemeChange} />
+          <ThemePicker value={selectedTheme.name} onValueChange={setTheme} />
           <div className="flex items-center gap-2">
             {[
               selectedTheme.colors.primary,
@@ -180,9 +179,6 @@ export default function ThemesPage() {
           <div
             style={{
               backgroundColor: selectedTheme.colors.background,
-              ["--terminal-text" as string]: selectedTheme.colors.text,
-              ["--terminal-primary" as string]: selectedTheme.colors.primary,
-              ["--terminal-success" as string]: selectedTheme.colors.success,
             }}
           >
             <Terminal
@@ -195,8 +191,6 @@ export default function ThemesPage() {
               prompt="→"
               className="border-0 rounded-none shadow-none"
               style={{
-                backgroundColor: selectedTheme.colors.background,
-                color: selectedTheme.colors.text,
                 ["--tw-text-opacity" as string]: "1",
               }}
             />
@@ -211,7 +205,7 @@ export default function ThemesPage() {
           {prebuiltThemes.map((theme) => (
             <button
               key={theme.name}
-              onClick={() => setSelectedTheme(theme)}
+              onClick={() => setTheme(theme.name)}
               className={`
                 relative p-4 rounded-lg border-2 transition-all text-left w-full
                 hover:scale-[1.02] hover:shadow-lg
