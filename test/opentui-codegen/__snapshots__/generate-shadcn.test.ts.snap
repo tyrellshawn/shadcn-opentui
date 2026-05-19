@@ -1,0 +1,272 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generateShadcnComponent > generates component from box with nested children 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function NestedBoxes({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full">
+        <span className="font-mono text-sm text-emerald-200">Header</span>
+        <div className="w-full">
+          <span className="font-mono text-sm text-zinc-500">Nested content</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+"
+`;
+
+exports[`generateShadcnComponent > generates component from minimal text-only IR 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function SimpleView({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      <span className="font-mono text-sm text-emerald-200">Hello, World!</span>
+    </div>
+  )
+}
+"
+`;
+
+exports[`generateShadcnComponent > generates component with empty box 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function EmptyBox({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col" />
+    </div>
+  )
+}
+"
+`;
+
+exports[`generateShadcnComponent > generates component with scrollbox wrapper 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function ScrollingContent({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      <div className="overflow-auto h-full w-full">
+        <div className="flex flex-col">
+          <span className="font-mono text-sm text-emerald-200">Line 1</span>
+          <span className="font-mono text-sm text-emerald-200">Line 2</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+"
+`;
+
+exports[`generateShadcnComponent > generates component with unknown HunkDiffBody node 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function WithDiffBody({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full font-mono text-xs">
+        <span className="font-mono text-sm text-zinc-500">diff content</span>
+      </div>
+    </div>
+  )
+}
+"
+`;
+
+exports[`generateShadcnComponent > generates full HunkReviewStream program 1`] = `
+"import type { HunkDiffFileInput } from "hunkdiff/opentui"
+import type { HunkDiffSelection } from "hunkdiff/opentui"
+
+export function HunkReviewStream({
+  files,
+  layout = "split",
+  width = 80,
+  theme = "graphite",
+  selection,
+  showLineNumbers = true,
+  showHunkHeaders = true,
+  wrapLines = false,
+  highlight = true,
+  showFileHeaders = true,
+  showFileSeparators = true,
+  horizontalOffset = 0,
+  onSelectionChange,
+}: {
+  files?: HunkDiffFileInput[]
+  layout?: "split" | "stack"
+  width?: number
+  theme?: string
+  selection?: HunkDiffSelection
+  showLineNumbers?: boolean
+  showHunkHeaders?: boolean
+  wrapLines?: boolean
+  highlight?: boolean
+  showFileHeaders?: boolean
+  showFileSeparators?: boolean
+  horizontalOffset?: number
+  onSelectionChange?: (s: HunkDiffSelection) => void
+}) {
+  return (
+    <div className="flex flex-col w-full">
+      {/* HunkReviewStream */}
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full font-mono text-xs">
+          <div className="flex flex-col w-full">
+            <span className="font-mono text-sm text-emerald-200">diff content here</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+"
+`;

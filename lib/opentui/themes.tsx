@@ -533,6 +533,11 @@ export function useTerminalTheme() {
   return context
 }
 
+export function useOptionalTerminalTheme(): ThemeContextValue | null {
+  const context = useContext(ThemeContext)
+  return context
+}
+
 interface TerminalThemeProviderProps {
   children: ReactNode
   defaultTheme?: string

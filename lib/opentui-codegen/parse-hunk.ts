@@ -29,6 +29,43 @@ function extractJsxAttributeValue(attr: any): unknown {
   return `<${initializer.getKindName()}>`
 }
 
+function parseJsxExpressionChildren(expr: any): OpenTUIIrNode[] {
+  const results: OpenTUIIrNode[] = []
+
+  const jsxElements = expr.getDescendantsOfKind(SyntaxKind.JsxElement) as JsxElement[]
+  const selfClosing = expr.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement) as JsxSelfClosingElement[]
+  const allElements = [...jsxElements, ...selfClosing]
+
+  const topLevel = allElements.filter((el: any) => {
+    let parent = el.getParent()
+    while (parent && !parent.isKind(SyntaxKind.JsxExpression)) {
+      if (parent.isKind(SyntaxKind.JsxElement) || parent.isKind(SyntaxKind.JsxSelfClosingElement)) {
+        return false
+      }
+      parent = parent.getParent()
+      if (!parent) return false
+    }
+    return parent?.isKind(SyntaxKind.JsxExpression)
+  })
+
+  if (topLevel.length > 0) {
+    for (const el of topLevel) {
+      if (el.isKind(SyntaxKind.JsxElement)) {
+        results.push(parseJsxNode(el))
+      } else {
+        results.push(parseJsxSelfClosing(el))
+      }
+    }
+  } else {
+    const text = expr.getText().trim()
+    if (text.length > 0) {
+      results.push({ kind: "text", value: text.length > 80 ? text.slice(0, 80) + "..." : text })
+    }
+  }
+
+  return results
+}
+
 function parseJsxChildren(element: JsxElement): OpenTUIIrNode[] {
   const children: OpenTUIIrNode[] = []
 
@@ -38,10 +75,8 @@ function parseJsxChildren(element: JsxElement): OpenTUIIrNode[] {
     } else if (child.isKind(SyntaxKind.JsxSelfClosingElement)) {
       children.push(parseJsxSelfClosing(child as JsxSelfClosingElement))
     } else if (child.isKind(SyntaxKind.JsxExpression)) {
-      const text = child.getText().trim()
-      if (text.length > 0) {
-        children.push({ kind: "text", value: text.length > 80 ? text.slice(0, 80) + "..." : text })
-      }
+      const nestedResults = parseJsxExpressionChildren(child)
+      children.push(...nestedResults)
     }
   }
 

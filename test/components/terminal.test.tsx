@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { Terminal } from '@/components/ui/terminal'
+import { TerminalThemeProvider } from '@/lib/opentui/themes'
 
 describe('Terminal', () => {
   it('shows command completions, supports arrow navigation, and completes with tab', async () => {
@@ -116,5 +117,31 @@ describe('Terminal', () => {
     const errorLine = container.querySelector('.text-terminal-error')
     expect(errorLine).not.toBeNull()
     expect(errorLine).toHaveTextContent(/not found/i)
+  })
+
+  it('applies theme from TerminalThemeProvider context', () => {
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="tokyo-night">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+    const root = container.firstChild as HTMLElement
+    // Tokyo Night primary color
+    expect(root.style.getPropertyValue('--terminal-primary')).toBe('#7aa2f7')
+  })
+
+  it('explicit theme prop overrides TerminalThemeProvider context', () => {
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal
+          theme={{
+            '--terminal-primary': '#ff0000',
+          }}
+        />
+      </TerminalThemeProvider>,
+    )
+    const root = container.firstChild as HTMLElement
+    // Context would set #22c55e (matrix primary), but prop should win
+    expect(root.style.getPropertyValue('--terminal-primary')).toBe('#ff0000')
   })
 })

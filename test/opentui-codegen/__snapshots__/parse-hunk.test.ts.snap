@@ -1,0 +1,383 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseHunkFile > falls back to text for expression children without JSX 1`] = `
+{
+  "name": "TextFallback",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "{name}",
+                },
+              ],
+              "kind": "text",
+              "props": undefined,
+            },
+          ],
+          "kind": "box",
+          "props": undefined,
+        },
+      ],
+      "kind": "unknown",
+      "name": "TextFallback",
+    },
+  ],
+  "source": "TextFallback.tsx",
+}
+`;
+
+exports[`parseHunkFile > handles JSX expression children with nested OpenTUI primitives 1`] = `
+{
+  "name": "FilesList",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "kind": "text",
+                      "value": "{file.name}",
+                    },
+                  ],
+                  "kind": "text",
+                  "props": {
+                    "fg": "white",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "key": "<file.id>",
+                "style": true,
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "style": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "FilesList",
+    },
+  ],
+  "source": "FilesList.tsx",
+}
+`;
+
+exports[`parseHunkFile > handles JSX expression with conditional ternary returning JSX 1`] = `
+{
+  "name": "ConditionalView",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": undefined,
+                  "kind": "text",
+                  "props": {
+                    "fg": "green",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "style": true,
+              },
+            },
+            {
+              "children": [
+                {
+                  "children": undefined,
+                  "kind": "text",
+                  "props": {
+                    "fg": "muted",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": undefined,
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "style": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "ConditionalView",
+    },
+  ],
+  "source": "ConditionalView.tsx",
+}
+`;
+
+exports[`parseHunkFile > parses HunkFileNav-style pattern with group/file entries 1`] = `
+{
+  "name": "HunkFileNav",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "kind": "text",
+                      "value": "{entry.name}",
+                    },
+                  ],
+                  "kind": "text",
+                  "props": {
+                    "fg": "cyan",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "key": "<entry.id>",
+              },
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "kind": "text",
+                      "value": "{entry.name}",
+                    },
+                  ],
+                  "kind": "text",
+                  "props": {
+                    "fg": "white",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "key": "<entry.id>",
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "style": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "HunkFileNav",
+    },
+  ],
+  "source": "HunkFileNav.tsx",
+}
+`;
+
+exports[`parseHunkFile > parses HunkReviewStream-style pattern with map and conditional JSX 1`] = `
+{
+  "name": "HunkReviewStream",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "kind": "text",
+                          "value": "{"\\u2500".repeat(Math.max(1, width - 2))}",
+                        },
+                      ],
+                      "kind": "text",
+                      "props": {
+                        "fg": "border",
+                      },
+                    },
+                  ],
+                  "kind": "box",
+                  "props": {
+                    "style": true,
+                  },
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "kind": "text",
+                          "value": "{file.path}",
+                        },
+                      ],
+                      "kind": "text",
+                      "props": {
+                        "fg": "white",
+                      },
+                    },
+                    {
+                      "children": [
+                        {
+                          "kind": "text",
+                          "value": "{file.additions}",
+                        },
+                      ],
+                      "kind": "text",
+                      "props": {
+                        "fg": "green",
+                      },
+                    },
+                    {
+                      "children": [
+                        {
+                          "kind": "text",
+                          "value": "{file.deletions}",
+                        },
+                      ],
+                      "kind": "text",
+                      "props": {
+                        "fg": "red",
+                      },
+                    },
+                  ],
+                  "kind": "box",
+                  "props": {
+                    "style": true,
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "key": "<file.id>",
+                "style": true,
+              },
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "kind": "text",
+                      "value": "{"\\u2500".repeat(Math.max(1, width - 2))}",
+                    },
+                  ],
+                  "kind": "text",
+                  "props": {
+                    "fg": "border",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "style": true,
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "style": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "HunkReviewStream",
+    },
+  ],
+  "source": "HunkReviewStream.tsx",
+}
+`;
+
+exports[`parseHunkFile > parses basic box and text elements 1`] = `
+{
+  "name": "SimpleBox",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": undefined,
+              "kind": "text",
+              "props": {
+                "fg": "green",
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "style": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "SimpleBox",
+    },
+  ],
+  "source": "SimpleBox.tsx",
+}
+`;
+
+exports[`parseHunkFile > parses self-closing scrollbox 1`] = `
+{
+  "name": "ScrollingView",
+  "nodes": [
+    {
+      "children": [
+        {
+          "kind": "scrollbox",
+          "props": {
+            "focused": false,
+            "height": "100%",
+            "scrollY": true,
+            "width": "100%",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "ScrollingView",
+    },
+  ],
+  "source": "ScrollingView.tsx",
+}
+`;
+
+exports[`parseHunkFile > parses unknown elements as 'unknown' kind 1`] = `
+{
+  "name": "WithCustom",
+  "nodes": [
+    {
+      "children": [
+        {
+          "kind": "unknown",
+          "name": "CustomComponent",
+          "props": {
+            "files": "<files>",
+            "onSelect": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "WithCustom",
+    },
+  ],
+  "source": "WithCustom.tsx",
+}
+`;
