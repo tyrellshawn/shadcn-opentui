@@ -15,6 +15,10 @@
     "registry:check-boundaries": "bun scripts/check-registry-boundaries.mjs",
     "grammar:generate": "bunx antlr-ng -Dlanguage=TypeScript -o lib/opentui-codegen/generated --generate-visitor grammars/OpenTUIProgram.g4",
     "codegen:hunk": "bun scripts/generate-shadcn-from-opentui.ts",
+    "hunk:inspect": "bun scripts/inspect-hunk-source.ts",
+    "hunk:codegen": "bun scripts/generate-hunk-shadcn.ts",
+    "hunk:generate": "bun scripts/inspect-hunk-source.ts && bun scripts/generate-hunk-shadcn.ts",
+    "hunk:verify": "bun scripts/inspect-hunk-source.ts && bun scripts/generate-hunk-shadcn.ts && bun --bun next build 2>&1 | tail -5",
     "start": "bun --bun next start",
     "test": "bun vitest run",
     "test:watch": "bun vitest",
@@ -26,10 +30,10 @@
     "test:ci": "bun vitest run --reporter=dot && bun scripts/verify-opentui.ts && bun vitest run --config vitest.integration.config.ts --reporter=dot"
   },
   "dependencies": {
-    "@opentui/web-react": "workspace:*",
-    "@opentui/web-renderer": "workspace:*",
     "@opentui/core": "^0.1.90",
     "@opentui/react": "^0.1.90",
+    "@opentui/web-react": "workspace:*",
+    "@opentui/web-renderer": "workspace:*",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-popover": "latest",
     "@radix-ui/react-separator": "latest",
@@ -40,6 +44,7 @@
     "@vercel/analytics": "latest",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hunkdiff": "0.13.0",
     "lucide-react": "^0.454.0",
     "next": "15.2.8",
     "next-themes": "latest",
@@ -49,6 +54,7 @@
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "ts-morph": "^28.0.0",
     "turbo": "^2.8.20"
   },
   "devDependencies": {

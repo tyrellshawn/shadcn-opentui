@@ -1,0 +1,161 @@
+[
+  {
+    "name": "HunkDiffView",
+    "source": "src/opentui/HunkDiffView.tsx",
+    "nodes": [
+      {
+        "kind": "unknown",
+        "name": "HunkDiffView",
+        "children": [
+          {
+            "kind": "scrollbox",
+            "props": {
+              "width": "100%",
+              "height": "100%",
+              "scrollY": true,
+              "viewportCulling": true,
+              "focused": false
+            },
+            "children": [
+              {
+                "kind": "text",
+                "value": "{content}"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Exported function: HunkDiffView"
+    ]
+  },
+  {
+    "name": "HunkReviewStream",
+    "source": "src/opentui/HunkReviewStream.tsx",
+    "nodes": [
+      {
+        "kind": "unknown",
+        "name": "HunkReviewStream",
+        "children": [
+          {
+            "kind": "box",
+            "props": {
+              "key": "<file.id>",
+              "style": true
+            },
+            "children": [
+              {
+                "kind": "text",
+                "value": "{showFileSeparators && index > 0 ? (\n              <box style={{ width: \"100%\", ..."
+              },
+              {
+                "kind": "text",
+                "value": "{showFileHeaders ? (\n              <HunkDiffFileHeader\n                file={fil..."
+              },
+              {
+                "kind": "unknown",
+                "name": "HunkDiffBody",
+                "props": {
+                  "file": "<file>",
+                  "layout": "<layout>",
+                  "width": "<width>",
+                  "theme": "<theme>",
+                  "showLineNumbers": "<showLineNumbers>",
+                  "showHunkHeaders": "<showHunkHeaders>",
+                  "wrapLines": "<wrapLines>",
+                  "horizontalOffset": "<horizontalOffset>",
+                  "highlight": "<highlight>",
+                  "selectedHunkIndex": "<selectedHunkIndex>"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Exported function: HunkReviewStream"
+    ]
+  },
+  {
+    "name": "HunkDiffBody",
+    "source": "src/opentui/HunkDiffBody.tsx",
+    "nodes": [
+      {
+        "kind": "unknown",
+        "name": "HunkDiffBody",
+        "children": [
+          {
+            "kind": "box",
+            "props": {
+              "style": true
+            },
+            "children": [
+              {
+                "kind": "text",
+                "value": "{rows.map((row) => (\n        <box key={row.key} style={{ width: \"100%\", flexDire..."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Exported function: HunkDiffBody"
+    ]
+  },
+  {
+    "name": "HunkFileNav",
+    "source": "src/opentui/HunkFileNav.tsx",
+    "nodes": [
+      {
+        "kind": "unknown",
+        "name": "HunkFileNav",
+        "children": [
+          {
+            "kind": "box",
+            "props": {
+              "style": true
+            },
+            "children": [
+              {
+                "kind": "text",
+                "value": "{entries.map((entry) =>\n        entry.kind === \"group\" ? (\n          <FileGroupH..."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Exported function: HunkFileNav"
+    ]
+  },
+  {
+    "name": "HunkDiffFileHeader",
+    "source": "src/opentui/HunkDiffFileHeader.tsx",
+    "nodes": [
+      {
+        "kind": "unknown",
+        "name": "HunkDiffFileHeader",
+        "children": [
+          {
+            "kind": "unknown",
+            "name": "DiffFileHeaderRow",
+            "props": {
+              "file": "<internalFile>",
+              "headerLabelWidth": "<call>",
+              "headerStatsWidth": "<headerStatsWidth>",
+              "theme": "<resolvedTheme>",
+              "onSelect": "<onSelect>"
+            }
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "Exported function: HunkDiffFileHeader"
+    ]
+  }
+]
