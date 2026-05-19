@@ -1,48 +1,23 @@
-import { Code2, ExternalLink, FileText, GitPullRequestArrow, PanelLeft } from "lucide-react"
+import { Code2, ExternalLink, GitPullRequestArrow } from "lucide-react"
 import Link from "next/link"
+import { readFileSync } from "fs"
+import { join } from "path"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CodeBlock } from "@/components/docs/code-block"
+import { HunkReviewView } from "@/generated/hunk/HunkReviewView.generated"
 
-const files = [
-  { path: "src/opentui/HunkReviewStream.tsx", additions: 24, deletions: 5, active: true },
-  { path: "src/opentui/HunkFileNav.tsx", additions: 12, deletions: 2, active: false },
-  { path: "src/opentui/HunkDiffView.tsx", additions: 8, deletions: 1, active: false },
-]
+const generatedComponentSource = readFileSync(
+  join(process.cwd(), "generated/hunk/HunkReviewView.generated.tsx"),
+  "utf-8",
+)
 
-const samplePatch = `diff --git a/src/opentui/HunkReviewStream.tsx b/src/opentui/HunkReviewStream.tsx
-index 2d0b4f7..7ca51bd 100644
---- a/src/opentui/HunkReviewStream.tsx
-+++ b/src/opentui/HunkReviewStream.tsx
-@@ -12,8 +12,12 @@ export function HunkReviewStream({ files, width, layout }) {
--  return files.map((file) => (
--    <HunkDiffBody key={file.id} file={file} width={width} layout={layout} />
--  ))
-+  return (
-+    <scrollbox width="100%" height="100%" scrollY>
-+      {files.map((file) => (
-+        <HunkDiffBody key={file.id} file={file} width={width} layout={layout} />
-+      ))}
-+    </scrollbox>
-+  )
- }
-`
-
-const generatedCode = `export function GeneratedHunkReview() {
-  return (
-    <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
-      <aside className="rounded-lg border bg-black/50 p-3 font-mono text-xs">
-        <div className="mb-2 text-emerald-300">Files</div>
-        <button>src/opentui/HunkReviewStream.tsx</button>
-      </aside>
-      <section className="rounded-lg border bg-black/60 p-4 font-mono text-xs">
-        <pre><code>{samplePatch}</code></pre>
-      </section>
-    </div>
-  )
-}`
+const irSnapshot = readFileSync(
+  join(process.cwd(), "generated/hunk/ir.json"),
+  "utf-8",
+)
 
 export default function HunkExamplePage() {
   return (
@@ -54,12 +29,12 @@ export default function HunkExamplePage() {
         </div>
         <p className="max-w-3xl text-xl text-muted-foreground">
           Hunk is the project-level validation target for Shadcn OpenTUI: a real OpenTUI diff review application that
-          should eventually be viewable as generated shadcn web code.
+          is now viewable as generated shadcn web code via <code>HunkReviewView</code>.
         </p>
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">Hunk-inspired</Badge>
-          <Badge variant="outline">Static fixture</Badge>
-          <Badge variant="outline">Generated-code target</Badge>
+          <Badge variant="default" className="bg-emerald-600 text-white">Generated</Badge>
+          <Badge variant="outline">Codegen output</Badge>
           <Badge variant="outline">Not official OpenTUI</Badge>
         </div>
       </div>
@@ -72,6 +47,7 @@ export default function HunkExamplePage() {
           </CardTitle>
           <CardDescription>
             Hunk publishes reusable OpenTUI primitives such as `HunkDiffView`, `HunkReviewStream`, and `HunkFileNav`.
+            Generated from local external fixture at <code className="text-emerald-300">Github/vendor/hunk</code>.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,55 +60,28 @@ export default function HunkExamplePage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
-        <Card className="bg-black/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <PanelLeft className="h-4 w-4" />
-              Files
-            </CardTitle>
-            <CardDescription>Hunk-style review navigation</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {files.map((file) => (
-              <div
-                key={file.path}
-                className={`rounded-md border px-3 py-2 font-mono text-xs ${
-                  file.active
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-100"
-                    : "border-border/60 bg-background/40 text-muted-foreground"
-                }`}
-              >
-                <div className="flex items-start gap-2">
-                  <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                  <span className="break-all">{file.path}</span>
-                </div>
-                <div className="mt-1 text-[11px]">
-                  <span className="text-emerald-400">+{file.additions}</span>{" "}
-                  <span className="text-red-400">-{file.deletions}</span>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      <section>
+        <h2 className="mb-4 text-2xl font-semibold tracking-tight">Live generated component</h2>
+        <div className="min-h-[400px] rounded-lg border bg-black/60">
+          <HunkReviewView />
+        </div>
+      </section>
 
-        <Card className="bg-black/60">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Code2 className="h-4 w-4" />
-              Generated review stream target
-            </CardTitle>
-            <CardDescription>A static shadcn rendering of the kind of Hunk view the generator should emit.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <pre className="max-h-[480px] overflow-auto rounded-lg border border-emerald-500/20 bg-black p-4 text-xs leading-relaxed text-emerald-100">
-              <code>{samplePatch}</code>
-            </pre>
-          </CardContent>
-        </Card>
-      </div>
+      <section>
+        <h2 className="mb-4 text-2xl font-semibold tracking-tight">Parser IR snapshot</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Intermediate representation extracted from the OpenTUI source via <code>hunk:generate</code>.
+        </p>
+        <CodeBlock code={irSnapshot} language="json" title="generated/hunk/ir.json" />
+      </section>
 
-      <CodeBlock code={generatedCode} language="tsx" title="Generated shadcn target" />
+      <section>
+        <h2 className="mb-4 text-2xl font-semibold tracking-tight">Generated component source</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          The <code>HunkReviewView</code> component rendered above, produced by the shadcn codegen from the Hunk fixture.
+        </p>
+        <CodeBlock code={generatedComponentSource} language="tsx" title="generated/hunk/HunkReviewView.generated.tsx" />
+      </section>
     </div>
   )
 }
