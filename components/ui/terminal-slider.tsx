@@ -45,7 +45,7 @@ function TerminalSlider({
     <div className={cn("space-y-2 font-mono", className)}>
       {label && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-green-400">{label}</span>
+          <span className="text-terminal-primary">{label}</span>
           {showValue && (
             <span className="text-muted-foreground">
               {displayValue}
@@ -57,7 +57,7 @@ function TerminalSlider({
 
       {ascii ? (
         <div className="space-y-1">
-          <div className="text-xs text-green-400 font-mono">
+          <div className="text-xs text-terminal-primary font-mono">
             [{createAsciiBar(displayValue, max, width)}] {displayValue}
             {unit}
           </div>
@@ -86,10 +86,10 @@ function TerminalSlider({
           className={cn("relative flex w-full touch-none items-center select-none", "data-[disabled]:opacity-50")}
           {...props}
         >
-          <SliderPrimitive.Track className="bg-muted/30 border border-green-400/20 relative grow overflow-hidden rounded-none h-2 w-full">
-            <SliderPrimitive.Range className="bg-green-400 absolute h-full" />
+          <SliderPrimitive.Track className="bg-muted/30 border border-terminal-border relative grow overflow-hidden rounded-none h-2 w-full">
+            <SliderPrimitive.Range className="bg-terminal-cursor absolute h-full" />
           </SliderPrimitive.Track>
-          <SliderPrimitive.Thumb className="border-green-400 bg-green-400 ring-green-400/50 block size-3 shrink-0 rounded-none border shadow-sm transition-[color,box-shadow] hover:ring-2 focus-visible:ring-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50" />
+          <SliderPrimitive.Thumb className="border-terminal-border bg-terminal-cursor ring-terminal-cursor/50 block size-3 shrink-0 rounded-none border shadow-sm transition-[color,box-shadow] hover:ring-2 focus-visible:ring-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50" />
         </SliderPrimitive.Root>
       )}
 

@@ -34,7 +34,7 @@ function styleToTailwind(style: StyleMap): string {
   const classes: string[] = []
   if (style.flexDirection === "column") classes.push("flex", "flex-col")
   if (style.width === "100%") classes.push("w-full")
-  if (style.height === "100%" || style.height === "100%") classes.push("h-full")
+  if (style.height === "100%") classes.push("h-full")
   return classes.join(" ")
 }
 

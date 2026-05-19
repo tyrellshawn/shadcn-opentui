@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { Palette, Copy, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Terminal } from "@/components/ui/terminal"
+import { Terminal, type OpenTUIContext } from "@/components/ui/terminal"
 import { ThemePicker } from "@/components/theme-picker"
 import { prebuiltThemes, type ThemeConfig } from "@/lib/opentui/themes"
 
@@ -30,7 +30,7 @@ export default function ThemesPage() {
 
   // Custom commands for themed terminal demo
   const themeCommands = {
-    theme: async (args: string[], context: any) => {
+    theme: async (args: string[], context: OpenTUIContext) => {
       const themeName = args[0]
       if (!themeName) {
         context.addLines([
@@ -53,7 +53,7 @@ export default function ThemesPage() {
         context.addLines([`Theme "${themeName}" not found. Run 'theme' to see available themes.`])
       }
     },
-    colors: async (args: string[], context: any) => {
+    colors: async (args: string[], context: OpenTUIContext) => {
       context.addLines([
         `Current Theme: ${selectedTheme.displayName}`,
         "",
@@ -68,7 +68,7 @@ export default function ThemesPage() {
         `  Warning:    ${selectedTheme.colors.warning}`,
       ])
     },
-    demo: async (args: string[], context: any) => {
+    demo: async (args: string[], context: OpenTUIContext) => {
       context.addLines(["Syntax Highlighting Demo:", ""])
       // Simulate typed code
       await new Promise((r) => setTimeout(r, 100))
@@ -97,12 +97,12 @@ export default function ThemesPage() {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-lg bg-green-400/10">
-            <Palette className="w-6 h-6 text-green-400" />
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Palette className="w-6 h-6 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold text-green-400">Themes</h1>
+          <h1 className="text-4xl font-bold text-primary">Themes</h1>
         </div>
-        <p className="text-green-400/70 text-lg max-w-2xl">
+        <p className="text-primary/70 text-lg max-w-2xl">
           OpenTUI includes {prebuiltThemes.length} beautiful prebuilt themes inspired by popular terminal and editor
           color schemes. Select a theme below to preview it live in a real OpenTUI terminal.
         </p>
@@ -111,8 +111,8 @@ export default function ThemesPage() {
       {/* Theme Picker Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-green-400">Select Theme</h2>
-          <div className="flex items-center gap-2 text-sm text-green-400/50">
+          <h2 className="text-2xl font-semibold text-primary">Select Theme</h2>
+          <div className="flex items-center gap-2 text-sm text-primary/50">
             <Sparkles className="w-4 h-4" />
             <span>Live preview updates instantly</span>
           </div>
@@ -141,11 +141,11 @@ export default function ThemesPage() {
 
       {/* Live Terminal Preview */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-green-400">Live Preview</h2>
-        <p className="text-green-400/60 text-sm">
-          Try commands: <code className="px-1.5 py-0.5 rounded bg-green-400/10">theme</code>,{" "}
-          <code className="px-1.5 py-0.5 rounded bg-green-400/10">colors</code>,{" "}
-          <code className="px-1.5 py-0.5 rounded bg-green-400/10">demo</code>
+        <h2 className="text-2xl font-semibold text-primary">Live Preview</h2>
+        <p className="text-primary/60 text-sm">
+          Try commands: <code className="px-1.5 py-0.5 rounded bg-primary/10">theme</code>,{" "}
+          <code className="px-1.5 py-0.5 rounded bg-primary/10">colors</code>,{" "}
+          <code className="px-1.5 py-0.5 rounded bg-primary/10">demo</code>
         </p>
 
         <div
@@ -206,7 +206,7 @@ export default function ThemesPage() {
 
       {/* Theme Gallery */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold text-green-400">All Themes</h2>
+        <h2 className="text-2xl font-semibold text-primary">All Themes</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {prebuiltThemes.map((theme) => (
             <button

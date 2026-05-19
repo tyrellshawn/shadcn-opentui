@@ -19,9 +19,9 @@ const defaultTheme: OpenTUIRuntimeState["theme"] = {
   prompt: "user@terminal:~$",
   colors: {
     background: "bg-black",
-    foreground: "text-green-400",
+    foreground: "text-terminal-primary",
     input: "text-white",
-    output: "text-green-400",
+    output: "text-terminal-primary",
     error: "text-red-400",
     success: "text-emerald-400",
     system: "text-yellow-400",
