@@ -7,7 +7,7 @@ describe("browser OpenTUI capability", () => {
     const capability = getOpenTUIBrowserCapability()
 
     expect(capability.packages).toEqual(OPENTUI_PACKAGE_NAMES)
-    expect(capability.renderer).toBe("dom-wrapper")
+    expect(capability.renderer).toBe("shadcn-web")
     expect(capability.shadcnCompatible).toBe(true)
     expect(capability.browserRuntimeAvailable).toBe(false)
   })

@@ -3,6 +3,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Terminal theme tokens - green default, overridable via CSS variables */
+:root {
+  --terminal-bg: oklch(0 0 0);
+  --terminal-text: oklch(0.75 0.18 160);
+  --terminal-primary: oklch(0.75 0.18 160);
+  --terminal-muted: oklch(0.75 0.18 160 / 0.6);
+  --terminal-success: oklch(0.72 0.22 160);
+  --terminal-error: oklch(0.577 0.245 27.325);
+  --terminal-warning: oklch(0.7 0.2 80);
+  --terminal-info: oklch(0.7 0.2 200);
+  --terminal-border: oklch(0.75 0.18 160 / 0.2);
+  --terminal-cursor: oklch(0.75 0.18 160);
+  --terminal-highlight-bg: oklch(0.75 0.18 160 / 0.2);
+  --terminal-shadow: oklch(0.75 0.18 160 / 0.1);
+}
+
 /* New modern dark theme with emerald accent */
 :root {
   --background: oklch(0.07 0.01 260);
@@ -114,6 +130,18 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-terminal-bg: var(--terminal-bg);
+  --color-terminal-text: var(--terminal-text);
+  --color-terminal-primary: var(--terminal-primary);
+  --color-terminal-muted: var(--terminal-muted);
+  --color-terminal-success: var(--terminal-success);
+  --color-terminal-error: var(--terminal-error);
+  --color-terminal-warning: var(--terminal-warning);
+  --color-terminal-info: var(--terminal-info);
+  --color-terminal-border: var(--terminal-border);
+  --color-terminal-cursor: var(--terminal-cursor);
+  --color-terminal-highlight-bg: var(--terminal-highlight-bg);
+  --color-terminal-shadow: var(--terminal-shadow);
 }
 
 @layer base {
@@ -134,17 +162,17 @@
   }
 
   .terminal-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(74, 222, 128, 0.3);
+    background: color-mix(in srgb, var(--terminal-primary) 30%, transparent);
     border-radius: 3px;
   }
 
   .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(74, 222, 128, 0.5);
+    background: color-mix(in srgb, var(--terminal-primary) 50%, transparent);
   }
 
   .terminal-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(74, 222, 128, 0.3) transparent;
+    scrollbar-color: color-mix(in srgb, var(--terminal-primary) 30%, transparent) transparent;
   }
 
   /* Progress bar line styling - prevent wrapping */
@@ -164,29 +192,29 @@
 /* Added animations and effects */
 @layer utilities {
   .text-gradient {
-    background: linear-gradient(to right, #4ade80, #22d3ee);
+    background: linear-gradient(to right, var(--terminal-primary), #22d3ee);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .glow {
-    box-shadow: 0 0 40px rgba(74, 222, 128, 0.15);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--terminal-primary) 15%, transparent);
   }
 
   .glow-text {
-    text-shadow: 0 0 30px rgba(74, 222, 128, 0.5);
+    text-shadow: 0 0 30px color-mix(in srgb, var(--terminal-primary) 50%, transparent);
   }
 
   /* Add stronger glow for the main title */
   .glow-text-strong {
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.6), 0 0 40px rgba(74, 222, 128, 0.4), 0
-      0 80px rgba(74, 222, 128, 0.2);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--terminal-primary) 80%, transparent), 0 0 20px color-mix(in srgb, var(--terminal-primary) 60%, transparent), 0 0 40px color-mix(in srgb, var(--terminal-primary) 40%, transparent), 0
+      0 80px color-mix(in srgb, var(--terminal-primary) 20%, transparent);
   }
 
   .grid-pattern {
-    background-image: linear-gradient(rgba(74, 222, 128, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(74, 222, 128, 0.03) 1px, transparent 1px);
+    background-image: linear-gradient(color-mix(in srgb, var(--terminal-primary) 3%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--terminal-primary) 3%, transparent) 1px, transparent 1px);
     background-size: 60px 60px;
   }
 
@@ -223,10 +251,10 @@
   @keyframes pulse-glow {
     0%,
     100% {
-      box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+      box-shadow: 0 0 20px color-mix(in srgb, var(--terminal-primary) 30%, transparent);
     }
     50% {
-      box-shadow: 0 0 40px rgba(74, 222, 128, 0.6);
+      box-shadow: 0 0 40px color-mix(in srgb, var(--terminal-primary) 60%, transparent);
     }
   }
 

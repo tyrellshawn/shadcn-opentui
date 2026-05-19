@@ -29,6 +29,7 @@ interface TerminalProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "compact" | "minimal"
   autoScroll?: boolean
   smoothScroll?: boolean
+  theme?: Record<string, string>
 }
 
 interface TerminalUIComponent {
@@ -58,6 +59,7 @@ interface CommandCompletion {
     removeUIComponent: (id: string) => void
     updateFormData: (key: string, value: any) => void
     addLine: (content: string, type?: TerminalLine["type"]) => void
+    addLines: (lines: Array<{ content: string; type?: TerminalLine["type"] }>) => void
     clearLines: () => void
     updateLastLine: (content: string, type?: TerminalLine["type"]) => void
   }
@@ -333,6 +335,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       variant = "default",
       autoScroll = true,
       smoothScroll = true,
+      theme,
       ...props
     },
     ref,
@@ -436,6 +439,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         }))
       },
       addLine,
+      addLines: (lines) => {
+        lines.forEach((l) => addLine(l.content, l.type))
+      },
       clearLines,
       updateLastLine,
     }
@@ -485,7 +491,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
     const renderHighlightedInput = useCallback(() => {
       if (!currentInput) {
-        return <span className="text-green-400/40">{currentPlaceholder}</span>
+        return <span className="text-terminal-primary/40">{currentPlaceholder}</span>
       }
 
       const leadingWhitespace = currentInput.slice(0, leadingWhitespaceLength)
@@ -493,16 +499,16 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       const hasPartialCommandMatch = commandNames.some((name) => name.startsWith(commandPart))
 
       const commandClass = hasExactCommandMatch
-        ? "text-emerald-300"
+        ? "text-terminal-success"
         : hasPartialCommandMatch
-          ? "text-amber-300"
-          : "text-red-300"
+          ? "text-terminal-warning"
+          : "text-terminal-error"
 
       return (
         <>
           <span className="text-transparent">{leadingWhitespace}</span>
           <span className={commandClass}>{commandPart}</span>
-          <span className="text-cyan-200">{argsPart}</span>
+          <span className="text-terminal-info">{argsPart}</span>
         </>
       )
     }, [argsPart, commandMap, commandNames, commandPart, currentInput, currentPlaceholder, leadingWhitespaceLength])
@@ -735,14 +741,14 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       switch (type) {
         case "menu":
           return (
-            <div className="border border-green-400/20 rounded p-2 mb-2 bg-black/50">
-              <div className="text-green-400 text-xs mb-2">MENU (Use ↑↓ arrows, ENTER to select)</div>
+            <div className="border border-terminal-border rounded p-2 mb-2 bg-terminal-bg/50">
+              <div className="text-terminal-primary text-xs mb-2">MENU (Use ↑↓ arrows, ENTER to select)</div>
               {props.items?.map((item: string, index: number) => (
                 <div
                   key={index}
                   className={cn(
                     "px-2 py-1 font-mono text-sm",
-                    index === opentuiState[0].menuSelection ? "bg-green-400 text-black" : "text-green-400",
+                    index === opentuiState[0].menuSelection ? "bg-terminal-cursor text-black" : "text-terminal-primary",
                   )}
                 >
                   {index === opentuiState[0].menuSelection ? "► " : "  "}
@@ -753,11 +759,11 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           )
         case "form":
           return (
-            <div className="border border-green-400/20 rounded p-2 mb-2 bg-black/50">
-              <div className="text-green-400 text-xs mb-2">FORM (TAB to navigate, ENTER to submit, ESC to cancel)</div>
+            <div className="border border-terminal-border rounded p-2 mb-2 bg-terminal-bg/50">
+              <div className="text-terminal-primary text-xs mb-2">FORM (TAB to navigate, ENTER to submit, ESC to cancel)</div>
               {props.fields?.map((field: string, index: number) => (
                 <div key={index} className="mb-2">
-                  <label className="text-green-400 text-sm block mb-1">{field}:</label>
+                  <label className="text-terminal-primary text-sm block mb-1">{field}:</label>
                   <input
                     ref={(el) => {
                       formInputRefs.current[index] = el
@@ -766,7 +772,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                       }
                     }}
                     type="text"
-                    className="w-full bg-transparent border border-green-400/20 rounded px-2 py-1 text-green-400 font-mono text-sm focus:border-green-400 outline-none"
+                    className="w-full bg-transparent border border-terminal-border rounded px-2 py-1 text-terminal-primary font-mono text-sm focus:border-terminal-primary outline-none"
                     placeholder={`Enter ${field}`}
                     onKeyDown={(e) => handleFormKeyDown(e, index)}
                     defaultValue={opentuiState[0].formData[field] || ""}
@@ -787,7 +793,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         case "minimal":
           return "p-3 border-0 shadow-none"
         default:
-          return "p-3 text-xs shadow-2xl shadow-green-400/10 sm:p-4 sm:text-sm"
+          return "p-3 text-xs shadow-2xl shadow-terminal-shadow sm:p-4 sm:text-sm"
       }
     }
 
@@ -995,10 +1001,11 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         <div
           ref={ref}
           className={cn(
-            "bg-black text-green-400 font-mono rounded-lg border border-border overflow-hidden",
+            "bg-terminal-bg text-terminal-text font-mono rounded-lg border border-border overflow-hidden",
             getVariantStyles(),
             className,
           )}
+          style={{ ...theme, ...props.style } as React.CSSProperties}
           onClick={(e) => {
             const target = e.target as HTMLElement
             const isFormInput =
@@ -1018,11 +1025,11 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           {...props}
         >
           {variant !== "minimal" && (
-            <div className="mb-2 flex flex-col gap-1 border-b border-green-400/20 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-green-400 text-xs font-semibold">
+            <div className="mb-2 flex flex-col gap-1 border-b border-terminal-border pb-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-terminal-primary text-xs font-semibold">
                 OpenTUI Terminal {opentuiState[0].mode !== "command" && `- ${opentuiState[0].mode.toUpperCase()} MODE`}
               </div>
-              <div className="text-green-400/60 text-xs">Ctrl+L to clear</div>
+              <div className="text-terminal-muted text-xs">Ctrl+L to clear</div>
             </div>
           )}
 
@@ -1058,10 +1065,10 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   className={cn(
                     "terminal-line mb-1 break-words leading-relaxed",
                     isProgressLine && "font-variant-numeric-tabular",
-                    line.type === "input" && "text-white font-semibold",
-                    line.type === "error" && "text-red-400",
-                    line.type === "success" && "text-emerald-400",
-                    line.type === "output" && "text-green-400",
+                    line.type === "input" && "text-terminal-text font-semibold",
+                    line.type === "error" && "text-terminal-error",
+                    line.type === "success" && "text-terminal-success",
+                    line.type === "output" && "text-terminal-primary",
                   )}
                 >
                   {line.content}
@@ -1071,8 +1078,8 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
             {renderUIComponent()}
 
-            <div className="relative mt-1 flex items-start text-white">
-              <span className="text-green-400 mr-2 font-bold shrink-0">{prompt}</span>
+            <div className="relative mt-1 flex items-start text-terminal-text">
+              <span className="text-terminal-primary mr-2 font-bold shrink-0">{prompt}</span>
               <div className="relative min-w-0 flex-1">
                 <div
                   aria-hidden="true"
@@ -1106,24 +1113,24 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   placeholder={currentPlaceholder}
                 />
                 <div
-                  className="absolute top-0 w-2 h-5 bg-green-400 pointer-events-none animate-terminal-blink"
+                  className="absolute top-0 w-2 h-5 bg-terminal-cursor pointer-events-none animate-terminal-blink"
                   style={{
                     left: `${cursorPosition * 0.6}em`,
                   }}
                 />
 
                 {completionSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded border border-green-400/20 bg-black/95 shadow-lg">
+                  <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded border border-terminal-border bg-terminal-bg shadow-lg">
                     <div className="max-h-40 overflow-y-auto terminal-scrollbar">
                       {completionSuggestions.map((suggestion, index) => (
                         <button
                           key={suggestion.name}
                           type="button"
                           className={cn(
-                            "w-full border-b border-green-400/10 px-3 py-2 text-left text-xs last:border-b-0 sm:text-sm",
+                            "w-full border-b border-terminal-border px-3 py-2 text-left text-xs last:border-b-0 sm:text-sm",
                             index === activeCompletionIndex
-                              ? "bg-green-400/20 text-green-200"
-                              : "text-green-400 hover:bg-green-400/10",
+                              ? "bg-terminal-highlight-bg text-terminal-primary"
+                              : "text-terminal-primary hover:bg-terminal-highlight-bg",
                           )}
                           onMouseDown={(event) => {
                             event.preventDefault()
@@ -1134,20 +1141,20 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                           <div className="flex items-center justify-between gap-3">
                             <span className="font-semibold">{suggestion.name}</span>
                             {suggestion.category && (
-                              <span className="text-[10px] uppercase tracking-wide text-green-400/60">{suggestion.category}</span>
+                              <span className="text-[10px] uppercase tracking-wide text-terminal-muted">{suggestion.category}</span>
                             )}
                           </div>
-                          <div className="truncate text-[11px] text-green-400/70">{suggestion.description}</div>
+                          <div className="truncate text-[11px] text-terminal-primary/70">{suggestion.description}</div>
                         </button>
                       ))}
                     </div>
-                    <div className="border-t border-green-400/10 px-3 py-1.5 text-[10px] text-green-400/60">
+                    <div className="border-t border-terminal-border px-3 py-1.5 text-[10px] text-terminal-muted">
                       Tab to complete, arrows to navigate
                     </div>
                   </div>
                 )}
               </div>
-              {isProcessing && <span className="ml-2 text-yellow-400 animate-pulse">⚡</span>}
+              {isProcessing && <span className="ml-2 text-terminal-warning animate-pulse">⚡</span>}
             </div>
           </div>
         </div>

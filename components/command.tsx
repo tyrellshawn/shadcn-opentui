@@ -17,7 +17,7 @@ const Command = React.forwardRef<HTMLElement, CommandProps>(
           "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
           {
             "text-foreground": variant === "default",
-            "text-green-600 dark:text-green-400": variant === "success",
+            "text-terminal-primary": variant === "success",
             "text-red-600 dark:text-red-400": variant === "error",
             "text-yellow-600 dark:text-yellow-400": variant === "warning",
           },

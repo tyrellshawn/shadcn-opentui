@@ -21,8 +21,8 @@ function TerminalControls({ className, onCommand }: TerminalControlsProps) {
   }
 
   return (
-    <div className={cn("space-y-4 p-4 border border-green-400/20 rounded bg-black/50", className)}>
-      <div className="text-green-400 font-mono text-sm border-b border-green-400/20 pb-2">TERMINAL CONTROLS</div>
+    <div className={cn("space-y-4 p-4 border border-terminal-border rounded bg-black/50", className)}>
+      <div className="text-terminal-primary font-mono text-sm border-b border-terminal-border pb-2">TERMINAL CONTROLS</div>
 
       <TerminalSlider
         label="Volume"
@@ -63,7 +63,7 @@ function TerminalControls({ className, onCommand }: TerminalControlsProps) {
         <Button
           variant="outline"
           size="sm"
-          className="font-mono text-xs border-green-400/20 text-green-400 hover:bg-green-400/10 bg-transparent"
+          className="font-mono text-xs border-terminal-border text-terminal-primary hover:bg-terminal-highlight-bg bg-transparent"
           onClick={() => onCommand?.("reset controls")}
         >
           RESET
@@ -71,7 +71,7 @@ function TerminalControls({ className, onCommand }: TerminalControlsProps) {
         <Button
           variant="outline"
           size="sm"
-          className="font-mono text-xs border-green-400/20 text-green-400 hover:bg-green-400/10 bg-transparent"
+          className="font-mono text-xs border-terminal-border text-terminal-primary hover:bg-terminal-highlight-bg bg-transparent"
           onClick={() => onCommand?.("save config")}
         >
           SAVE
