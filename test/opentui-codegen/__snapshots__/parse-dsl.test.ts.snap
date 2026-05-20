@@ -1,0 +1,273 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseDSL > handles array arguments as children 1`] = `
+{
+  "name": "listView",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "one",
+                },
+              ],
+              "kind": "text",
+            },
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "two",
+                },
+              ],
+              "kind": "text",
+            },
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "three",
+                },
+              ],
+              "kind": "text",
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "flexDirection": "column",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "listView",
+    },
+  ],
+  "source": "listView.opentui",
+}
+`;
+
+exports[`parseDSL > handles minified single-line input 1`] = `
+{
+  "name": "minified",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "minified",
+                },
+              ],
+              "kind": "text",
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "flex": "row",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "x",
+    },
+  ],
+  "source": "minified.opentui",
+}
+`;
+
+exports[`parseDSL > parses a simple box with text 1`] = `
+{
+  "name": "myView",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "hello",
+                },
+              ],
+              "kind": "text",
+              "props": {
+                "fg": "green",
+              },
+            },
+            {
+              "kind": "scrollbox",
+              "props": {
+                "width": "100%",
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "flexDirection": "column",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "myView",
+    },
+  ],
+  "source": "myView.opentui",
+}
+`;
+
+exports[`parseDSL > parses boolean and number literal props 1`] = `
+{
+  "name": "propsAllTypes",
+  "nodes": [
+    {
+      "children": [
+        {
+          "kind": "box",
+          "props": {
+            "count": 42,
+            "label": "test",
+            "visible": true,
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "propsAllTypes",
+    },
+  ],
+  "source": "propsAllTypes.opentui",
+}
+`;
+
+exports[`parseDSL > parses nested calls 1`] = `
+{
+  "name": "nested",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "kind": "text",
+                      "value": "nested",
+                    },
+                  ],
+                  "kind": "text",
+                  "props": {
+                    "fg": "white",
+                  },
+                },
+              ],
+              "kind": "box",
+              "props": {
+                "padding": 1,
+              },
+            },
+          ],
+          "kind": "box",
+          "props": {
+            "flexDirection": "column",
+            "width": "100%",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "nested",
+    },
+  ],
+  "source": "nested.opentui",
+}
+`;
+
+exports[`parseDSL > parses text-only call 1`] = `
+{
+  "name": "greet",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "text",
+              "value": "Hello, World!",
+            },
+          ],
+          "kind": "text",
+        },
+      ],
+      "kind": "unknown",
+      "name": "greet",
+    },
+  ],
+  "source": "greet.opentui",
+}
+`;
+
+exports[`parseDSL > parses unknown calls as unknown kind 1`] = `
+{
+  "name": "custom",
+  "nodes": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "kind": "text",
+                  "value": "label",
+                },
+              ],
+              "kind": "text",
+              "props": {
+                "fg": "white",
+              },
+            },
+          ],
+          "kind": "unknown",
+          "name": "CustomComponent",
+          "props": {
+            "items": "files",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "custom",
+    },
+  ],
+  "source": "custom.opentui",
+}
+`;
+
+exports[`parseDSL > parses with props object only 1`] = `
+{
+  "name": "simple",
+  "nodes": [
+    {
+      "children": [
+        {
+          "kind": "scrollbox",
+          "props": {
+            "height": "100%",
+            "width": "100%",
+          },
+        },
+      ],
+      "kind": "unknown",
+      "name": "simple",
+    },
+  ],
+  "source": "simple.opentui",
+}
+`;

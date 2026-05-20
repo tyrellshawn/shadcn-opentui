@@ -30,3 +30,6 @@ next-env.d.ts
 /test/artifacts/
 node_modules/
 graphify-out/
+
+# generated ANTLR parser
+/lib/opentui-codegen/generated/
