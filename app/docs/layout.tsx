@@ -24,6 +24,7 @@ import { useState } from "react"
 import { SearchButton } from "@/components/search"
 import { BreadcrumbNav } from "@/components/docs/breadcrumb-nav"
 import { PageNav } from "@/components/docs/page-nav"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navigation = [
   {
@@ -124,7 +125,8 @@ export default function DocsLayout({
               <Terminal className="h-4 w-4" />
               <span>OpenTUI React Documentation</span>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              <ThemeToggle />
               <SearchButton />
             </div>
           </header>
