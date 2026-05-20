@@ -22,8 +22,8 @@ export default function InstallationPage() {
             <CardDescription>Install the terminal component in one simple step</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-muted rounded-lg p-4">
-              <code className="text-sm block">bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json</code>
+            <div className="bg-muted rounded-lg p-4 overflow-x-auto">
+              <code className="text-sm block whitespace-nowrap">bunx --bun shadcn@latest add https://opentui.vercel.app/r/terminal.json</code>
             </div>
           </CardContent>
         </Card>
@@ -87,8 +87,8 @@ export default function InstallationPage() {
             Stable shadcn component usage and the OpenTUI-to-shadcn codegen track are the default paths. Use these packages
             only if you are working on the parked browser-native runtime research.
           </p>
-          <div className="bg-background/70 rounded-md p-3 border border-amber-500/20">
-            <code className="text-sm block">bun add @opentui/core @opentui/react</code>
+          <div className="bg-background/70 rounded-md p-3 border border-amber-500/20 overflow-x-auto">
+            <code className="text-sm block whitespace-nowrap">bun add @opentui/core @opentui/react</code>
           </div>
           <p>These packages are intentionally not part of the normal install path.</p>
         </div>

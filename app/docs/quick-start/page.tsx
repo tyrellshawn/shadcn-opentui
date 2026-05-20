@@ -74,16 +74,16 @@ export default function QuickStartPage() {
          <p className="text-xl text-muted-foreground">
            Build your first interactive terminal interface with the shadcn terminal component in just a few minutes.
          </p>
-         <div className="bg-muted rounded-lg p-4">
-           <p className="text-sm">
+          <div className="bg-muted rounded-lg p-4 overflow-x-auto">
+            <p className="text-sm">
               <strong>Prerequisites:</strong> Add the Shadcn OpenTUI registry to your components.json:
-           </p>
-           <code className="text-xs block mt-2">
+            </p>
+            <code className="text-xs block mt-2">
 {`"registries": [
   "https://opentui.vercel.app/registry/index.json"
 ]`}
-           </code>
-         </div>
+            </code>
+          </div>
        </div>
 
       {/* Hello Terminal Example */}
