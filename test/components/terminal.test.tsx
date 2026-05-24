@@ -119,6 +119,39 @@ describe('Terminal', () => {
     expect(errorLine).toHaveTextContent(/not found/i)
   })
 
+  it('renders ascii output from the provided words', async () => {
+    const user = userEvent.setup()
+
+    render(<Terminal />)
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'ascii hello world')
+    await user.keyboard('{Enter}')
+
+    expect(
+      screen.getByText((_, element) =>
+        element?.textContent === '#   # ##### #     #      ###      #   #  ###  ####  #     ####',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('renders table output with aligned borders and intersections', async () => {
+    const user = userEvent.setup()
+
+    render(<Terminal />)
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'table')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByText('┌─────────┬─────┬───────────────┐')).toBeInTheDocument()
+    expect(screen.getByText('├─────────┼─────┼───────────────┤')).toBeInTheDocument()
+    expect(screen.getByText((_, element) => element?.textContent === '│ Bob     │ 30  │ San Francisco │')).toBeInTheDocument()
+    expect(screen.getByText('└─────────┴─────┴───────────────┘')).toBeInTheDocument()
+  })
+
   it('applies theme from TerminalThemeProvider context', () => {
     const { container } = render(
       <TerminalThemeProvider defaultTheme="tokyo-night">

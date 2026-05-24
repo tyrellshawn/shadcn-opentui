@@ -1,4 +1,5 @@
 import type { TerminalCommand } from "./types"
+import { renderAsciiBanner, renderTable, sampleTerminalTableData } from "./renderers"
 
 // Built-in system commands
 export const createBuiltInCommands = (): TerminalCommand[] => [
@@ -185,25 +186,24 @@ export const createUICommands = (): TerminalCommand[] => [
     },
   },
   {
+    name: "ascii",
+    description: "Generate ASCII art",
+    category: "ui",
+    usage: "ascii [text]",
+    handler: (args, context) => {
+      const text = args.join(" ") || "OpenTUI"
+
+      context.addLine("Generating ASCII art...", "success")
+      renderAsciiBanner(text).forEach((line) => context.addLine(line, "success"))
+    },
+  },
+  {
     name: "table",
     description: "Display data in table format",
     category: "ui",
     handler: (_, context) => {
-      const data = [
-        ["Name", "Role", "Status"],
-        ["Alice", "Developer", "Active"],
-        ["Bob", "Designer", "Active"],
-        ["Charlie", "Manager", "Away"],
-      ]
-
       context.addLine("Sample Data Table:", "success")
-      data.forEach((row, index) => {
-        const formatted = row.map((cell) => cell.padEnd(12)).join(" │ ")
-        context.addLine(`│ ${formatted} │`)
-        if (index === 0) {
-          context.addLine(`├${"─".repeat(formatted.length + 2)}┤`)
-        }
-      })
+      renderTable(sampleTerminalTableData).forEach((line) => context.addLine(line))
     },
   },
 ]
