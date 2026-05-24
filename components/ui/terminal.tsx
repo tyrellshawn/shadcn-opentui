@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useContext, createContext, useEff
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
 import { useOptionalTerminalTheme, getThemeCSS } from "@/lib/opentui/themes"
+import { renderAsciiBanner, renderTable, sampleTerminalTableData } from "@/lib/opentui/renderers"
 
 interface TerminalLine {
   id: string
@@ -285,40 +286,16 @@ const createBuiltInCommands = (
     handler: (args) => {
       const text = args.join(" ") || "OpenTUI"
       addLine("Generating ASCII art...", "success")
-
-      // Simple ASCII art generator
-      const asciiArt = [
-        "  ___                   _____ _   _ ___ ",
-        " / _ \\ _ __   ___ _ __  |_   _| | | |_ _|",
-        "| | | | '_ \\ / _ \\ '_ \\   | | | | | || | ",
-        "| |_| | |_) |  __/ | | |  | | | |_| || | ",
-        " \\___/| .__/ \\___|_| |_|  |_|  \\___/|___|",
-        "      |_|                               ",
-      ]
-
-      asciiArt.forEach((line) => addLine(line, "success"))
+      renderAsciiBanner(text).forEach((line) => addLine(line, "success"))
     },
   },
   {
     name: "table",
     description: "Display data in table format",
     category: "data",
-    handler: (args) => {
-      const sampleData = [
-        ["Name", "Age", "City"],
-        ["Alice", "25", "New York"],
-        ["Bob", "30", "San Francisco"],
-        ["Charlie", "35", "Chicago"],
-      ]
-
+    handler: () => {
       addLine("Sample Data Table:", "success")
-      sampleData.forEach((row, index) => {
-        const formattedRow = row.map((cell) => cell.padEnd(12)).join(" | ")
-        addLine(index === 0 ? `| ${formattedRow} |` : `| ${formattedRow} |`, "output")
-        if (index === 0) {
-          addLine(`|${"-".repeat(formattedRow.length + 2)}|`, "output")
-        }
-      })
+      renderTable(sampleTerminalTableData).forEach((line) => addLine(line, "output"))
     },
   },
 ]
