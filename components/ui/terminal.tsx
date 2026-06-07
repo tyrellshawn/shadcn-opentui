@@ -328,6 +328,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       autoScroll = true,
       smoothScroll = true,
       theme,
+      style,
       ...props
     },
     ref,
@@ -1009,7 +1010,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
             getVariantStyles(),
             className,
           )}
-          style={{ ...combinedTheme, ...props.style } as React.CSSProperties}
+          style={{ ...combinedTheme, ...style } as React.CSSProperties}
           onClick={(e) => {
             const target = e.target as HTMLElement
             const isFormInput =
@@ -1072,7 +1073,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                     line.type === "input" && "text-terminal-text font-semibold",
                     line.type === "error" && "text-terminal-error",
                     line.type === "success" && "text-terminal-success",
-                    line.type === "output" && "text-terminal-primary",
+                    line.type === "output" && "text-terminal-text",
                   )}
                 >
                   {line.content}

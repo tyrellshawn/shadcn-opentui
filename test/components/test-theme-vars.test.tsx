@@ -1,4 +1,5 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import type { CSSProperties } from 'react'
 import { describe, expect, it } from 'vitest'
 import { Terminal } from '@/components/ui/terminal'
 import { TerminalThemeProvider, getThemeCSS, prebuiltThemes } from '@/lib/opentui/themes'
@@ -91,6 +92,32 @@ describe('Terminal inline theme styles', () => {
     for (const v of required) {
       expect(style).toContain(v)
     }
+  })
+
+  it('preserves theme CSS vars when user style prop is provided', () => {
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="catppuccin">
+        <Terminal style={{ '--tw-text-opacity': '1' } as CSSProperties} />
+      </TerminalThemeProvider>,
+    )
+    const root = container.firstChild as HTMLElement
+
+    expect(root.style.getPropertyValue('--terminal-bg')).toBe('#1e1e2e')
+    expect(root.style.getPropertyValue('--terminal-text')).toBe('#cdd6f4')
+    expect(root.style.getPropertyValue('--terminal-primary')).toBe('#cba6f7')
+    expect(root.style.getPropertyValue('--tw-text-opacity')).toBe('1')
+  })
+
+  it('renders output lines with terminal text color, not primary accent color', () => {
+    render(
+      <TerminalThemeProvider defaultTheme="catppuccin">
+        <Terminal welcomeMessage={['Catppuccin preview text']} />
+      </TerminalThemeProvider>,
+    )
+
+    const line = screen.getByText('Catppuccin preview text')
+    expect(line.className).toContain('text-terminal-text')
+    expect(line.className).not.toContain('text-terminal-primary')
   })
 })
 

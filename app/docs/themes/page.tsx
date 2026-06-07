@@ -182,6 +182,7 @@ function ThemesPageContent() {
             }}
           >
             <Terminal
+              key={selectedTheme.name}
               welcomeMessage={[
                 `Welcome to OpenTUI — ${selectedTheme.displayName} Theme`,
                 `Type 'theme' to list themes, 'colors' to see palette, or 'demo' for syntax preview.`,
@@ -190,9 +191,6 @@ function ThemesPageContent() {
               commands={themeCommands}
               prompt="→"
               className="border-0 rounded-none shadow-none"
-              style={{
-                ["--tw-text-opacity" as string]: "1",
-              }}
             />
           </div>
         </div>
