@@ -6,6 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Terminal, type OpenTUIContext } from "@/components/ui/terminal"
 import { ThemePicker } from "@/components/theme-picker"
 import { TerminalThemeProvider, useTerminalTheme, prebuiltThemes } from "@/lib/opentui/themes"
+import type { CommandHandler } from "@/lib/types"
+
+type ThemeMenuItem = {
+  label: string
+  value: string
+}
+
+function isThemeMenuItem(item: unknown): item is ThemeMenuItem {
+  return Boolean(item && typeof item === "object" && "value" in item && typeof (item as ThemeMenuItem).value === "string")
+}
 
 export default function ThemesPage() {
   return (
@@ -20,7 +30,8 @@ function ThemesPageContent() {
   const [copied, setCopied] = useState(false)
 
   const configCode = `{
-  "theme": "${selectedTheme.name}"
+  "theme": "${selectedTheme.name}",
+  "fontFamily": "${selectedTheme.fontFamily ?? "default mono"}"
 }`
 
   const handleCopy = () => {
@@ -29,65 +40,121 @@ function ThemesPageContent() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const themeCommands: Record<string, (args: string[], context: OpenTUIContext) => Promise<void>> = {
-    theme: async (args, context) => {
-      const themeName = args[0]
-      if (!themeName) {
+  const themeCommands: Record<string, CommandHandler> = {
+    theme: {
+      name: "theme",
+      description: "Preview and select a terminal theme",
+      category: "ui",
+      handler: async (args, context?: OpenTUIContext) => {
+        if (!context) return
+        const themeName = args[0]
+        if (!themeName) {
+          const originalThemeName = selectedTheme.name
+          const items: ThemeMenuItem[] = prebuiltThemes.map((theme) => ({
+            label: `${theme.displayName.padEnd(18)} ${theme.variant.padEnd(5)} ${theme.description}`,
+            value: theme.name,
+          }))
+          const selectedIndex = Math.max(
+            0,
+            prebuiltThemes.findIndex((theme) => theme.name === selectedTheme.name),
+          )
+
+          context.addLines([
+            "Choose a theme:",
+            "Use ↑/↓ to preview. Press Enter to save, Esc to cancel.",
+          ])
+          context.setState((prev) => ({
+            ...prev,
+            mode: "ui",
+            menuSelection: selectedIndex,
+            activeComponent: {
+              id: `theme-menu-${Date.now()}`,
+              type: "menu",
+              active: true,
+              props: {
+                items,
+                onPreview: (item: unknown) => {
+                  if (isThemeMenuItem(item)) setTheme(item.value)
+                },
+                onSelect: (item: unknown) => {
+                  if (!isThemeMenuItem(item)) return
+                  const found = prebuiltThemes.find((theme) => theme.name === item.value)
+                  if (!found) return
+                  setTheme(found.name)
+                  context.addLines([
+                    `Theme saved: ${found.displayName}`,
+                    `Description: ${found.description}`,
+                    `Variant: ${found.variant}`,
+                  ])
+                },
+                onCancel: () => {
+                  setTheme(originalThemeName)
+                  context.addLine("Theme change cancelled", "error")
+                },
+              },
+            },
+          }))
+          return
+        }
+        const found = prebuiltThemes.find((t) => t.name === themeName)
+        if (found) {
+          setTheme(found.name)
+          context.addLines([
+            `Theme changed to: ${found.displayName}`,
+            `Description: ${found.description}`,
+            `Variant: ${found.variant}`,
+          ])
+        } else {
+          context.addLines([`Theme "${themeName}" not found. Run 'theme' to choose from the menu.`])
+        }
+      },
+    },
+    colors: {
+      name: "colors",
+      description: "Show the selected theme color palette",
+      handler: async (_args, context?: OpenTUIContext) => {
+        if (!context) return
         context.addLines([
-          "Usage: theme <name>",
+          `Current Theme: ${selectedTheme.displayName}`,
           "",
-          "Available themes:",
-          ...prebuiltThemes.map((t) => `  ${t.name.padEnd(15)} - ${t.description}`),
+          "Color Palette:",
+          `  Primary:    ${selectedTheme.colors.primary}`,
+          `  Secondary:  ${selectedTheme.colors.secondary}`,
+          `  Accent:     ${selectedTheme.colors.accent}`,
+          `  Background: ${selectedTheme.colors.background}`,
+          `  Text:       ${selectedTheme.colors.text}`,
+          `  Font:       ${selectedTheme.fontFamily ?? "default mono"}`,
+          `  Success:    ${selectedTheme.colors.success}`,
+          `  Error:      ${selectedTheme.colors.error}`,
+          `  Warning:    ${selectedTheme.colors.warning}`,
         ])
-        return
-      }
-      const found = prebuiltThemes.find((t) => t.name === themeName)
-      if (found) {
-        setTheme(found.name)
+      },
+    },
+    demo: {
+      name: "demo",
+      description: "Show syntax preview output",
+      handler: async (_args, context?: OpenTUIContext) => {
+        if (!context) return
+        context.addLines(["Syntax Highlighting Demo:", ""])
+        await new Promise((r) => setTimeout(r, 100))
+        context.addLines([`const theme = "${selectedTheme.name}";`])
+        await new Promise((r) => setTimeout(r, 100))
+        context.addLines([`function applyTheme(name: string) {`])
+        await new Promise((r) => setTimeout(r, 100))
+        context.addLines([`  console.log("Applying:", name);`])
+        await new Promise((r) => setTimeout(r, 100))
+        context.addLines([`  return { success: true };`])
+        await new Promise((r) => setTimeout(r, 100))
+        context.addLines([`}`])
+        await new Promise((r) => setTimeout(r, 200))
         context.addLines([
-          `Theme changed to: ${found.displayName}`,
-          `Description: ${found.description}`,
-          `Variant: ${found.variant}`,
+          "",
+          "Status Messages:",
+          "✓ Theme loaded successfully",
+          "ℹ Using " + selectedTheme.variant + " mode",
+          "⚠ " + prebuiltThemes.length + " themes available",
         ])
-      } else {
-        context.addLines([`Theme "${themeName}" not found. Run 'theme' to see available themes.`])
-      }
-    },
-    colors: async (_args, context) => {
-      context.addLines([
-        `Current Theme: ${selectedTheme.displayName}`,
-        "",
-        "Color Palette:",
-        `  Primary:    ${selectedTheme.colors.primary}`,
-        `  Secondary:  ${selectedTheme.colors.secondary}`,
-        `  Accent:     ${selectedTheme.colors.accent}`,
-        `  Background: ${selectedTheme.colors.background}`,
-        `  Text:       ${selectedTheme.colors.text}`,
-        `  Success:    ${selectedTheme.colors.success}`,
-        `  Error:      ${selectedTheme.colors.error}`,
-        `  Warning:    ${selectedTheme.colors.warning}`,
-      ])
-    },
-    demo: async (_args, context) => {
-      context.addLines(["Syntax Highlighting Demo:", ""])
-      await new Promise((r) => setTimeout(r, 100))
-      context.addLines([`const theme = "${selectedTheme.name}";`])
-      await new Promise((r) => setTimeout(r, 100))
-      context.addLines([`function applyTheme(name: string) {`])
-      await new Promise((r) => setTimeout(r, 100))
-      context.addLines([`  console.log("Applying:", name);`])
-      await new Promise((r) => setTimeout(r, 100))
-      context.addLines([`  return { success: true };`])
-      await new Promise((r) => setTimeout(r, 100))
-      context.addLines([`}`])
-      await new Promise((r) => setTimeout(r, 200))
-      context.addLines([
-        "",
-        "Status Messages:",
-        "✓ Theme loaded successfully",
-        "ℹ Using " + selectedTheme.variant + " mode",
-        "⚠ " + prebuiltThemes.length + " themes available",
-      ])
+      },
     },
   }
 
@@ -168,9 +235,14 @@ function ThemesPageContent() {
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedTheme.colors.warning }} />
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedTheme.colors.success }} />
               </div>
-              <span className="text-sm font-mono" style={{ color: selectedTheme.colors.textMuted }}>
-                {selectedTheme.displayName} — OpenTUI Terminal
-              </span>
+                <span className="text-sm font-mono" style={{ color: selectedTheme.colors.textMuted }}>
+                  {selectedTheme.displayName} — OpenTUI Terminal
+                </span>
+                {selectedTheme.fontFamily && (
+                  <span className="text-xs" style={{ color: selectedTheme.colors.textMuted }}>
+                    {selectedTheme.fontFamily.split(",")[0].replaceAll('"', "")}
+                  </span>
+                )}
             </div>
             <Palette className="w-4 h-4" style={{ color: selectedTheme.colors.primary }} />
           </div>
@@ -182,7 +254,6 @@ function ThemesPageContent() {
             }}
           >
             <Terminal
-              key={selectedTheme.name}
               welcomeMessage={[
                 `Welcome to OpenTUI — ${selectedTheme.displayName} Theme`,
                 `Type 'theme' to list themes, 'colors' to see palette, or 'demo' for syntax preview.`,
@@ -212,7 +283,6 @@ function ThemesPageContent() {
               style={{
                 backgroundColor: theme.colors.background,
                 borderColor: theme.name === selectedTheme.name ? theme.colors.primary : theme.colors.border,
-                ringColor: theme.colors.primary,
               }}
             >
               {theme.name === selectedTheme.name && (
@@ -349,7 +419,8 @@ const myTheme: ThemeConfig = {
     accent: '${selectedTheme.colors.accent}',
     background: '${selectedTheme.colors.background}',
     // ... define all colors
-  }
+  },
+  fontFamily: '${selectedTheme.fontFamily ?? "\"SF Mono\", \"Fira Code\", ui-monospace, monospace"}'
 }
 
 // Use with TerminalThemeProvider

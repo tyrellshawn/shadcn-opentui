@@ -47,6 +47,7 @@ export interface ThemeConfig {
   displayName: string
   description: string
   variant: "dark" | "light"
+  fontFamily?: string
   colors: ThemeColors
 }
 
@@ -598,6 +599,76 @@ const catppuccinLatteTheme: ThemeConfig = {
   },
 }
 
+const caiDarkTheme: ThemeConfig = {
+  name: "cai-dark",
+  displayName: "CAI Dark",
+  description: "Canadian AI dark brand theme with neutral ink and maple signal accents",
+  variant: "dark",
+  fontFamily: '"SF Mono", "Fira Code", ui-monospace, monospace',
+  colors: {
+    primary: "#e63030",
+    secondary: "#c8401a",
+    accent: "#f0f0f0",
+    background: "#171717",
+    backgroundPanel: "#1f1f1f",
+    backgroundElement: "#2e2e2e",
+    text: "#f0f0f0",
+    textMuted: "#a8a8a8",
+    textInverse: "#141414",
+    border: "#3d3d3d",
+    success: "#f0f0f0",
+    error: "#e63030",
+    warning: "#c8401a",
+    info: "#b0b0b0",
+    syntaxKeyword: "#e63030",
+    syntaxString: "#f0f0f0",
+    syntaxNumber: "#c8401a",
+    syntaxFunction: "#ffffff",
+    syntaxVariable: "#e8e8e8",
+    syntaxComment: "#a8a8a8",
+    syntaxOperator: "#e63030",
+    syntaxPunctuation: "#b0b0b0",
+    promptSymbol: "#e63030",
+    cursor: "#e63030",
+    selection: "#e6303033",
+  },
+}
+
+const caiLightTheme: ThemeConfig = {
+  name: "cai-light",
+  displayName: "CAI Light",
+  description: "Canadian AI light brand theme with snow surfaces and ink typography",
+  variant: "light",
+  fontFamily: '"SF Mono", "Fira Code", ui-monospace, monospace',
+  colors: {
+    primary: "#e63030",
+    secondary: "#c8401a",
+    accent: "#141414",
+    background: "#f7f7f7",
+    backgroundPanel: "#ffffff",
+    backgroundElement: "#e8e8e8",
+    text: "#141414",
+    textMuted: "#717171",
+    textInverse: "#ffffff",
+    border: "#b0b0b0",
+    success: "#3a3a3a",
+    error: "#e63030",
+    warning: "#c8401a",
+    info: "#717171",
+    syntaxKeyword: "#e63030",
+    syntaxString: "#3a3a3a",
+    syntaxNumber: "#c8401a",
+    syntaxFunction: "#141414",
+    syntaxVariable: "#3a3a3a",
+    syntaxComment: "#717171",
+    syntaxOperator: "#e63030",
+    syntaxPunctuation: "#3a3a3a",
+    promptSymbol: "#e63030",
+    cursor: "#141414",
+    selection: "#e6303033",
+  },
+}
+
 export const prebuiltThemes: ThemeConfig[] = [
   matrixTheme,
   tokyoNightTheme,
@@ -615,6 +686,8 @@ export const prebuiltThemes: ThemeConfig[] = [
   solarizedLightTheme,
   githubLightTheme,
   catppuccinLatteTheme,
+  caiDarkTheme,
+  caiLightTheme,
 ]
 
 // ============================================================================
@@ -728,5 +801,6 @@ export function getThemeCSS(theme: ThemeConfig): string {
     --terminal-info: ${theme.colors.info};
     --terminal-cursor: ${theme.colors.cursor};
     --terminal-highlight-bg: ${theme.colors.selection};
+    ${theme.fontFamily ? `--terminal-font-family: ${theme.fontFamily};` : ""}
   `
 }

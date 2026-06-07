@@ -38,6 +38,22 @@ describe('getThemeCSS variable names', () => {
       expect(css).toContain(v)
     }
   })
+
+  it('emits optional terminal font family variable', () => {
+    const caiDark = prebuiltThemes.find(t => t.name === 'cai-dark')!
+    const css = getThemeCSS(caiDark)
+    expect(css).toContain('--terminal-font-family: "SF Mono", "Fira Code", ui-monospace, monospace;')
+  })
+
+  it('includes Canadian AI dark and light themes', () => {
+    const caiDark = prebuiltThemes.find(t => t.name === 'cai-dark')!
+    const caiLight = prebuiltThemes.find(t => t.name === 'cai-light')!
+
+    expect(caiDark.colors.background).toBe('#171717')
+    expect(caiDark.colors.primary).toBe('#e63030')
+    expect(caiLight.colors.background).toBe('#f7f7f7')
+    expect(caiLight.colors.text).toBe('#141414')
+  })
 })
 
 describe('Terminal inline theme styles', () => {
@@ -106,6 +122,18 @@ describe('Terminal inline theme styles', () => {
     expect(root.style.getPropertyValue('--terminal-text')).toBe('#cdd6f4')
     expect(root.style.getPropertyValue('--terminal-primary')).toBe('#cba6f7')
     expect(root.style.getPropertyValue('--tw-text-opacity')).toBe('1')
+  })
+
+  it('applies theme font family as an inline CSS variable', () => {
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="cai-dark">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+    const root = container.firstChild as HTMLElement
+
+    expect(root.style.getPropertyValue('--terminal-font-family')).toBe('"SF Mono", "Fira Code", ui-monospace, monospace')
+    expect(root.style.fontFamily).toBe('var(--terminal-font-family, var(--font-mono))')
   })
 
   it('renders output lines with terminal text color, not primary accent color', () => {

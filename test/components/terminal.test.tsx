@@ -78,7 +78,11 @@ describe('Terminal', () => {
     const { container } = render(
       <Terminal
         commands={{
-          test: async () => {},
+          test: {
+            name: 'test',
+            description: 'Test command',
+            handler: async () => {},
+          },
         }}
       />,
     )
@@ -176,5 +180,83 @@ describe('Terminal', () => {
     const root = container.firstChild as HTMLElement
     // Context would set #22c55e (matrix primary), but prop should win
     expect(root.style.getPropertyValue('--terminal-primary')).toBe('#ff0000')
+  })
+
+  it('supports addLines with string entries from custom commands', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Terminal
+        commands={{
+          theme: {
+            name: 'theme',
+            description: 'List themes',
+            handler: (_args, context) => {
+              context?.addLines?.(['Choose a theme:', 'Use arrows to preview.'])
+            },
+          },
+        }}
+      />,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByText('Choose a theme:')).toBeInTheDocument()
+    expect(screen.getByText('Use arrows to preview.')).toBeInTheDocument()
+    expect(screen.queryByText(/Error executing theme/)).not.toBeInTheDocument()
+  })
+
+  it('previews menu items on arrow keys and only selects on enter', async () => {
+    const user = userEvent.setup()
+    const previews: string[] = []
+    const selections: string[] = []
+
+    render(
+      <Terminal
+        commands={{
+          theme: {
+            name: 'theme',
+            description: 'Choose a theme',
+            handler: (_args, context) => {
+              context?.setState?.((prev: any) => ({
+                ...prev,
+                mode: 'ui',
+                menuSelection: 0,
+                activeComponent: {
+                  id: 'theme-menu-test',
+                  type: 'menu',
+                  active: true,
+                  props: {
+                    items: [
+                      { label: 'Matrix', value: 'matrix' },
+                      { label: 'Tokyo Night', value: 'tokyo-night' },
+                    ],
+                    onPreview: (item: { value: string }) => previews.push(item.value),
+                    onSelect: (item: { value: string }) => selections.push(item.value),
+                  },
+                },
+              }))
+            },
+          },
+        }}
+      />,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByText('Tokyo Night')).toBeInTheDocument()
+
+    await user.keyboard('{ArrowDown}')
+    expect(previews).toEqual(['tokyo-night'])
+    expect(selections).toEqual([])
+
+    await user.keyboard('{Enter}')
+    expect(selections).toEqual(['tokyo-night'])
   })
 })
