@@ -716,17 +716,17 @@ export function getThemeCSS(theme: ThemeConfig): string {
     --terminal-primary: ${theme.colors.primary};
     --terminal-secondary: ${theme.colors.secondary};
     --terminal-accent: ${theme.colors.accent};
-    --terminal-background: ${theme.colors.background};
+    --terminal-bg: ${theme.colors.background};
     --terminal-background-panel: ${theme.colors.backgroundPanel};
     --terminal-background-element: ${theme.colors.backgroundElement};
     --terminal-text: ${theme.colors.text};
-    --terminal-text-muted: ${theme.colors.textMuted};
+    --terminal-muted: ${theme.colors.textMuted};
     --terminal-border: ${theme.colors.border};
     --terminal-success: ${theme.colors.success};
     --terminal-error: ${theme.colors.error};
     --terminal-warning: ${theme.colors.warning};
     --terminal-info: ${theme.colors.info};
     --terminal-cursor: ${theme.colors.cursor};
-    --terminal-selection: ${theme.colors.selection};
+    --terminal-highlight-bg: ${theme.colors.selection};
   `
 }
