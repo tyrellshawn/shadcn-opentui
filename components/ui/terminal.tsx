@@ -41,6 +41,8 @@ interface TerminalUIComponent {
   active: boolean
 }
 
+type TerminalLineInput = string | { content: string; type?: TerminalLine["type"] }
+
 interface TerminalState {
   mode: "command" | "ui" | "form"
   activeComponent?: TerminalUIComponent
@@ -61,7 +63,7 @@ interface CommandCompletion {
     removeUIComponent: (id: string) => void
     updateFormData: (key: string, value: any) => void
     addLine: (content: string, type?: TerminalLine["type"]) => void
-    addLines: (lines: Array<{ content: string; type?: TerminalLine["type"] }>) => void
+    addLines: (lines: TerminalLineInput[]) => void
     clearLines: () => void
     updateLastLine: (content: string, type?: TerminalLine["type"]) => void
   }
@@ -314,6 +316,19 @@ function parseCSSVars(css: string): Record<string, string> {
   return vars
 }
 
+function getMenuItemLabel(item: unknown): string {
+  if (typeof item === "string") return item
+  if (item && typeof item === "object") {
+    const maybeLabel = (item as { label?: unknown; name?: unknown; value?: unknown }).label
+    if (typeof maybeLabel === "string") return maybeLabel
+    const maybeName = (item as { name?: unknown }).name
+    if (typeof maybeName === "string") return maybeName
+    const maybeValue = (item as { value?: unknown }).value
+    if (typeof maybeValue === "string") return maybeValue
+  }
+  return String(item)
+}
+
 const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
   (
     {
@@ -328,6 +343,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       autoScroll = true,
       smoothScroll = true,
       theme,
+      style,
       ...props
     },
     ref,
@@ -340,6 +356,20 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         timestamp: new Date(),
       })),
     )
+    const welcomeMessageSignature = welcomeMessage.join("\u0000")
+
+    useEffect(() => {
+      setLines((prev) => {
+        const nonWelcomeLines = prev.filter((line) => !line.id.startsWith("welcome-"))
+        const nextWelcomeLines = welcomeMessage.map((msg, i) => ({
+          id: `welcome-${i}`,
+          type: "output" as const,
+          content: msg,
+          timestamp: new Date(),
+        }))
+        return [...nextWelcomeLines, ...nonWelcomeLines].slice(-maxLines)
+      })
+    }, [welcomeMessageSignature, maxLines])
 
     const [currentInput, setCurrentInput] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
@@ -444,7 +474,13 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       },
       addLine,
       addLines: (lines) => {
-        lines.forEach((l) => addLine(l.content, l.type))
+        lines.forEach((line) => {
+          if (typeof line === "string") {
+            addLine(line)
+          } else {
+            addLine(line.content, line.type)
+          }
+        })
       },
       clearLines,
       updateLastLine,
@@ -575,26 +611,30 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (opentuiState[0].mode === "ui" && opentuiState[0].activeComponent?.type === "menu") {
+        const activeComponent = opentuiState[0].activeComponent
+        const menuItems = activeComponent.props.items || []
         if (e.key === "ArrowUp") {
           e.preventDefault()
-          opentuiState[1]((prev) => ({
-            ...prev,
-            menuSelection: Math.max(0, prev.menuSelection - 1),
-          }))
+          const nextSelection = Math.max(0, opentuiState[0].menuSelection - 1)
+          activeComponent.props.onPreview?.(menuItems[nextSelection], nextSelection)
+          opentuiState[1]((prev) => ({ ...prev, menuSelection: nextSelection }))
           return
         } else if (e.key === "ArrowDown") {
           e.preventDefault()
-          const maxItems = opentuiState[0].activeComponent?.props.items?.length || 0
-          opentuiState[1]((prev) => ({
-            ...prev,
-            menuSelection: Math.min(maxItems - 1, prev.menuSelection + 1),
-          }))
+          const maxItems = menuItems.length || 0
+          const nextSelection = Math.min(maxItems - 1, opentuiState[0].menuSelection + 1)
+          activeComponent.props.onPreview?.(menuItems[nextSelection], nextSelection)
+          opentuiState[1]((prev) => ({ ...prev, menuSelection: nextSelection }))
           return
         } else if (e.key === "Enter") {
           e.preventDefault()
-          const selectedItem = opentuiState[0].activeComponent?.props.items?.[opentuiState[0].menuSelection]
+          const selectedItem = menuItems[opentuiState[0].menuSelection]
           if (selectedItem) {
-            addLine(`Selected: ${selectedItem}`, "success")
+            if (activeComponent.props.onSelect) {
+              activeComponent.props.onSelect(selectedItem, opentuiState[0].menuSelection)
+            } else {
+              addLine(`Selected: ${getMenuItemLabel(selectedItem)}`, "success")
+            }
             opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined }))
           }
           return
@@ -603,6 +643,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
       if (e.key === "Escape" && opentuiState[0].mode !== "command") {
         e.preventDefault()
+        if (opentuiState[0].activeComponent?.type === "menu") {
+          opentuiState[0].activeComponent.props.onCancel?.()
+        }
         opentuiState[1]((prev) => ({ ...prev, mode: "command", activeComponent: undefined, formData: {} }))
         setCurrentFormFieldIndex(0)
         addLine("Exited UI mode", "success")
@@ -747,7 +790,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
           return (
             <div className="border border-terminal-border rounded p-2 mb-2 bg-terminal-bg/50">
               <div className="text-terminal-primary text-xs mb-2">MENU (Use ↑↓ arrows, ENTER to select)</div>
-              {props.items?.map((item: string, index: number) => (
+              {props.items?.map((item: unknown, index: number) => (
                 <div
                   key={index}
                   className={cn(
@@ -756,7 +799,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                   )}
                 >
                   {index === opentuiState[0].menuSelection ? "► " : "  "}
-                  {item}
+                  {getMenuItemLabel(item)}
                 </div>
               ))}
             </div>
@@ -1009,7 +1052,13 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
             getVariantStyles(),
             className,
           )}
-          style={{ ...combinedTheme, ...props.style } as React.CSSProperties}
+          style={
+            {
+              fontFamily: "var(--terminal-font-family, var(--font-mono))",
+              ...combinedTheme,
+              ...style,
+            } as React.CSSProperties
+          }
           onClick={(e) => {
             const target = e.target as HTMLElement
             const isFormInput =
@@ -1072,7 +1121,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                     line.type === "input" && "text-terminal-text font-semibold",
                     line.type === "error" && "text-terminal-error",
                     line.type === "success" && "text-terminal-success",
-                    line.type === "output" && "text-terminal-primary",
+                    line.type === "output" && "text-terminal-text",
                   )}
                 >
                   {line.content}
