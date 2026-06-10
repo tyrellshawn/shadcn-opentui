@@ -28,4 +28,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      - name: Generate ANTLR parser
+        run: bun run grammar:generate
+
       - run: bun vitest run
