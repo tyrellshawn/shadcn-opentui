@@ -3,8 +3,9 @@
 import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
-import { useOptionalTerminalTheme, getThemeCSS, type ThemeConfig } from "@/lib/opentui/themes"
+import { useOptionalTerminalTheme, getThemeCSS, prebuiltThemes, type ThemeConfig } from "@/lib/opentui/themes"
 import { renderAsciiBanner, renderTable, sampleTerminalTableData } from "@/lib/opentui/renderers"
+import { TerminalThemeSelector } from "@/components/ui/terminal-theme-selector"
 
 interface TerminalLine {
   id: string
@@ -32,6 +33,8 @@ interface TerminalProps extends React.HTMLAttributes<HTMLDivElement> {
   autoScroll?: boolean
   smoothScroll?: boolean
   theme?: Record<string, string>
+  defaultTheme?: string
+  themes?: ThemeConfig[]
 }
 
 interface TerminalUIComponent {
@@ -47,11 +50,6 @@ type TerminalThemeContextValue = {
   theme: ThemeConfig
   setTheme: (name: string) => void
   themes: ThemeConfig[]
-}
-
-type ThemeMenuItem = {
-  label: string
-  value: string
 }
 
 interface TerminalState {
@@ -116,6 +114,9 @@ const createBuiltInCommands = (
   commandHistory: string[],
   opentuiContext?: OpenTUIContext,
   themeCtx?: TerminalThemeContextValue | null,
+  openThemeSelector?: () => void,
+  storeOriginalTheme?: () => string | null,
+  restoreOriginalTheme?: () => void,
 ): TerminalCommand[] => [
   {
     name: "clear",
@@ -179,16 +180,16 @@ const createBuiltInCommands = (
     category: "ui",
     handler: (args) => {
       if (!themeCtx) {
-        addLine("Theme selection requires TerminalThemeProvider", "error")
+        addLine("Theme selection unavailable", "error")
         return
       }
 
       const themeName = args[0]
       if (themeName) {
-        const found = themeCtx.themes.find((theme) => theme.name === themeName)
+        const found = themeCtx.themes.find((t) => t.name === themeName)
         if (!found) {
           addLine(`Theme not found: ${themeName}`, "error")
-          addLine("Run 'theme' to choose from available themes.")
+          addLine("Run 'theme' to open the theme selector.")
           return
         }
 
@@ -197,50 +198,8 @@ const createBuiltInCommands = (
         return
       }
 
-      if (!opentuiContext) {
-        addLine("OpenTUI context not available", "error")
-        return
-      }
-
-      const originalThemeName = themeCtx.theme.name
-      const items: ThemeMenuItem[] = themeCtx.themes.map((theme) => ({
-        label: `${theme.displayName.padEnd(18)} ${theme.variant}`,
-        value: theme.name,
-      }))
-      const selectedIndex = Math.max(
-        0,
-        themeCtx.themes.findIndex((theme) => theme.name === themeCtx.theme.name),
-      )
-
-      addLine("Theme selector opened.", "success")
-      addLine("Use ↑/↓ to preview. Press Enter to save, Esc to cancel.")
-      opentuiContext.setState((prev) => ({
-        ...prev,
-        mode: "ui",
-        menuSelection: selectedIndex,
-        activeComponent: {
-          id: `theme-menu-${Date.now()}`,
-          type: "menu",
-          active: true,
-          props: {
-            items,
-            onPreview: (item: unknown) => {
-              if (isThemeMenuItem(item)) themeCtx.setTheme(item.value)
-            },
-            onSelect: (item: unknown) => {
-              if (!isThemeMenuItem(item)) return
-              const found = themeCtx.themes.find((theme) => theme.name === item.value)
-              if (!found) return
-              themeCtx.setTheme(found.name)
-              addLine(`Theme saved: ${found.displayName}`, "success")
-            },
-            onCancel: () => {
-              themeCtx.setTheme(originalThemeName)
-              addLine("Theme preview cancelled", "error")
-            },
-          },
-        },
-      }))
+      storeOriginalTheme?.()
+      openThemeSelector?.()
     },
   },
   {
@@ -412,10 +371,6 @@ function getMenuItemLabel(item: unknown): string {
   return String(item)
 }
 
-function isThemeMenuItem(item: unknown): item is ThemeMenuItem {
-  return Boolean(item && typeof item === "object" && "value" in item && typeof (item as ThemeMenuItem).value === "string")
-}
-
 const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
   (
     {
@@ -431,6 +386,8 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       smoothScroll = true,
       theme,
       style,
+      defaultTheme,
+      themes,
       ...props
     },
     ref,
@@ -478,7 +435,33 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
     const isAnimatingRef = useRef<boolean>(false)
     const targetScrollRef = useRef<number>(0)
 
-    const themeCtx = useOptionalTerminalTheme()
+    const parentThemeCtx = useOptionalTerminalTheme()
+
+    const [localTheme, setLocalTheme] = useState<ThemeConfig>(() => {
+      const list = (themes && themes.length > 0 ? themes : prebuiltThemes)
+      return list.find((t) => t.name === (defaultTheme ?? "matrix")) ?? list[0]
+    })
+
+    const localThemes = useMemo(
+      () => (themes && themes.length > 0 ? themes : prebuiltThemes),
+      [themes],
+    )
+
+    const localSetTheme = useCallback(
+      (name: string) => {
+        const found = localThemes.find((t) => t.name === name)
+        if (found) setLocalTheme(found)
+      },
+      [localThemes],
+    )
+
+    const themeCtx: TerminalThemeContextValue | null = useMemo(() => {
+      if (parentThemeCtx) return parentThemeCtx
+      return { theme: localTheme, setTheme: localSetTheme, themes: localThemes }
+    }, [parentThemeCtx, localTheme, localSetTheme, localThemes])
+
+    const [themeSelectorOpen, setThemeSelectorOpen] = useState(false)
+    const originalThemeRef = useRef<string | null>(null)
 
     const themeCSSVars = useMemo(() => {
       if (!themeCtx) return {}
@@ -573,7 +556,20 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       updateLastLine,
     }
 
-    const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext, themeCtx)
+    const builtInCommands = createBuiltInCommands(
+      addLine, clearLines, updateLastLine, commandHistory, opentuiContext, themeCtx,
+      () => setThemeSelectorOpen(true),
+      () => {
+        const name = themeCtx?.theme.name ?? null
+        originalThemeRef.current = name
+        return name
+      },
+      () => {
+        if (originalThemeRef.current) {
+          themeCtx?.setTheme(originalThemeRef.current)
+        }
+      },
+    )
     const allCommands = [...builtInCommands, ...Object.values(commands)]
     const commandNames = allCommands.map((command) => command.name)
     const commandMap = new Map(allCommands.map((command) => [command.name, command]))
@@ -1135,7 +1131,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         <div
           ref={ref}
           className={cn(
-            "bg-terminal-bg text-terminal-text font-mono rounded-lg border border-border overflow-hidden",
+            "bg-terminal-bg text-terminal-text font-mono rounded-lg border border-border overflow-hidden relative",
             getVariantStyles(),
             className,
           )}
@@ -1297,6 +1293,26 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
               {isProcessing && <span className="ml-2 text-terminal-warning animate-pulse">⚡</span>}
             </div>
           </div>
+          {themeCtx && (
+            <TerminalThemeSelector
+              open={themeSelectorOpen}
+              themes={themeCtx.themes}
+              currentThemeName={themeCtx.theme.name}
+              onPreview={(name) => themeCtx.setTheme(name)}
+              onSelect={(name) => {
+                themeCtx.setTheme(name)
+                setThemeSelectorOpen(false)
+                addLine(`Theme saved: ${name}`, "success")
+              }}
+              onCancel={() => {
+                if (originalThemeRef.current) {
+                  themeCtx.setTheme(originalThemeRef.current)
+                }
+                setThemeSelectorOpen(false)
+                addLine("Theme preview cancelled", "error")
+              }}
+            />
+          )}
         </div>
       </OpenTUIContext.Provider>
     )
