@@ -446,4 +446,30 @@ describe('Terminal', () => {
     expect(screen.getByText('deploy')).toBeInTheDocument()
     expect(screen.getByText('task runner')).toBeInTheDocument()
   })
+
+  it('handles theme open/cancel/reopen without crash', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    await screen.findByPlaceholderText('Search themes...')
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByPlaceholderText('Search themes...')).not.toBeInTheDocument()
+
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(await screen.findByPlaceholderText('Search themes...')).toBeInTheDocument()
+  })
 })

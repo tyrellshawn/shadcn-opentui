@@ -69,7 +69,6 @@ export function TerminalThemeSelector({
       setFilterTab("all")
       const idx = filtered.findIndex((t) => t.name === currentThemeName)
       setSelectedIndex(idx >= 0 ? idx : 0)
-      setTimeout(() => searchRef.current?.focus(), 50)
     }
   }, [open])
 
@@ -130,10 +129,16 @@ export function TerminalThemeSelector({
       onKeyDown={handleKeyDown}
     >
       {/* backdrop */}
-      <div className="absolute inset-0 -m-2 sm:-m-4 bg-terminal-bg/95 backdrop-blur-sm" />
+      <div
+        className="absolute inset-0 -m-2 sm:-m-4 bg-terminal-bg/95 backdrop-blur-sm"
+        onClick={(e) => { e.stopPropagation(); onCancel() }}
+      />
 
       {/* panel */}
-      <div className="relative flex w-full max-h-full min-h-0 flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg mx-auto max-w-[500px]">
+      <div
+        className="relative flex w-full max-h-full min-h-0 flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg mx-auto max-w-[500px]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* header: search */}
         <div className="relative flex-shrink-0 border-b border-terminal-border">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted">
@@ -142,6 +147,7 @@ export function TerminalThemeSelector({
           <input
             ref={searchRef}
             type="text"
+            autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search themes..."
