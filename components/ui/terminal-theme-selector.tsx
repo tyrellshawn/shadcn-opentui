@@ -40,14 +40,20 @@ export function TerminalThemeSelector({
     }
     if (query.trim()) {
       const q = query.toLowerCase().trim()
-      result = result.filter(
-        (t) =>
-          t.name.toLowerCase().includes(q) ||
-          t.displayName.toLowerCase().includes(q) ||
-          t.description.toLowerCase().includes(q) ||
-          t.variant.toLowerCase().includes(q) ||
-          (t.fontFamily && t.fontFamily.toLowerCase().includes(q)),
-      )
+      result = result.filter((t) => {
+        const name = t.name ?? ""
+        const displayName = t.displayName ?? ""
+        const description = t.description ?? ""
+        const variant = t.variant ?? ""
+        const fontFamily = t.fontFamily ?? ""
+        return (
+          name.toLowerCase().includes(q) ||
+          displayName.toLowerCase().includes(q) ||
+          description.toLowerCase().includes(q) ||
+          variant.toLowerCase().includes(q) ||
+          fontFamily.toLowerCase().includes(q)
+        )
+      })
     }
     return result
   }, [themes, filterTab, query])
@@ -88,19 +94,22 @@ export function TerminalThemeSelector({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      const isSearchFocused = document.activeElement === searchRef.current
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault()
-          setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1))
+          if (filtered.length > 0) {
+            setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1))
+          }
           break
         case "ArrowUp":
           e.preventDefault()
-          setSelectedIndex((prev) => Math.max(prev - 1, 0))
+          if (filtered.length > 0) {
+            setSelectedIndex((prev) => Math.max(prev - 1, 0))
+          }
           break
         case "Enter":
           e.preventDefault()
-          if (filtered[selectedIndex]) {
+          if (filtered.length > 0 && filtered[selectedIndex]) {
             onSelect(filtered[selectedIndex].name)
           }
           break
@@ -117,20 +126,14 @@ export function TerminalThemeSelector({
 
   return (
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center sm:p-4"
+      className="absolute inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
       onKeyDown={handleKeyDown}
     >
       {/* backdrop */}
       <div className="absolute inset-0 bg-terminal-bg/95 backdrop-blur-sm" />
 
-      {/* mobile bottom sheet */}
-      <div
-        className={cn(
-          "relative flex flex-col",
-          "sm:max-w-[560px] sm:w-full sm:max-h-[80vh] sm:rounded-lg sm:border sm:border-terminal-border sm:bg-terminal-bg",
-          "fixed sm:static bottom-0 left-0 right-0 max-h-[85%] rounded-t-xl border-t border-terminal-border bg-terminal-bg sm:border-t",
-        )}
-      >
+      {/* panel */}
+      <div className="relative flex w-full max-h-full flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg sm:max-h-[80vh] sm:max-w-[560px]">
         {/* header: search */}
         <div className="relative flex-shrink-0 border-b border-terminal-border">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted">

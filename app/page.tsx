@@ -48,37 +48,6 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function TerminalDemoCard({
-  title,
-  description,
-  commands,
-  welcomeMessage,
-}: {
-  title: string
-  description: string
-  commands: Record<string, CommandHandler>
-  welcomeMessage: string[]
-}) {
-  return (
-    <div className="rounded-lg border border-primary/30 bg-black shadow-lg shadow-primary/10 overflow-hidden">
-      <div className="flex items-center justify-between border-b border-primary/20 bg-black/80 px-4 py-2.5">
-        <span className="text-xs font-mono font-semibold text-primary">shadcn OpenTUI</span>
-        <span className="text-xs font-mono text-primary/50">{title}</span>
-      </div>
-      <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-[260px] bg-black" />
-      <div className="border-t border-primary/20 bg-black/80 px-4 py-2 text-xs text-primary/70">{description}</div>
-    </div>
-  )
-}
-
-function AnimatedThemeSelectorDemo() {
-  return (
-    <TerminalThemeProvider defaultTheme="matrix">
-      <AnimatedThemeSelectorDemoContent />
-    </TerminalThemeProvider>
-  )
-}
-
 function AnimatedThemeSelectorDemoContent() {
   const { theme: selectedTheme, setTheme } = useTerminalTheme()
   const [autoPreview, setAutoPreview] = useState(true)
@@ -169,6 +138,88 @@ function AnimatedThemeSelectorDemoContent() {
         className="h-[320px] rounded-none border-0 shadow-none"
         prompt="→"
       />
+    </div>
+  )
+}
+
+function LandingDemoShowcase() {
+  const [slide, setSlide] = useState<"theme" | "agent">("theme")
+
+  return (
+    <TerminalThemeProvider defaultTheme="matrix">
+      <div className="space-y-6">
+        <div className="flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setSlide("theme")}
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono transition-all ${
+              slide === "theme"
+                ? "border-primary bg-primary/20 text-primary"
+                : "border-primary/30 text-muted-foreground hover:text-primary"
+            }`}
+          >
+            <WandSparkles className="w-4 h-4" />
+            Theme selection
+          </button>
+          <button
+            type="button"
+            onClick={() => setSlide("agent")}
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-mono transition-all ${
+              slide === "agent"
+                ? "border-primary bg-primary/20 text-primary"
+                : "border-primary/30 text-muted-foreground hover:text-primary"
+            }`}
+          >
+            <TerminalIcon className="w-4 h-4" />
+            Agent session
+          </button>
+        </div>
+
+        {slide === "theme" ? <AnimatedThemeSelectorDemoContent /> : <AgentSlideWithAutoStart />}
+      </div>
+    </TerminalThemeProvider>
+  )
+}
+
+function AgentSlideWithAutoStart() {
+  const [started, setStarted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStarted(true), 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!started) {
+    return (
+      <div className="rounded-2xl border border-primary/20 bg-black/50 p-12 text-center">
+        <div className="inline-flex items-center gap-2 text-terminal-muted">
+          <TerminalThinkingIndicator label="Starting session" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4 rounded-2xl border border-primary/20 bg-black/50 p-5 font-mono">
+      <div className="flex items-center gap-2 border-b border-terminal-border/30 px-2 py-1 text-xs text-terminal-muted">
+        <span className="font-semibold text-terminal-primary">agent session</span>
+      </div>
+      <TerminalSessionContent autoScroll streaming>
+        <TerminalMessage>/improve-the-ui</TerminalMessage>
+        <TerminalThinkingIndicator label="Thinking" />
+        <TerminalStreamText speed={60} mode="fade">
+          I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.
+        </TerminalStreamText>
+        <TerminalEditBlock
+          file="components/ui/button.tsx"
+          startLine={12}
+          highlightLines={[19, 20, 21]}
+          code={agentCode}
+        />
+        <TerminalStreamText speed={60} mode="fade">
+          Done — hover now eases to 90% opacity with a subtle press-in effect. Want me to apply the same pass to the secondary and ghost variants?
+        </TerminalStreamText>
+      </TerminalSessionContent>
     </div>
   )
 }
@@ -459,63 +510,7 @@ export default function Home() {
                 <p className="text-muted-foreground text-lg">Live shadcn terminal components running in the browser</p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                <TerminalDemoCard
-                  title="Installation"
-                  description="Install and validate the stable shadcn terminal component."
-                  commands={{
-                    install: {
-                      name: "install",
-                      description: "Show install command",
-                      handler: (_args, context) => {
-                        context?.addLine?.("bunx shadcn@latest add terminal", "success")
-                        context?.addLine?.("Registry component ready.")
-                      },
-                    },
-                  }}
-                  welcomeMessage={["Install demo", "Try: install"]}
-                />
-                <TerminalDemoCard
-                  title="UI Components"
-                  description="Open forms and menus inside the stable terminal surface."
-                  commands={{
-                    menu: {
-                      name: "menu",
-                      description: "Open a menu",
-                      handler: (_args, context) => {
-                        context?.setState?.((prev: { menuSelection: number }) => ({
-                          ...prev,
-                          mode: "ui",
-                          menuSelection: 0,
-                          activeComponent: {
-                            id: `demo-menu-${Date.now()}`,
-                            type: "menu",
-                            props: { items: ["Dashboard", "Projects", "Settings"] },
-                            active: true,
-                          },
-                        }))
-                      },
-                    },
-                  }}
-                  welcomeMessage={["UI demo", "Try: menu"]}
-                />
-                <TerminalDemoCard
-                  title="Built-in Commands"
-                  description="Command history, completions, async handlers, and terminal output."
-                  commands={{
-                    status: {
-                      name: "status",
-                      description: "Show status",
-                      handler: (_args, context) => {
-                        context?.addLine?.("Terminal mounted", "success")
-                        context?.addLine?.("Commands active: help, clear, status")
-                      },
-                    },
-                  }}
-                  welcomeMessage={["Commands demo", "Try: status", "Try: help"]}
-                />
-                <AnimatedThemeSelectorDemo />
-              </div>
+              <LandingDemoShowcase />
             </div>
           </section>
 
