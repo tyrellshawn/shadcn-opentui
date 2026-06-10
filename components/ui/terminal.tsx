@@ -556,9 +556,15 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       updateLastLine,
     }
 
+    const selectorJustOpenedRef = useRef(false)
+    const openThemeSelectorWithRef = useCallback(() => {
+      selectorJustOpenedRef.current = true
+      setThemeSelectorOpen(true)
+    }, [])
+
     const builtInCommands = createBuiltInCommands(
       addLine, clearLines, updateLastLine, commandHistory, opentuiContext, themeCtx,
-      () => setThemeSelectorOpen(true),
+      openThemeSelectorWithRef,
       () => {
         const name = themeCtx?.theme.name ?? null
         originalThemeRef.current = name
@@ -581,7 +587,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         ? `${opentuiState[0].mode.toUpperCase()} mode - ESC to exit`
         : "Type a command..."
     const canShowCompletions =
-      opentuiState[0].mode === "command" && !isProcessing && currentInput.trim().length > 0 && argsPart.length === 0
+      !themeSelectorOpen && opentuiState[0].mode === "command" && !isProcessing && currentInput.trim().length > 0 && argsPart.length === 0
     const completionSuggestions: CommandCompletion[] = canShowCompletions
       ? allCommands
           .filter((command) => command.name.startsWith(commandPart))
@@ -684,10 +690,13 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
       try {
         await processCommand(command)
-      } finally {
+      }       finally {
         setIsProcessing(false)
         setTimeout(() => {
-          inputRef.current?.focus()
+          if (!selectorJustOpenedRef.current) {
+            inputRef.current?.focus()
+          }
+          selectorJustOpenedRef.current = false
         }, 0)
       }
     }
@@ -1242,7 +1251,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
                       setCursorPosition(inputRef.current.selectionStart || 0)
                     }
                   }}
-                  disabled={isProcessing}
+                  disabled={isProcessing || themeSelectorOpen}
                   className="w-full bg-transparent border-none font-mono text-sm text-transparent caret-transparent outline-none sm:text-base"
                   autoComplete="off"
                   spellCheck={false}

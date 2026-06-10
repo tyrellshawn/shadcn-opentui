@@ -291,4 +291,67 @@ describe('Terminal', () => {
 
     expect(screen.getByText('Theme changed to: Tokyo Night')).toBeInTheDocument()
   })
+
+  it('does not crash when searching themes from the in-terminal selector', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    const search = await screen.findByPlaceholderText('Search themes...')
+    await user.type(search, 'tokyo')
+
+    expect(screen.getByPlaceholderText('Search themes...')).toBeInTheDocument()
+    expect(screen.getByText('Tokyo Night')).toBeInTheDocument()
+  })
+
+  it('disables terminal command input while theme selector is open', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(await screen.findByPlaceholderText('Search themes...')).toBeInTheDocument()
+    expect(input).toBeDisabled()
+  })
+
+  it('handles empty search results safely without crash', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    const search = await screen.findByPlaceholderText('Search themes...')
+    await user.type(search, 'zzzz-no-match')
+
+    expect(screen.getByText('No themes found')).toBeInTheDocument()
+
+    await user.keyboard('{ArrowDown}{ArrowUp}{Enter}{Escape}')
+
+    expect(screen.queryByPlaceholderText('Search themes...')).not.toBeInTheDocument()
+  })
 })
