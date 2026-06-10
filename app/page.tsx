@@ -236,14 +236,14 @@ function AgentSlideWithAutoStart() {
   const [useCaseDep, setUseCaseDep] = useState(0)
 
   function ParallelTasksRunner() {
-    const [pts, setPts] = React.useState<ParallelTask[]>([
+    const [pts, setPts] = useState<ParallelTask[]>([
       { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
       { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
       { id: "test", label: "test --run", status: "pending", duration: "---" },
       { id: "build", label: "build --prod", status: "pending", duration: "---" },
     ])
 
-    React.useEffect(() => {
+    useEffect(() => {
       setPts([
         { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
         { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
