@@ -126,14 +126,14 @@ export function TerminalThemeSelector({
 
   return (
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
+      className="absolute inset-2 flex items-center justify-center sm:inset-4"
       onKeyDown={handleKeyDown}
     >
       {/* backdrop */}
-      <div className="absolute inset-0 bg-terminal-bg/95 backdrop-blur-sm" />
+      <div className="absolute inset-0 -m-2 sm:-m-4 bg-terminal-bg/95 backdrop-blur-sm" />
 
       {/* panel */}
-      <div className="relative flex w-full max-h-full flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg sm:max-h-[80vh] sm:max-w-[560px]">
+      <div className="relative flex w-full max-h-full min-h-0 flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg mx-auto max-w-[500px]">
         {/* header: search */}
         <div className="relative flex-shrink-0 border-b border-terminal-border">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted">
@@ -145,7 +145,7 @@ export function TerminalThemeSelector({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search themes..."
-            className="w-full bg-transparent py-3 pl-10 pr-4 text-sm text-terminal-text placeholder:text-terminal-muted outline-none"
+            className="w-full bg-transparent py-2.5 pl-10 pr-4 text-sm text-terminal-text placeholder:text-terminal-muted outline-none sm:py-3"
             onKeyDown={(e) => {
               if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                 e.preventDefault()
@@ -155,7 +155,7 @@ export function TerminalThemeSelector({
         </div>
 
         {/* filter tabs */}
-        <div className="flex flex-shrink-0 gap-1 border-b border-terminal-border px-2 py-2">
+        <div className="flex flex-shrink-0 gap-1 border-b border-terminal-border px-2 py-1.5 sm:py-2">
           {(["all", "dark", "light"] as FilterTab[]).map((tab) => (
             <button
               key={tab}
@@ -178,7 +178,7 @@ export function TerminalThemeSelector({
         </div>
 
         {/* theme list */}
-        <div ref={listRef} className="flex-1 overflow-y-auto py-1">
+        <div ref={listRef} className="flex-1 overflow-y-auto py-1 terminal-scrollbar overscroll-contain min-h-0">
           {filtered.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-terminal-muted">
               No themes found

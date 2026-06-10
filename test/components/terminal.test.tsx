@@ -4,6 +4,9 @@ import { describe, expect, it } from 'vitest'
 
 import { Terminal } from '@/components/ui/terminal'
 import { TerminalThemeProvider } from '@/lib/opentui/themes'
+import { TerminalThinkingIndicator } from '@/components/ui/terminal-thinking-indicator'
+import { TerminalJsTable } from '@/components/ui/terminal-js-table'
+import { TerminalEmailDraft } from '@/components/ui/terminal-email-draft'
 
 describe('Terminal', () => {
   it('shows command completions, supports arrow navigation, and completes with tab', async () => {
@@ -353,5 +356,75 @@ describe('Terminal', () => {
     await user.keyboard('{ArrowDown}{ArrowUp}{Enter}{Escape}')
 
     expect(screen.queryByPlaceholderText('Search themes...')).not.toBeInTheDocument()
+  })
+
+  it('renders terminal theme selector with containment classes', async () => {
+    const user = userEvent.setup()
+
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    const search = await screen.findByPlaceholderText('Search themes...')
+
+    const panel = search.closest('[class*="max-w"]')
+    expect(panel).not.toBeNull()
+    expect(panel?.className).toContain('max-w-[500px]')
+
+    const outer = search.closest('[class*="inset-2"]')
+    expect(outer).not.toBeNull()
+  })
+
+  it('renders TerminalThinkingIndicator with blob variant', () => {
+    const { container } = render(
+      <TerminalThinkingIndicator label="Thinking" variant="blob" tone="active" />,
+    )
+    expect(screen.getByText('Thinking')).toBeInTheDocument()
+
+    const blobDots = container.querySelectorAll('[class*="h-2\\.5"]')
+    expect(blobDots.length).toBe(3)
+  })
+
+  it('renders TerminalJsTable with columns and rows', () => {
+    render(
+      <TerminalJsTable
+        columns={[
+          { key: 'name', header: 'Name' },
+          { key: 'value', header: 'Value' },
+        ]}
+        data={[
+          { name: 'alpha', value: 10 },
+          { name: 'beta', value: 20 },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Name')).toBeInTheDocument()
+    expect(screen.getByText('Value')).toBeInTheDocument()
+    expect(screen.getByText('alpha')).toBeInTheDocument()
+    expect(screen.getByText('beta')).toBeInTheDocument()
+    expect(screen.getByText('10')).toBeInTheDocument()
+    expect(screen.getByText('20')).toBeInTheDocument()
+  })
+
+  it('renders TerminalEmailDraft with headers and body', () => {
+    render(
+      <TerminalEmailDraft
+        from="alice@test.com"
+        to="bob@test.com"
+        subject="Hello"
+        body="Greetings from the terminal."
+      />,
+    )
+    expect(screen.getByText('alice@test.com')).toBeInTheDocument()
+    expect(screen.getByText('bob@test.com')).toBeInTheDocument()
+    expect(screen.getByText('Hello')).toBeInTheDocument()
+    expect(screen.getByText('Greetings from the terminal.')).toBeInTheDocument()
   })
 })

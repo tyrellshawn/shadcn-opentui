@@ -29,6 +29,8 @@ import { TerminalThinkingIndicator } from "@/components/ui/terminal-thinking-ind
 import { TerminalStreamText } from "@/components/ui/terminal-stream-text"
 import { TerminalSessionContent } from "@/components/ui/terminal-session-content"
 import { TerminalEditBlock } from "@/components/ui/terminal-edit-block"
+import { TerminalJsTable } from "@/components/ui/terminal-js-table"
+import { TerminalEmailDraft } from "@/components/ui/terminal-email-draft"
 
 const homePreviewThemeNames = ["matrix", "tokyo-night", "catppuccin", "cai-dark", "cai-light"]
 
@@ -183,17 +185,121 @@ function LandingDemoShowcase() {
 
 function AgentSlideWithAutoStart() {
   const [started, setStarted] = useState(false)
+  const [useCase, setUseCase] = useState<"code" | "email" | "database">("code")
+  const [phase, setPhase] = useState<"idle" | "command" | "thinking" | "intro" | "artifact" | "final">("idle")
+  const [introStreamDone, setIntroStreamDone] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setStarted(true), 600)
+    setPhase("idle")
+    setIntroStreamDone(false)
+    const t = setTimeout(() => setPhase("command"), 50)
+    return () => clearTimeout(t)
+  }, [useCase])
+
+  useEffect(() => {
+    if (phase === "command") {
+      const t = setTimeout(() => setPhase("thinking"), 400)
+      return () => clearTimeout(t)
+    }
+    if (phase === "thinking") {
+      const t = setTimeout(() => setPhase("intro"), 900)
+      return () => clearTimeout(t)
+    }
+  }, [phase])
+
+  useEffect(() => {
+    if (introStreamDone && phase === "intro") {
+      setPhase("artifact")
+    }
+  }, [introStreamDone, phase])
+
+  useEffect(() => {
+    if (phase === "artifact") {
+      const t = setTimeout(() => setPhase("final"), 400)
+      return () => clearTimeout(t)
+    }
+  }, [phase])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStarted(true)
+      setPhase("command")
+    }, 600)
     return () => clearTimeout(timer)
   }, [])
+
+  const handleIntroComplete = () => setIntroStreamDone(true)
+
+  const showCommand = phase !== "idle"
+  const showThinking = phase === "thinking" || phase === "intro" || phase === "artifact" || phase === "final"
+  const showIntro = phase === "intro" || phase === "artifact" || phase === "final"
+  const showArtifact = phase === "artifact" || phase === "final"
+  const showFinal = phase === "final"
+
+  const useCases = {
+    code: {
+      label: "Code",
+      command: "/improve-the-ui",
+      thinkingLabel: "Analyzing button component",
+      intro: "I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.",
+      artifact: (
+        <TerminalEditBlock
+          file="components/ui/button.tsx"
+          startLine={12}
+          highlightLines={[19, 20, 21]}
+          code={agentCode}
+        />
+      ),
+      final: "Done — hover now eases to 90% opacity with a subtle press-in effect. Want me to apply the same pass to the secondary and ghost variants?",
+    },
+    email: {
+      label: "Email",
+      command: "/rewrite-email",
+      thinkingLabel: "Analyzing tone and structure",
+      intro: "The original email reads too passive. I&apos;ll restructure it with a clearer subject line and direct CTA to improve response rate.",
+      artifact: (
+        <TerminalEmailDraft
+          from="you@company.com"
+          to="client@acme.com"
+          subject="Proposal Follow-Up"
+          body={`Hi Alex,\n\nThanks for the great call earlier.\n\nAs discussed, I've attached the updated proposal reflecting your feedback on timeline and scope.\n\nKey changes:\n- Phase 1 delivery: Oct 15 \u2192 Oct 30\n- Added Q2 maintenance retainer\n- Removed legacy migration scope\n\nLet me know if you'd like to walk through it together.\n\nBest,\nJordan`}
+        />
+      ),
+      final: "Rewritten \u2014 127 \u2192 89 words, tone shifted from passive to direct/actionable. Estimated reply rate +35%.",
+    },
+    database: {
+      label: "Database",
+      command: "/migrate-schema",
+      thinkingLabel: "Analyzing migration plan",
+      intro: "The users table needs a timezone column and the existing preferences JSONB needs a migration path. Here&apos;s the affected data set:",
+      artifact: (
+        <TerminalJsTable
+          columns={[
+            { key: "table", header: "Table", width: "25%" },
+            { key: "action", header: "Action", width: "20%" },
+            { key: "status", header: "Status", width: "18%" },
+            { key: "rows", header: "Rows", align: "right" as const, width: "15%" },
+            { key: "eta", header: "ETA", align: "right" as const, width: "15%" },
+          ]}
+          data={[
+            { table: "users", action: "ADD COLUMN", status: "pending", rows: 12480, eta: "1.2s" },
+            { table: "users", action: "CREATE INDEX", status: "pending", rows: 12480, eta: "0.8s" },
+            { table: "preferences", action: "ALTER JSONB", status: "pending", rows: 8920, eta: "2.4s" },
+            { table: "audit_log", action: "ADD CONSTRAINT", status: "done", rows: 0, eta: "0.1s" },
+          ]}
+        />
+      ),
+      final: "Migration complete \u2014 1 column added, 1 index created, 1 JSONB migrated. 0 rows affected by constraint.",
+    },
+  }
+
+  const current = useCases[useCase]
 
   if (!started) {
     return (
       <div className="rounded-2xl border border-primary/20 bg-black/50 p-12 text-center">
         <div className="inline-flex items-center gap-2 text-terminal-muted">
-          <TerminalThinkingIndicator label="Starting session" />
+          <TerminalThinkingIndicator label="Starting session" variant="blob" />
         </div>
       </div>
     )
@@ -201,25 +307,47 @@ function AgentSlideWithAutoStart() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-primary/20 bg-black/50 p-5 font-mono">
-      <div className="flex items-center gap-2 border-b border-terminal-border/30 px-2 py-1 text-xs text-terminal-muted">
+      {/* use-case tabs */}
+      <div className="flex items-center gap-1 border-b border-terminal-border/30 pb-2 text-xs">
+        {(Object.keys(useCases) as Array<keyof typeof useCases>).map((uc) => (
+          <button
+            key={uc}
+            type="button"
+            onClick={() => setUseCase(uc)}
+            className={`rounded-md px-3 py-1 transition-colors ${
+              useCase === uc
+                ? "bg-terminal-primary/20 text-terminal-primary"
+                : "text-terminal-muted hover:text-terminal-text"
+            }`}
+          >
+            {useCases[uc].label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-terminal-border/30 pb-1 text-xs text-terminal-muted">
         <span className="font-semibold text-terminal-primary">agent session</span>
       </div>
-      <TerminalSessionContent autoScroll streaming>
-        <TerminalMessage>/improve-the-ui</TerminalMessage>
-        <TerminalThinkingIndicator label="Thinking" />
-        <TerminalStreamText speed={60} mode="fade">
-          I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.
+
+      {showCommand && <TerminalMessage>{current.command}</TerminalMessage>}
+
+      {showThinking && (
+        <TerminalThinkingIndicator label={current.thinkingLabel} variant="blob" tone="active" />
+      )}
+
+      {showIntro && (
+        <TerminalStreamText speed={60} mode="fade" onComplete={handleIntroComplete}>
+          {current.intro}
         </TerminalStreamText>
-        <TerminalEditBlock
-          file="components/ui/button.tsx"
-          startLine={12}
-          highlightLines={[19, 20, 21]}
-          code={agentCode}
-        />
+      )}
+
+      {showArtifact && current.artifact}
+
+      {showFinal && (
         <TerminalStreamText speed={60} mode="fade">
-          Done — hover now eases to 90% opacity with a subtle press-in effect. Want me to apply the same pass to the secondary and ghost variants?
+          {current.final}
         </TerminalStreamText>
-      </TerminalSessionContent>
+      )}
     </div>
   )
 }
