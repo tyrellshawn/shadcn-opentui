@@ -24,6 +24,11 @@ import { MatrixRain } from "@/components/matrix-rain"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 import { Terminal } from "@/components/ui/terminal"
 import { TerminalThemeProvider, prebuiltThemes, useTerminalTheme, type ThemeConfig } from "@/lib/opentui/themes"
+import { TerminalMessage } from "@/components/ui/terminal-message"
+import { TerminalThinkingIndicator } from "@/components/ui/terminal-thinking-indicator"
+import { TerminalStreamText } from "@/components/ui/terminal-stream-text"
+import { TerminalSessionContent } from "@/components/ui/terminal-session-content"
+import { TerminalEditBlock } from "@/components/ui/terminal-edit-block"
 
 const homePreviewThemeNames = ["matrix", "tokyo-night", "catppuccin", "cai-dark", "cai-light"]
 
@@ -164,6 +169,74 @@ function AnimatedThemeSelectorDemoContent() {
         className="h-[320px] rounded-none border-0 shadow-none"
         prompt="→"
       />
+    </div>
+  )
+}
+
+const agentCode = `export function PrimaryButton({ children, className }: ButtonProps) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex items-center justify-center rounded-md",
+        "px-4 py-2 bg-[var(--terminal-white)]",
+        "text-[var(--terminal-bg)]",
+        "transition-[opacity,transform]",
+        "duration-150 ease-out",
+        "hover:opacity-90 active:scale-[0.98]",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}`
+
+function AgentSessionDemo() {
+  const [demoStarted, setDemoStarted] = useState(false)
+
+  if (!demoStarted) {
+    return (
+      <div className="lg:col-span-2 space-y-4 rounded-2xl border border-primary/20 bg-black/50 p-5">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Agent session</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Streaming transcript with thinking indicator, stream text, and edit block in a terminal-native layout.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setDemoStarted(true)}
+          className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-mono text-primary hover:bg-primary/20 transition-colors"
+        >
+          Start demo session
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="lg:col-span-2 space-y-4 rounded-2xl border border-primary/20 bg-black/50 p-5 font-mono">
+      <div className="flex items-center gap-2 px-2 py-1 border-b border-terminal-border/30 text-xs text-terminal-muted">
+        <span className="text-terminal-primary font-semibold">agent session</span>
+      </div>
+      <TerminalSessionContent autoScroll streaming>
+        <TerminalMessage>/improve-the-ui</TerminalMessage>
+        <TerminalThinkingIndicator label="Thinking" />
+        <TerminalStreamText speed={60} mode="fade">
+          I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.
+        </TerminalStreamText>
+        <TerminalEditBlock
+          file="components/ui/button.tsx"
+          startLine={12}
+          highlightLines={[19, 20, 21]}
+          code={agentCode}
+        />
+        <TerminalStreamText speed={60} mode="fade">
+          Done — hover now eases to 90% opacity with a subtle press-in effect. Want me to apply the same pass to the secondary and ghost variants?
+        </TerminalStreamText>
+      </TerminalSessionContent>
     </div>
   )
 }
@@ -555,6 +628,9 @@ export default function Home() {
                 />
               </div>
             </div>
+          </div>
+          <div className="mt-8 grid lg:grid-cols-2 gap-8">
+            <AgentSessionDemo />
           </div>
         </section>
 

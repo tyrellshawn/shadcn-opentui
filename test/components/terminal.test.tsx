@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
@@ -260,7 +260,7 @@ describe('Terminal', () => {
     expect(selections).toEqual(['tokyo-night'])
   })
 
-  it('includes a built-in theme selector when wrapped in TerminalThemeProvider', async () => {
+  it('opens in-terminal theme modal from built-in theme command and saves on click', async () => {
     const user = userEvent.setup()
 
     const { container } = render(
@@ -272,29 +272,23 @@ describe('Terminal', () => {
     const root = container.firstChild as HTMLElement
     const input = screen.getByPlaceholderText('Type a command...')
     await user.click(input)
-    await user.type(input, 'theme')
+    await user.type(input, 'theme tokyo-night')
     await user.keyboard('{Enter}')
 
-    expect(screen.getByText('Theme selector opened.')).toBeInTheDocument()
-    expect(screen.getByText(/Tokyo Night/)).toBeInTheDocument()
-
-    await user.keyboard('{ArrowDown}')
+    expect(screen.getByText('Theme changed to: Tokyo Night')).toBeInTheDocument()
     expect(root.style.getPropertyValue('--terminal-bg')).toBe('#1a1b26')
-
-    await user.keyboard('{Enter}')
-    expect(screen.getByText('Theme saved: Tokyo Night')).toBeInTheDocument()
   })
 
-  it('reports theme provider requirement for built-in theme command outside provider', async () => {
+  it('supports native theme without TerminalThemeProvider', async () => {
     const user = userEvent.setup()
 
-    render(<Terminal />)
+    render(<Terminal defaultTheme="tokyo-night" />)
 
     const input = screen.getByPlaceholderText('Type a command...')
     await user.click(input)
-    await user.type(input, 'theme')
+    await user.type(input, 'theme tokyo-night')
     await user.keyboard('{Enter}')
 
-    expect(screen.getByText('Theme selection requires TerminalThemeProvider')).toBeInTheDocument()
+    expect(screen.getByText('Theme changed to: Tokyo Night')).toBeInTheDocument()
   })
 })
