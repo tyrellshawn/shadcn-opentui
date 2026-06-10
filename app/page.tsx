@@ -31,6 +31,7 @@ import { TerminalSessionContent } from "@/components/ui/terminal-session-content
 import { TerminalEditBlock } from "@/components/ui/terminal-edit-block"
 import { TerminalJsTable } from "@/components/ui/terminal-js-table"
 import { TerminalEmailDraft } from "@/components/ui/terminal-email-draft"
+import { TerminalParallelTasks, type ParallelTask } from "@/components/ui/terminal-parallel-tasks"
 
 const homePreviewThemeNames = ["matrix", "tokyo-night", "catppuccin", "cai-dark", "cai-light"]
 
@@ -185,24 +186,20 @@ function LandingDemoShowcase() {
 
 function AgentSlideWithAutoStart() {
   const [started, setStarted] = useState(false)
-  const [useCase, setUseCase] = useState<"code" | "email" | "database">("code")
-  const [phase, setPhase] = useState<"idle" | "command" | "thinking" | "intro" | "artifact" | "final">("idle")
+  const [useCase, setUseCase] = useState<"code" | "email" | "database" | "prompt" | "parallel">("code")
+  const [phase, setPhase] = useState<"idle" | "command" | "intro" | "artifact" | "final">("idle")
   const [introStreamDone, setIntroStreamDone] = useState(false)
 
   useEffect(() => {
     setPhase("idle")
     setIntroStreamDone(false)
-    const t = setTimeout(() => setPhase("command"), 50)
+    const t = setTimeout(() => setPhase("command"), 30)
     return () => clearTimeout(t)
   }, [useCase])
 
   useEffect(() => {
     if (phase === "command") {
-      const t = setTimeout(() => setPhase("thinking"), 400)
-      return () => clearTimeout(t)
-    }
-    if (phase === "thinking") {
-      const t = setTimeout(() => setPhase("intro"), 900)
+      const t = setTimeout(() => setPhase("intro"), 200)
       return () => clearTimeout(t)
     }
   }, [phase])
@@ -215,7 +212,7 @@ function AgentSlideWithAutoStart() {
 
   useEffect(() => {
     if (phase === "artifact") {
-      const t = setTimeout(() => setPhase("final"), 400)
+      const t = setTimeout(() => setPhase("final"), 200)
       return () => clearTimeout(t)
     }
   }, [phase])
@@ -224,23 +221,109 @@ function AgentSlideWithAutoStart() {
     const timer = setTimeout(() => {
       setStarted(true)
       setPhase("command")
-    }, 600)
+    }, 500)
     return () => clearTimeout(timer)
   }, [])
 
   const handleIntroComplete = () => setIntroStreamDone(true)
 
   const showCommand = phase !== "idle"
-  const showThinking = phase === "thinking" || phase === "intro" || phase === "artifact" || phase === "final"
   const showIntro = phase === "intro" || phase === "artifact" || phase === "final"
   const showArtifact = phase === "artifact" || phase === "final"
   const showFinal = phase === "final"
+  const showAnalyzing = phase === "intro" || phase === "artifact" || phase === "final"
+
+  const [useCaseDep, setUseCaseDep] = useState(0)
+
+  function ParallelTasksRunner() {
+    const [pts, setPts] = React.useState<ParallelTask[]>([
+      { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
+      { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
+      { id: "test", label: "test --run", status: "pending", duration: "---" },
+      { id: "build", label: "build --prod", status: "pending", duration: "---" },
+    ])
+
+    React.useEffect(() => {
+      setPts([
+        { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
+        { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
+        { id: "test", label: "test --run", status: "pending", duration: "---" },
+        { id: "build", label: "build --prod", status: "pending", duration: "---" },
+      ])
+      const start = Date.now()
+
+      const interval = setInterval(() => {
+        const elapsed = (Date.now() - start) / 1000
+        setPts((prev) =>
+          prev.map((t) => {
+            if (t.id === "lint") {
+              if (elapsed < 0.8) return { ...t, status: "running" as const, progress: Math.round((elapsed / 0.8) * 100), duration: `${elapsed.toFixed(1)}s` }
+              return { ...t, status: "success" as const, progress: 100, duration: "0.8s" }
+            }
+            if (t.id === "typecheck") {
+              if (elapsed < 0.4) return { ...t, status: "pending" as const }
+              const runElapsed = elapsed - 0.4
+              const prog = Math.min(100, Math.round((runElapsed / 1.2) * 100))
+              if (elapsed < 1.6) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+              return { ...t, status: "success" as const, progress: 100, duration: "1.6s" }
+            }
+            if (t.id === "test") {
+              if (elapsed < 0.9) return { ...t, status: "pending" as const }
+              const runElapsed = elapsed - 0.9
+              const prog = Math.min(100, Math.round((runElapsed / 1.5) * 100))
+              if (elapsed < 2.4) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+              return { ...t, status: "success" as const, progress: 100, duration: "1.5s" }
+            }
+            if (t.id === "build") {
+              if (elapsed < 1.5) return { ...t, status: "pending" as const }
+              const runElapsed = elapsed - 1.5
+              const prog = Math.min(100, Math.round((runElapsed / 1.8) * 100))
+              if (elapsed < 3.3) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+              return { ...t, status: "success" as const, progress: 100, duration: "1.8s" }
+            }
+            return t
+          }),
+        )
+      }, 80)
+
+      return () => clearInterval(interval)
+    }, [useCaseDep])
+
+    return <TerminalParallelTasks tasks={pts} />
+  }
+
+  const promptCode = `const prompt = \`Generate a React component that:
+- Accepts \\\`title\\\` and \\\`onClick\\\` props
+- Renders a styled button with hover/active states
+- Uses Tailwind CSS classes
+- Exports as default
+
+Use TypeScript with strict typing.\`
+
+// Optimized with structured output constraints
+const optimizedPrompt = \`You are a React component generator.
+
+Generate a TypeScript React component with:
+1. Props interface with Title (string) and OnClick (callback)
+2. Tailwind CSS styling with hover:scale-105 and active:scale-95
+3. Default export
+
+Output format:
+\\\`\\\`\\\`tsx
+// component code
+\\\`\\\`\\\`
+
+Example:
+interface ButtonProps { title: string; onClick: () => void }
+export default function Button({ title, onClick }: ButtonProps) {
+  return <button onClick={onClick} className="...">{title}</button>
+}\``
 
   const useCases = {
     code: {
       label: "Code",
       command: "/improve-the-ui",
-      thinkingLabel: "Analyzing button component",
+      analyzeLabel: "Analyzing button component",
       intro: "I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.",
       artifact: (
         <TerminalEditBlock
@@ -255,7 +338,7 @@ function AgentSlideWithAutoStart() {
     email: {
       label: "Email",
       command: "/rewrite-email",
-      thinkingLabel: "Analyzing tone and structure",
+      analyzeLabel: "Analyzing tone and structure",
       intro: "The original email reads too passive. I&apos;ll restructure it with a clearer subject line and direct CTA to improve response rate.",
       artifact: (
         <TerminalEmailDraft
@@ -270,7 +353,7 @@ function AgentSlideWithAutoStart() {
     database: {
       label: "Database",
       command: "/migrate-schema",
-      thinkingLabel: "Analyzing migration plan",
+      analyzeLabel: "Analyzing migration plan",
       intro: "The users table needs a timezone column and the existing preferences JSONB needs a migration path. Here&apos;s the affected data set:",
       artifact: (
         <TerminalJsTable
@@ -290,6 +373,29 @@ function AgentSlideWithAutoStart() {
         />
       ),
       final: "Migration complete \u2014 1 column added, 1 index created, 1 JSONB migrated. 0 rows affected by constraint.",
+    },
+    prompt: {
+      label: "Prompt",
+      command: "/prompt-optimize",
+      analyzeLabel: "Analyzing prompt structure",
+      intro: "The original prompt lacks specificity. I&apos;ll add output formatting constraints and few-shot examples to improve reliability.",
+      artifact: (
+        <TerminalEditBlock
+          file="prompts/generate-component.ts"
+          startLine={1}
+          highlightLines={[13, 14, 15, 16, 17, 18]}
+          code={promptCode}
+        />
+      ),
+      final: "Done — prompt optimized with structured output format + 3 examples. Estimated quality improvement +40%.",
+    },
+    parallel: {
+      label: "Parallel",
+      command: "/run-pipeline",
+      analyzeLabel: "Executing parallel tasks",
+      intro: "Running the CI pipeline with parallel task execution. Lint, typecheck, test, and build will run concurrently where possible.",
+      artifact: <ParallelTasksRunner />,
+      final: "Pipeline complete — 4/4 tasks passed in 3.3s. All checks green.",
     },
   }
 
@@ -313,7 +419,7 @@ function AgentSlideWithAutoStart() {
           <button
             key={uc}
             type="button"
-            onClick={() => setUseCase(uc)}
+            onClick={() => { setUseCase(uc); setUseCaseDep((d) => d + 1) }}
             className={`rounded-md px-3 py-1 transition-colors ${
               useCase === uc
                 ? "bg-terminal-primary/20 text-terminal-primary"
@@ -329,24 +435,28 @@ function AgentSlideWithAutoStart() {
         <span className="font-semibold text-terminal-primary">agent session</span>
       </div>
 
-      {showCommand && <TerminalMessage>{current.command}</TerminalMessage>}
+      <div className="space-y-3">
+        {showCommand && <TerminalMessage>{current.command}</TerminalMessage>}
 
-      {showThinking && (
-        <TerminalThinkingIndicator label={current.thinkingLabel} variant="blob" tone="active" />
-      )}
+        {showIntro && (
+          <TerminalStreamText speed={85} mode="fade" onComplete={handleIntroComplete}>
+            {current.intro}
+          </TerminalStreamText>
+        )}
 
-      {showIntro && (
-        <TerminalStreamText speed={60} mode="fade" onComplete={handleIntroComplete}>
-          {current.intro}
-        </TerminalStreamText>
-      )}
+        {showArtifact && current.artifact}
 
-      {showArtifact && current.artifact}
+        {showFinal && (
+          <TerminalStreamText speed={85} mode="fade">
+            {current.final}
+          </TerminalStreamText>
+        )}
+      </div>
 
-      {showFinal && (
-        <TerminalStreamText speed={60} mode="fade">
-          {current.final}
-        </TerminalStreamText>
+      {showAnalyzing && (
+        <div className="border-t border-terminal-border/20 pt-2">
+          <TerminalThinkingIndicator label={current.analyzeLabel} variant="blob" tone="active" />
+        </div>
       )}
     </div>
   )
