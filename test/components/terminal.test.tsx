@@ -7,6 +7,7 @@ import { TerminalThemeProvider } from '@/lib/opentui/themes'
 import { TerminalThinkingIndicator } from '@/components/ui/terminal-thinking-indicator'
 import { TerminalJsTable } from '@/components/ui/terminal-js-table'
 import { TerminalEmailDraft } from '@/components/ui/terminal-email-draft'
+import { TerminalParallelTasks } from '@/components/ui/terminal-parallel-tasks'
 
 describe('Terminal', () => {
   it('shows command completions, supports arrow navigation, and completes with tab', async () => {
@@ -426,5 +427,23 @@ describe('Terminal', () => {
     expect(screen.getByText('bob@test.com')).toBeInTheDocument()
     expect(screen.getByText('Hello')).toBeInTheDocument()
     expect(screen.getByText('Greetings from the terminal.')).toBeInTheDocument()
+  })
+
+  it('renders TerminalParallelTasks with all status variants', () => {
+    render(
+      <TerminalParallelTasks
+        tasks={[
+          { id: 'a', label: 'lint', status: 'success', duration: '0.8s' },
+          { id: 'b', label: 'build', status: 'running', progress: 65, duration: '1.2s' },
+          { id: 'c', label: 'test', status: 'pending', duration: '---' },
+          { id: 'd', label: 'deploy', status: 'error', duration: '0.3s' },
+        ]}
+      />,
+    )
+    expect(screen.getByText('lint')).toBeInTheDocument()
+    expect(screen.getByText('build')).toBeInTheDocument()
+    expect(screen.getByText('test')).toBeInTheDocument()
+    expect(screen.getByText('deploy')).toBeInTheDocument()
+    expect(screen.getByText('task runner')).toBeInTheDocument()
   })
 })
