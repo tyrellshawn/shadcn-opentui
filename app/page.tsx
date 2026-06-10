@@ -19,10 +19,13 @@ import {
   WandSparkles,
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { MatrixRain } from "@/components/matrix-rain"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
 import { Terminal } from "@/components/ui/terminal"
+import { TerminalThemeProvider, prebuiltThemes, useTerminalTheme, type ThemeConfig } from "@/lib/opentui/themes"
+
+const homePreviewThemeNames = ["matrix", "tokyo-night", "catppuccin", "cai-dark", "cai-light"]
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -59,6 +62,108 @@ function TerminalDemoCard({
       </div>
       <Terminal commands={commands} welcomeMessage={welcomeMessage} className="h-[260px] bg-black" />
       <div className="border-t border-primary/20 bg-black/80 px-4 py-2 text-xs text-primary/70">{description}</div>
+    </div>
+  )
+}
+
+function AnimatedThemeSelectorDemo() {
+  return (
+    <TerminalThemeProvider defaultTheme="matrix">
+      <AnimatedThemeSelectorDemoContent />
+    </TerminalThemeProvider>
+  )
+}
+
+function AnimatedThemeSelectorDemoContent() {
+  const { theme: selectedTheme, setTheme } = useTerminalTheme()
+  const [autoPreview, setAutoPreview] = useState(true)
+
+  const previewThemes = useMemo(
+    () =>
+      homePreviewThemeNames
+        .map((name) => prebuiltThemes.find((theme) => theme.name === name))
+        .filter(Boolean) as ThemeConfig[],
+    [],
+  )
+
+  useEffect(() => {
+    if (!autoPreview || previewThemes.length === 0) return
+
+    const timer = window.setInterval(() => {
+      const currentIndex = previewThemes.findIndex((theme) => theme.name === selectedTheme.name)
+      const nextTheme = previewThemes[(currentIndex + 1) % previewThemes.length]
+      setTheme(nextTheme.name)
+    }, 1500)
+
+    return () => window.clearInterval(timer)
+  }, [autoPreview, previewThemes, selectedTheme.name, setTheme])
+
+  const chooseTheme = (name: string) => {
+    setAutoPreview(false)
+    setTheme(name)
+  }
+
+  const commands: Record<string, CommandHandler> = {
+    colors: {
+      name: "colors",
+      description: "Show active theme colors",
+      handler: (_args, context) => {
+        context?.addLines?.([
+          `Theme: ${selectedTheme.displayName}`,
+          `Background: ${selectedTheme.colors.background}`,
+          `Text: ${selectedTheme.colors.text}`,
+          `Primary: ${selectedTheme.colors.primary}`,
+        ])
+      },
+    },
+  }
+
+  return (
+    <div
+      className="md:col-span-3 rounded-xl border bg-black shadow-lg overflow-hidden transition-colors duration-500"
+      onFocusCapture={() => setAutoPreview(false)}
+      style={{ borderColor: selectedTheme.colors.border, boxShadow: `0 25px 60px -24px ${selectedTheme.colors.primary}` }}
+    >
+      <div
+        className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        style={{ backgroundColor: selectedTheme.colors.backgroundPanel, borderColor: selectedTheme.colors.border }}
+      >
+        <div>
+          <div className="text-xs font-mono font-semibold" style={{ color: selectedTheme.colors.primary }}>
+            Animated theme selector
+          </div>
+          <div className="text-xs" style={{ color: selectedTheme.colors.textMuted }}>
+            Auto-previewing themes. Type <span className="font-mono">theme</span> to take control.
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {previewThemes.map((theme) => (
+            <button
+              key={theme.name}
+              type="button"
+              onClick={() => chooseTheme(theme.name)}
+              className="h-8 rounded-full border px-3 text-xs font-mono transition-all duration-300"
+              style={{
+                backgroundColor: theme.name === selectedTheme.name ? theme.colors.primary : theme.colors.backgroundElement,
+                borderColor: theme.name === selectedTheme.name ? theme.colors.primary : theme.colors.border,
+                color: theme.name === selectedTheme.name ? theme.colors.textInverse : theme.colors.text,
+              }}
+            >
+              {theme.displayName}
+            </button>
+          ))}
+        </div>
+      </div>
+      <Terminal
+        commands={commands}
+        welcomeMessage={[
+          `Live theme preview: ${selectedTheme.displayName}`,
+          "Type 'theme' for keyboard navigation, preview-on-arrow, Enter-to-save.",
+          "Type 'colors' to print the active palette.",
+        ]}
+        className="h-[320px] rounded-none border-0 shadow-none"
+        prompt="→"
+      />
     </div>
   )
 }
@@ -336,6 +441,7 @@ export default function Home() {
                   }}
                   welcomeMessage={["Commands demo", "Try: status", "Try: help"]}
                 />
+                <AnimatedThemeSelectorDemo />
               </div>
             </div>
           </section>
