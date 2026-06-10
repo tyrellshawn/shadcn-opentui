@@ -3,7 +3,7 @@
 import React, { useState, useRef, useCallback, useContext, createContext, useEffect, useLayoutEffect, useMemo } from "react"
 import { cn } from "@/lib/utils"
 import type { CommandHandler } from "@/lib/types" // Declare or import CommandHandler
-import { useOptionalTerminalTheme, getThemeCSS } from "@/lib/opentui/themes"
+import { useOptionalTerminalTheme, getThemeCSS, type ThemeConfig } from "@/lib/opentui/themes"
 import { renderAsciiBanner, renderTable, sampleTerminalTableData } from "@/lib/opentui/renderers"
 
 interface TerminalLine {
@@ -42,6 +42,17 @@ interface TerminalUIComponent {
 }
 
 type TerminalLineInput = string | { content: string; type?: TerminalLine["type"] }
+
+type TerminalThemeContextValue = {
+  theme: ThemeConfig
+  setTheme: (name: string) => void
+  themes: ThemeConfig[]
+}
+
+type ThemeMenuItem = {
+  label: string
+  value: string
+}
 
 interface TerminalState {
   mode: "command" | "ui" | "form"
@@ -104,6 +115,7 @@ const createBuiltInCommands = (
   updateLastLine: (content: string, type?: TerminalLine["type"]) => void,
   commandHistory: string[],
   opentuiContext?: OpenTUIContext,
+  themeCtx?: TerminalThemeContextValue | null,
 ): TerminalCommand[] => [
   {
     name: "clear",
@@ -123,6 +135,7 @@ const createBuiltInCommands = (
       addLine("  ui         - Enter UI mode for interactive components")
       addLine("  form       - Create an interactive form")
       addLine("  menu       - Create an interactive menu")
+      addLine("  theme      - Preview and select terminal themes")
       addLine("  progress   - Show a progress bar")
       addLine("  ascii      - Generate ASCII art")
       addLine("  table      - Display data in table format")
@@ -158,6 +171,76 @@ const createBuiltInCommands = (
       addLine("Built with React and shadcn/ui")
       addLine("GitHub: https://github.com/anomalyco/opentui")
       addLine("Type 'help' for available commands")
+    },
+  },
+  {
+    name: "theme",
+    description: "Preview and select terminal themes",
+    category: "ui",
+    handler: (args) => {
+      if (!themeCtx) {
+        addLine("Theme selection requires TerminalThemeProvider", "error")
+        return
+      }
+
+      const themeName = args[0]
+      if (themeName) {
+        const found = themeCtx.themes.find((theme) => theme.name === themeName)
+        if (!found) {
+          addLine(`Theme not found: ${themeName}`, "error")
+          addLine("Run 'theme' to choose from available themes.")
+          return
+        }
+
+        themeCtx.setTheme(found.name)
+        addLine(`Theme changed to: ${found.displayName}`, "success")
+        return
+      }
+
+      if (!opentuiContext) {
+        addLine("OpenTUI context not available", "error")
+        return
+      }
+
+      const originalThemeName = themeCtx.theme.name
+      const items: ThemeMenuItem[] = themeCtx.themes.map((theme) => ({
+        label: `${theme.displayName.padEnd(18)} ${theme.variant}`,
+        value: theme.name,
+      }))
+      const selectedIndex = Math.max(
+        0,
+        themeCtx.themes.findIndex((theme) => theme.name === themeCtx.theme.name),
+      )
+
+      addLine("Theme selector opened.", "success")
+      addLine("Use ↑/↓ to preview. Press Enter to save, Esc to cancel.")
+      opentuiContext.setState((prev) => ({
+        ...prev,
+        mode: "ui",
+        menuSelection: selectedIndex,
+        activeComponent: {
+          id: `theme-menu-${Date.now()}`,
+          type: "menu",
+          active: true,
+          props: {
+            items,
+            onPreview: (item: unknown) => {
+              if (isThemeMenuItem(item)) themeCtx.setTheme(item.value)
+            },
+            onSelect: (item: unknown) => {
+              if (!isThemeMenuItem(item)) return
+              const found = themeCtx.themes.find((theme) => theme.name === item.value)
+              if (!found) return
+              themeCtx.setTheme(found.name)
+              addLine(`Theme saved: ${found.displayName}`, "success")
+            },
+            onCancel: () => {
+              themeCtx.setTheme(originalThemeName)
+              addLine("Theme preview cancelled", "error")
+            },
+          },
+        },
+      }))
     },
   },
   {
@@ -329,6 +412,10 @@ function getMenuItemLabel(item: unknown): string {
   return String(item)
 }
 
+function isThemeMenuItem(item: unknown): item is ThemeMenuItem {
+  return Boolean(item && typeof item === "object" && "value" in item && typeof (item as ThemeMenuItem).value === "string")
+}
+
 const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
   (
     {
@@ -486,7 +573,7 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       updateLastLine,
     }
 
-    const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext)
+    const builtInCommands = createBuiltInCommands(addLine, clearLines, updateLastLine, commandHistory, opentuiContext, themeCtx)
     const allCommands = [...builtInCommands, ...Object.values(commands)]
     const commandNames = allCommands.map((command) => command.name)
     const commandMap = new Map(allCommands.map((command) => [command.name, command]))

@@ -259,4 +259,42 @@ describe('Terminal', () => {
     await user.keyboard('{Enter}')
     expect(selections).toEqual(['tokyo-night'])
   })
+
+  it('includes a built-in theme selector when wrapped in TerminalThemeProvider', async () => {
+    const user = userEvent.setup()
+
+    const { container } = render(
+      <TerminalThemeProvider defaultTheme="matrix">
+        <Terminal />
+      </TerminalThemeProvider>,
+    )
+
+    const root = container.firstChild as HTMLElement
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByText('Theme selector opened.')).toBeInTheDocument()
+    expect(screen.getByText(/Tokyo Night/)).toBeInTheDocument()
+
+    await user.keyboard('{ArrowDown}')
+    expect(root.style.getPropertyValue('--terminal-bg')).toBe('#1a1b26')
+
+    await user.keyboard('{Enter}')
+    expect(screen.getByText('Theme saved: Tokyo Night')).toBeInTheDocument()
+  })
+
+  it('reports theme provider requirement for built-in theme command outside provider', async () => {
+    const user = userEvent.setup()
+
+    render(<Terminal />)
+
+    const input = screen.getByPlaceholderText('Type a command...')
+    await user.click(input)
+    await user.type(input, 'theme')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByText('Theme selection requires TerminalThemeProvider')).toBeInTheDocument()
+  })
 })
