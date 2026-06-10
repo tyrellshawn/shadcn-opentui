@@ -324,7 +324,7 @@ export default function Button({ title, onClick }: ButtonProps) {
       label: "Code",
       command: "/improve-the-ui",
       analyzeLabel: "Analyzing button component",
-      intro: "I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.",
+      intro: "I'll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.",
       artifact: (
         <TerminalEditBlock
           file="components/ui/button.tsx"
@@ -339,7 +339,7 @@ export default function Button({ title, onClick }: ButtonProps) {
       label: "Email",
       command: "/rewrite-email",
       analyzeLabel: "Analyzing tone and structure",
-      intro: "The original email reads too passive. I&apos;ll restructure it with a clearer subject line and direct CTA to improve response rate.",
+      intro: "The original email reads too passive. I'll restructure it with a clearer subject line and direct CTA to improve response rate.",
       artifact: (
         <TerminalEmailDraft
           from="you@company.com"
@@ -354,7 +354,7 @@ export default function Button({ title, onClick }: ButtonProps) {
       label: "Database",
       command: "/migrate-schema",
       analyzeLabel: "Analyzing migration plan",
-      intro: "The users table needs a timezone column and the existing preferences JSONB needs a migration path. Here&apos;s the affected data set:",
+      intro: "The users table needs a timezone column and the existing preferences JSONB needs a migration path. Here's the affected data set:",
       artifact: (
         <TerminalJsTable
           columns={[
@@ -378,7 +378,7 @@ export default function Button({ title, onClick }: ButtonProps) {
       label: "Prompt",
       command: "/prompt-optimize",
       analyzeLabel: "Analyzing prompt structure",
-      intro: "The original prompt lacks specificity. I&apos;ll add output formatting constraints and few-shot examples to improve reliability.",
+      intro: "The original prompt lacks specificity. I'll add output formatting constraints and few-shot examples to improve reliability.",
       artifact: (
         <TerminalEditBlock
           file="prompts/generate-component.ts"
@@ -514,7 +514,7 @@ function AgentSessionDemo() {
         <TerminalMessage>/improve-the-ui</TerminalMessage>
         <TerminalThinkingIndicator label="Thinking" />
         <TerminalStreamText speed={60} mode="fade">
-          I&apos;ll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.
+          I'll improve the primary button hover — easing the opacity transition and adding a motion-safe press scale.
         </TerminalStreamText>
         <TerminalEditBlock
           file="components/ui/button.tsx"
