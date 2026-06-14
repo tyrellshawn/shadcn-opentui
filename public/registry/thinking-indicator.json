@@ -1,0 +1,64 @@
+{
+  "name": "thinking-indicator",
+  "type": "registry:ui",
+  "title": "Thinking Indicator",
+  "description": "Animated thinking state while the agent works — dot matrix, ASCII spinner, cursor, blob.",
+  "dependencies": [
+    "lucide-react",
+    "tailwind-merge",
+    "clsx"
+  ],
+  "registryDependencies": [
+    "terminal"
+  ],
+  "tailwind": {
+    "config": {
+      "theme": {
+        "extend": {
+          "keyframes": {
+            "terminal-think-spin": {
+              "0%": {
+                "opacity": "0.3"
+              },
+              "50%": {
+                "opacity": "1"
+              },
+              "100%": {
+                "opacity": "0.3"
+              }
+            },
+            "terminal-think-blob": {
+              "0%": {
+                "borderRadius": "60% 40% 30% 70% / 60% 30% 70% 40%",
+                "opacity": "0.4",
+                "transform": "scale(0.85)"
+              },
+              "50%": {
+                "borderRadius": "30% 60% 70% 40% / 50% 60% 30% 60%",
+                "opacity": "0.9",
+                "transform": "scale(1.05)"
+              },
+              "100%": {
+                "borderRadius": "60% 40% 30% 70% / 60% 30% 70% 40%",
+                "opacity": "0.4",
+                "transform": "scale(0.85)"
+              }
+            }
+          },
+          "animation": {
+            "terminal-think-spin": "terminal-think-spin 1.6s ease-in-out infinite",
+            "terminal-think-blob": "terminal-think-blob 2.8s ease-in-out infinite"
+          }
+        }
+      }
+    }
+  },
+  "css": {},
+  "files": [
+    {
+      "path": "components/ui/terminal-thinking-indicator.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { cn } from \"@/lib/utils\"\n\nconst DOT_COUNT = 9\n\nconst DOT_POSITIONS = [\n  [0, 0], [1, 0], [2, 0],\n  [0, 1], [1, 1], [2, 1],\n  [0, 2], [1, 2], [2, 2],\n]\n\nfunction buildSpinKeyframes(): string {\n  const steps: number[][] = [\n    [4],\n    [3, 4, 5],\n    [0, 1, 2],\n    [1, 2, 5, 8],\n    [2, 5, 8],\n    [1, 4, 7],\n    [0, 4, 8],\n    [4, 8],\n  ]\n\n  let keyframes = \"@keyframes terminal-think-spin {\"\n  steps.forEach((lit, i) => {\n    const pct = (i / (steps.length - 1)) * 100\n    keyframes += `${pct}% { opacity: 1; transform: scale(1); }`\n  })\n  keyframes += \"100% { opacity: 1; transform: scale(1); }\"\n  keyframes += \"}\"\n\n  return keyframes\n}\n\nfunction buildBlobKeyframes(): string {\n  return `@keyframes terminal-think-blob {\n    0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; opacity: 0.4; transform: scale(0.85); }\n    25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; opacity: 0.7; transform: scale(1.05); }\n    50% { border-radius: 50% 60% 30% 80% / 40% 50% 70% 50%; opacity: 0.9; transform: scale(1); }\n    75% { border-radius: 20% 40% 60% 50% / 60% 40% 50% 70%; opacity: 0.6; transform: scale(0.95); }\n    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; opacity: 0.4; transform: scale(0.85); }\n  }`\n}\n\ninterface TerminalThinkingIndicatorProps {\n  label?: string\n  variant?: \"dots\" | \"cursor\" | \"blob\" | \"auto\"\n  tone?: \"default\" | \"active\"\n  className?: string\n}\n\nfunction TerminalThinkingIndicator({\n  label = \"\",\n  variant = \"blob\",\n  tone = \"default\",\n  className,\n}: TerminalThinkingIndicatorProps) {\n  const resolvedVariant = variant === \"auto\" ? \"blob\" : variant\n\n  if (resolvedVariant === \"blob\") {\n    return (\n      <div className={cn(\"flex items-center gap-3 px-2 py-2\", className)}>\n        <style>{buildBlobKeyframes()}</style>\n        <div className=\"flex items-center gap-1.5\">\n          {[0, 1, 2].map((i) => (\n            <div\n              key={i}\n              className=\"w-2.5 h-2.5 sm:w-3 sm:h-3\"\n              style={{\n                backgroundColor: tone === \"active\" ? \"var(--terminal-primary, #22c55e)\" : \"var(--terminal-text, #22c55e)\",\n                animation: \"terminal-think-blob 2.8s ease-in-out infinite\",\n                animationDelay: `${i * 0.4}s`,\n              }}\n            />\n          ))}\n        </div>\n        {label && (\n          <span className={cn(\n            \"text-xs animate-pulse\",\n            tone === \"active\" ? \"text-terminal-primary\" : \"text-terminal-text\",\n          )}>\n            {label}\n          </span>\n        )}\n      </div>\n    )\n  }\n\n  const delays = React.useMemo(() => {\n    return DOT_POSITIONS.map((_, i) => `${i * 0.12}s`)\n  }, [])\n\n  if (resolvedVariant === \"cursor\") {\n    return (\n      <div className={cn(\"flex items-center gap-2 px-2 py-1\", className)}>\n        {label && (\n          <span className={cn(tone === \"active\" ? \"text-terminal-primary\" : \"text-terminal-text\")}>\n            {label}\n          </span>\n        )}\n        <span className=\"inline-block w-2 h-4 bg-terminal-cursor animate-blink\" />\n      </div>\n    )\n  }\n\n  return (\n    <div className={cn(\"flex items-center gap-2 px-2 py-1\", className)}>\n      {label && (\n        <span className={cn(tone === \"active\" ? \"text-terminal-primary\" : \"text-terminal-text\")}>\n          {label}\n        </span>\n      )}\n      <style>{buildSpinKeyframes()}</style>\n      <div className=\"grid grid-cols-3 gap-0.5\">\n        {DOT_POSITIONS.map((_, i) => (\n          <div\n            key={i}\n            className={cn(\n              \"w-1.5 h-1.5 rounded-full\",\n              \"bg-terminal-text\",\n              tone === \"active\" ? \"opacity-100\" : \"opacity-60\"\n            )}\n            style={{\n              animation: `terminal-think-spin 1.6s ease-in-out infinite`,\n              animationDelay: delays[i],\n            }}\n          />\n        ))}\n      </div>\n    </div>\n  )\n}\n\nexport { TerminalThinkingIndicator }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

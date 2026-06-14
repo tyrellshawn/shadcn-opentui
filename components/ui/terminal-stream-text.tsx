@@ -73,7 +73,7 @@ function TerminalStreamText({
             <span
               key={i}
               className="inline animate-in fade-in duration-300 fill-mode-backwards"
-              style={{ animationDelay: "0ms" }}
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               {word}
             </span>

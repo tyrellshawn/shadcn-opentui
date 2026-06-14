@@ -82,6 +82,40 @@ const COMPONENTS = [
     files: ['components/ui/terminal-slider.tsx'],
     registryDependencies: ['terminal'],
   },
+  {
+    name: 'thinking-indicator',
+    type: 'registry:ui',
+    title: 'Thinking Indicator',
+    description: 'Animated thinking state while the agent works — dot matrix, ASCII spinner, cursor, blob.',
+    dependencies: ['lucide-react', 'tailwind-merge', 'clsx'],
+    registryDependencies: ['terminal'],
+    tailwind: {
+      config: {
+        theme: {
+          extend: {
+            keyframes: {
+              'terminal-think-spin': {
+                '0%': { opacity: '0.3' },
+                '50%': { opacity: '1' },
+                '100%': { opacity: '0.3' },
+              },
+              'terminal-think-blob': {
+                '0%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%', opacity: '0.4', transform: 'scale(0.85)' },
+                '50%': { borderRadius: '30% 60% 70% 40% / 50% 60% 30% 60%', opacity: '0.9', transform: 'scale(1.05)' },
+                '100%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%', opacity: '0.4', transform: 'scale(0.85)' },
+              },
+            },
+            animation: {
+              'terminal-think-spin': 'terminal-think-spin 1.6s ease-in-out infinite',
+              'terminal-think-blob': 'terminal-think-blob 2.8s ease-in-out infinite',
+            },
+          },
+        },
+      },
+    },
+    css: {},
+    files: ['components/ui/terminal-thinking-indicator.tsx'],
+  },
 ]
 
 // Plugin components to include in the registry

@@ -3,7 +3,8 @@
   "components": [
     "terminal",
     "terminal-controls",
-    "terminal-slider"
+    "terminal-slider",
+    "thinking-indicator"
   ],
   "plugins": [
     "cli-plugin-types",
@@ -18,5 +19,9 @@
     "cli-app-builder",
     "cli-plugin"
   ],
+<<<<<<< HEAD
   "generatedAt": "2026-06-10T13:24:25.520Z"
+=======
+  "generatedAt": "2026-06-14T21:00:00.945Z"
+>>>>>>> ae59f01 (fix: error handling audit — crash vectors, bug fixes, test factories, registry)
 }

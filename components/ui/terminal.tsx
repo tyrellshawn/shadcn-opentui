@@ -531,10 +531,10 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
         }))
       },
       removeUIComponent: (id) => {
-        opentuiState[1]((prev) => ({
-          ...prev,
-          activeComponent: prev.activeComponent?.id === id ? undefined : prev.activeComponent,
-        }))
+        opentuiState[1]((prev) => {
+          if (prev.activeComponent?.id !== id) return prev
+          return { ...prev, activeComponent: undefined, mode: "command", formData: {} }
+        })
       },
       updateFormData: (key, value) => {
         opentuiState[1]((prev) => ({
@@ -690,7 +690,9 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
 
       try {
         await processCommand(command)
-      }       finally {
+      } catch (error) {
+        addLine(`Error: ${error instanceof Error ? error.message : "Unknown error"}`, "error")
+      } finally {
         setIsProcessing(false)
         setTimeout(() => {
           if (!selectorJustOpenedRef.current) {
@@ -1120,8 +1122,13 @@ const Terminal = React.forwardRef<HTMLDivElement, TerminalProps>(
       })
       setHistoryIndex(-1)
 
-      await processCommand(input)
-      setIsProcessing(false)
+      try {
+        await processCommand(input)
+      } catch (error) {
+        addLine(`Error: ${error instanceof Error ? error.message : "Unknown error"}`, "error")
+      } finally {
+        setIsProcessing(false)
+      }
     }, [currentInput, isProcessing, prompt, addLine, processCommand])
 
     useEffect(() => {

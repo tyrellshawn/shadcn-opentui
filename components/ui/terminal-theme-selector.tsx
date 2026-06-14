@@ -9,9 +9,9 @@ export interface TerminalThemeSelectorProps {
   open: boolean
   themes: ThemeConfig[]
   currentThemeName: string
-  onSelect: (themeName: string) => void
+  onSelect?: (themeName: string) => void
   onPreview?: (themeName: string) => void
-  onCancel: () => void
+  onCancel?: () => void
 }
 
 type FilterTab = "all" | "dark" | "light"
@@ -109,12 +109,12 @@ export function TerminalThemeSelector({
         case "Enter":
           e.preventDefault()
           if (filtered.length > 0 && filtered[selectedIndex]) {
-            onSelect(filtered[selectedIndex].name)
+            onSelect?.(filtered[selectedIndex].name)
           }
           break
         case "Escape":
           e.preventDefault()
-          onCancel()
+          onCancel?.()
           break
       }
     },
@@ -131,7 +131,7 @@ export function TerminalThemeSelector({
       {/* backdrop */}
       <div
         className="absolute inset-0 -m-2 sm:-m-4 bg-terminal-bg/95 backdrop-blur-sm"
-        onClick={(e) => { e.stopPropagation(); onCancel() }}
+        onClick={(e) => { e.stopPropagation(); onCancel?.() }}
       />
 
       {/* panel */}
@@ -200,7 +200,7 @@ export function TerminalThemeSelector({
                   if (el) itemRefs.current.set(idx, el)
                   else itemRefs.current.delete(idx)
                 }}
-                onClick={() => onSelect(theme.name)}
+                onClick={() => onSelect?.(theme.name)}
                 onMouseEnter={() => {
                   setSelectedIndex(idx)
                   onPreview?.(theme.name)

@@ -741,6 +741,7 @@ export function TerminalThemeProvider({
   }
 
   const registerTheme = (theme: ThemeConfig) => {
+    if (!theme || !theme.name) return
     setThemes((prev) => {
       const exists = prev.find((t) => t.name === theme.name)
       if (exists) {

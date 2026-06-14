@@ -184,6 +184,63 @@ function LandingDemoShowcase() {
   )
 }
 
+function ParallelTasksRunner({ useCaseDep }: { useCaseDep: number }) {
+  const [pts, setPts] = useState<ParallelTask[]>([
+    { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
+    { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
+    { id: "test", label: "test --run", status: "pending", duration: "---" },
+    { id: "build", label: "build --prod", status: "pending", duration: "---" },
+  ])
+
+  useEffect(() => {
+    setPts([
+      { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
+      { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
+      { id: "test", label: "test --run", status: "pending", duration: "---" },
+      { id: "build", label: "build --prod", status: "pending", duration: "---" },
+    ])
+    const start = Date.now()
+
+    const interval = setInterval(() => {
+      const elapsed = (Date.now() - start) / 1000
+      setPts((prev) =>
+        prev.map((t) => {
+          if (t.id === "lint") {
+            if (elapsed < 0.8) return { ...t, status: "running" as const, progress: Math.round((elapsed / 0.8) * 100), duration: `${elapsed.toFixed(1)}s` }
+            return { ...t, status: "success" as const, progress: 100, duration: "0.8s" }
+          }
+          if (t.id === "typecheck") {
+            if (elapsed < 0.4) return { ...t, status: "pending" as const }
+            const runElapsed = elapsed - 0.4
+            const prog = Math.min(100, Math.round((runElapsed / 1.2) * 100))
+            if (elapsed < 1.6) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+            return { ...t, status: "success" as const, progress: 100, duration: "1.6s" }
+          }
+          if (t.id === "test") {
+            if (elapsed < 0.9) return { ...t, status: "pending" as const }
+            const runElapsed = elapsed - 0.9
+            const prog = Math.min(100, Math.round((runElapsed / 1.5) * 100))
+            if (elapsed < 2.4) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+            return { ...t, status: "success" as const, progress: 100, duration: "1.5s" }
+          }
+          if (t.id === "build") {
+            if (elapsed < 1.5) return { ...t, status: "pending" as const }
+            const runElapsed = elapsed - 1.5
+            const prog = Math.min(100, Math.round((runElapsed / 1.8) * 100))
+            if (elapsed < 3.3) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
+            return { ...t, status: "success" as const, progress: 100, duration: "1.8s" }
+          }
+          return t
+        }),
+      )
+    }, 80)
+
+    return () => clearInterval(interval)
+  }, [useCaseDep])
+
+  return <TerminalParallelTasks tasks={pts} />
+}
+
 function AgentSlideWithAutoStart() {
   const [started, setStarted] = useState(false)
   const [useCase, setUseCase] = useState<"code" | "email" | "database" | "prompt" | "parallel">("code")
@@ -234,63 +291,6 @@ function AgentSlideWithAutoStart() {
   const showAnalyzing = phase === "intro" || phase === "artifact" || phase === "final"
 
   const [useCaseDep, setUseCaseDep] = useState(0)
-
-  function ParallelTasksRunner() {
-    const [pts, setPts] = useState<ParallelTask[]>([
-      { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
-      { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
-      { id: "test", label: "test --run", status: "pending", duration: "---" },
-      { id: "build", label: "build --prod", status: "pending", duration: "---" },
-    ])
-
-    useEffect(() => {
-      setPts([
-        { id: "lint", label: "lint --fix", status: "pending", duration: "---" },
-        { id: "typecheck", label: "typecheck", status: "pending", duration: "---" },
-        { id: "test", label: "test --run", status: "pending", duration: "---" },
-        { id: "build", label: "build --prod", status: "pending", duration: "---" },
-      ])
-      const start = Date.now()
-
-      const interval = setInterval(() => {
-        const elapsed = (Date.now() - start) / 1000
-        setPts((prev) =>
-          prev.map((t) => {
-            if (t.id === "lint") {
-              if (elapsed < 0.8) return { ...t, status: "running" as const, progress: Math.round((elapsed / 0.8) * 100), duration: `${elapsed.toFixed(1)}s` }
-              return { ...t, status: "success" as const, progress: 100, duration: "0.8s" }
-            }
-            if (t.id === "typecheck") {
-              if (elapsed < 0.4) return { ...t, status: "pending" as const }
-              const runElapsed = elapsed - 0.4
-              const prog = Math.min(100, Math.round((runElapsed / 1.2) * 100))
-              if (elapsed < 1.6) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
-              return { ...t, status: "success" as const, progress: 100, duration: "1.6s" }
-            }
-            if (t.id === "test") {
-              if (elapsed < 0.9) return { ...t, status: "pending" as const }
-              const runElapsed = elapsed - 0.9
-              const prog = Math.min(100, Math.round((runElapsed / 1.5) * 100))
-              if (elapsed < 2.4) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
-              return { ...t, status: "success" as const, progress: 100, duration: "1.5s" }
-            }
-            if (t.id === "build") {
-              if (elapsed < 1.5) return { ...t, status: "pending" as const }
-              const runElapsed = elapsed - 1.5
-              const prog = Math.min(100, Math.round((runElapsed / 1.8) * 100))
-              if (elapsed < 3.3) return { ...t, status: "running" as const, progress: prog, duration: `${runElapsed.toFixed(1)}s` }
-              return { ...t, status: "success" as const, progress: 100, duration: "1.8s" }
-            }
-            return t
-          }),
-        )
-      }, 80)
-
-      return () => clearInterval(interval)
-    }, [useCaseDep])
-
-    return <TerminalParallelTasks tasks={pts} />
-  }
 
   const promptCode = `const prompt = \`Generate a React component that:
 - Accepts \\\`title\\\` and \\\`onClick\\\` props
@@ -394,7 +394,7 @@ export default function Button({ title, onClick }: ButtonProps) {
       command: "/run-pipeline",
       analyzeLabel: "Executing parallel tasks",
       intro: "Running the CI pipeline with parallel task execution. Lint, typecheck, test, and build will run concurrently where possible.",
-      artifact: <ParallelTasksRunner />,
+      artifact: <ParallelTasksRunner useCaseDep={useCaseDep} />,
       final: "Pipeline complete — 4/4 tasks passed in 3.3s. All checks green.",
     },
   }

@@ -31,6 +31,7 @@ function TerminalSlider({
   const displayValue = Array.isArray(currentValue) ? currentValue[0] : currentValue
 
   const createAsciiBar = (val: number, total: number, barWidth: number) => {
+    if (total <= 0) return "░".repeat(barWidth)
     const filled = Math.round((val / total) * barWidth)
     const empty = barWidth - filled
     return "█".repeat(filled) + "░".repeat(empty)
