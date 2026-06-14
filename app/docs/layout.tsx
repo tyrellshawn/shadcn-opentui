@@ -16,7 +16,7 @@ import {
   SidebarGroupLabel,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette } from "lucide-react"
+import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette, Brain } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -41,6 +41,7 @@ const navigation = [
       { title: "Terminal", href: "/docs/components/terminal", icon: Terminal },
       { title: "Command", href: "/docs/components/command", icon: Code },
       { title: "Interactive Examples", href: "/docs/components/examples", icon: Zap },
+      { title: "Thinking Indicator", href: "/docs/components/thinking-indicator", icon: Brain },
     ],
   },
   {

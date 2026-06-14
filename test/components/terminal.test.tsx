@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 import { Terminal } from '@/components/ui/terminal'
 import { TerminalThemeProvider } from '@/lib/opentui/themes'
-import { TerminalThinkingIndicator } from '@/components/ui/terminal-thinking-indicator'
+import { TerminalThinkingIndicator, TerminalDotMatrix, TerminalAsciiSpinner } from '@/components/ui/terminal-thinking-indicator'
+import { TerminalThinkingMatrix } from '@/components/ui/terminal-thinking-matrix'
 import { TerminalJsTable } from '@/components/ui/terminal-js-table'
 import { TerminalEmailDraft } from '@/components/ui/terminal-email-draft'
 import { TerminalParallelTasks } from '@/components/ui/terminal-parallel-tasks'
@@ -471,5 +472,62 @@ describe('Terminal', () => {
     await user.keyboard('{Enter}')
 
     expect(await screen.findByPlaceholderText('Search themes...')).toBeInTheDocument()
+  })
+
+  it('renders TerminalThinkingIndicator with dots variant', () => {
+    render(
+      <TerminalThinkingIndicator label="Thinking" variant="dots" />,
+    )
+    expect(screen.getByText('Thinking')).toBeInTheDocument()
+  })
+
+  it('renders TerminalThinkingIndicator with ascii variant', () => {
+    render(
+      <TerminalThinkingIndicator label="Thinking" variant="ascii" />,
+    )
+    expect(screen.getByText('Thinking')).toBeInTheDocument()
+  })
+
+  it('renders TerminalThinkingIndicator with cursor variant', () => {
+    render(
+      <TerminalThinkingIndicator label="Cursor" variant="cursor" />,
+    )
+    expect(screen.getByText('Cursor')).toBeInTheDocument()
+  })
+
+  it('renders TerminalDotMatrix standalone with custom props', () => {
+    const { container } = render(
+      <TerminalDotMatrix speed={80} trail={2} dotSize={3} pulseCenter={false} tone="active" />,
+    )
+    const dots = container.querySelectorAll('[class*="rounded-full"]')
+    expect(dots.length).toBe(9)
+  })
+
+  it('renders TerminalAsciiSpinner with default frames', () => {
+    const { container } = render(
+      <TerminalAsciiSpinner speed={200} color="#22c55e" />,
+    )
+    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+  })
+
+  it('renders TerminalAsciiSpinner with custom frames', () => {
+    const { container } = render(
+      <TerminalAsciiSpinner frames={["*", "+", "-"]} speed={100} />,
+    )
+    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+  })
+
+  it('TerminalThinkingIndicator passes dotProps to TerminalDotMatrix', () => {
+    const { container } = render(
+      <TerminalThinkingIndicator label="Test" variant="dots" dotProps={{ speed: 50, trail: 2 }} />,
+    )
+    expect(screen.getByText('Test')).toBeInTheDocument()
+    const dots = container.querySelectorAll('[class*="rounded-full"]')
+    expect(dots.length).toBe(9)
+  })
+
+  it('TerminalThinkingMatrix playground renders without crashing', () => {
+    const { container } = render(<TerminalThinkingMatrix />)
+    expect(container).toBeInTheDocument()
   })
 })
