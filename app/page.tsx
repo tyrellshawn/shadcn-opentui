@@ -53,7 +53,7 @@ function CopyButton({ text }: { text: string }) {
 
 function AnimatedThemeSelectorDemoContent() {
   const { theme: selectedTheme, setTheme } = useTerminalTheme()
-  const [autoPreview, setAutoPreview] = useState(true)
+  const [autoPreview, setAutoPreview] = useState(false)
 
   const previewThemes = useMemo(
     () =>
@@ -110,7 +110,7 @@ function AnimatedThemeSelectorDemoContent() {
             Animated theme selector
           </div>
           <div className="text-xs" style={{ color: selectedTheme.colors.textMuted }}>
-            Auto-previewing themes. Type <span className="font-mono">theme</span> to take control.
+            Choose a theme or type <span className="font-mono">theme</span> for keyboard navigation.
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
