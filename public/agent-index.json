@@ -14,6 +14,8 @@
     "comparison": "/docs/compare-termcn",
     "faq_json": "/faq.json",
     "qa_json": "/qa.json",
+    "skill": "/skills/shadcn-opentui/SKILL.md",
+    "skills_index": "/skills/index.json",
     "registry": "/registry/index.json"
   },
   "repository_agent_files": {
