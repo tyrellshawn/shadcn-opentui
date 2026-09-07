@@ -43,6 +43,7 @@ import { useState } from "react"
 import { SearchButton } from "@/components/search"
 import { BreadcrumbNav } from "@/components/docs/breadcrumb-nav"
 import { PageNav } from "@/components/docs/page-nav"
+import { AgentQuickstartCard } from "@/components/docs/agent-quickstart-card"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 const SHADCN_OPENTUI_REPOSITORY = "https://github.com/canadian-ai/shadcn-opentui"
@@ -212,6 +213,11 @@ export default function DocsLayout({
           <main className="flex-1 overflow-auto">
             <div className="container max-w-4xl mx-auto px-6 py-8">
               <BreadcrumbNav />
+              {pathname === "/docs/components/terminal" && (
+                <div className="mb-8 mt-4">
+                  <AgentQuickstartCard compact />
+                </div>
+              )}
               {children}
               <PageNav />
             </div>
