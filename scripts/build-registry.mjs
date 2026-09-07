@@ -14,7 +14,7 @@ const REGISTRY_CONFIG = {
   name: '@shadcn-opentui',
   description: 'Terminal components for shadcn/ui powered by OpenTUI',
   homepage: 'https://opentui.dev',
-  repository: 'https://github.com/shadcn-opentui/terminal',
+  repository: 'https://github.com/canadian-ai/shadcn-opentui',
 }
 
 // Components to include in the registry
