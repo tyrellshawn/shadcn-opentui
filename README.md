@@ -4,40 +4,95 @@
 [![Release](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/release.yml/badge.svg)](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Independent shadcn/ui experiments for bringing OpenTUI-style terminal applications to the web.
+**Inspectable shadcn/React terminal components for browser agent consoles, developer workflows, streaming output, commands, and approval UX.**
 
-This is not the native OpenTUI project. It started as a one-day experiment to explore an OpenTUI web adapter with React in mind, and is now focused on translating OpenTUI TypeScript applications into inspectable shadcn web code.
+Shadcn OpenTUI brings OpenTUI-inspired interaction patterns into React and Next.js applications while keeping the installed source local, readable, and editable. It is an independent browser/web project, not the official native OpenTUI runtime.
 
-- OpenTUI source repository: [tyrellshawn/opentui](https://github.com/tyrellshawn/opentui)
-- Canonical Shadcn OpenTUI repository: [canadian-ai/shadcn-opentui](https://github.com/canadian-ai/shadcn-opentui)
-- Issues and feature requests: [canadian-ai/shadcn-opentui/issues](https://github.com/canadian-ai/shadcn-opentui/issues)
+- **Canonical repository:** [canadian-ai/shadcn-opentui](https://github.com/canadian-ai/shadcn-opentui)
+- **Documentation:** [opentui.vercel.app/docs](https://opentui.vercel.app/docs)
+- **Agent quickstart:** [opentui.vercel.app/docs/agents](https://opentui.vercel.app/docs/agents)
+- **Issues and feature requests:** [canadian-ai/shadcn-opentui/issues](https://github.com/canadian-ai/shadcn-opentui/issues)
 
-## Current Focus
+## Give this to your coding agent
 
-- **Stable shadcn components:** installable components from the Shadcn OpenTUI registry (`terminal`, `terminal-slider`, `terminal-controls`, CLI plugin helpers).
-- **OpenTUI-to-shadcn codegen:** a parser and generator track for turning OpenTUI TypeScript/TSX programs into shadcn web components.
-- **Future runtime research:** Zig/WASM code remains in-tree for a later browser-native runtime integration, but it is not the main product path today.
+Install the terminal directly:
 
-## Why Hunk Matters
+```bash
+npx shadcn@latest add https://opentui.vercel.app/r/terminal.json
+```
 
-The north-star validation example is [Hunk](https://github.com/modem-dev/hunk), a review-first terminal diff viewer built on OpenTUI. A good outcome for this project is being able to view a Hunk-like OpenTUI app on the web as generated shadcn code.
+Then prompt your agent with:
 
-The first Hunk target is a static browser-viewable diff review example. Later milestones can parse more of Hunk's `src/opentui` components directly.
+> Install Shadcn OpenTUI's terminal component, inspect the copied source, then build my requested terminal workflow with typed commands, streaming-friendly output, and explicit approval before destructive actions. Keep the source local and editable.
 
-## Features
+The component follows the shadcn copy-own-edit model, so an agent can inspect the exact implementation it is changing instead of programming against an opaque terminal widget.
 
-- Interactive terminal with command history and keyboard shortcuts
-- OpenTUI-inspired forms, menus, and progress indicators
-- Terminal-style sliders and controls
-- TypeScript support with full type definitions
-- Theme support for light and dark modes, with a white GitHub-style terminal available out of the box
-- Native browser caret positioning for accurate tab-completion editing
+## Why use it for agent interfaces?
 
-## Installation
+- **Terminal-native sessions:** commands, history, completion, forms, menus, progress, tables, streaming text, edits, and status can live in one continuous developer surface.
+- **Inspectable source:** installed components are copied into your app and remain editable by humans and coding agents.
+- **Approval-friendly UX:** show a target and planned action before destructive or production-changing operations.
+- **React-first:** use normal React state, props, and TypeScript inside a browser application.
+- **Theme-aware:** explicit terminal theme context when desired, with a coherent dark fallback otherwise.
 
-### Stable shadcn components
+## Machine-readable agent entry points
 
-Add the registry to your `components.json`:
+Agents do not need to scrape the visual documentation first:
+
+- [`/agent-index.json`](https://opentui.vercel.app/agent-index.json) — canonical map of agent resources
+- [`/llms.txt`](https://opentui.vercel.app/llms.txt) — concise project context
+- [`/llms-full.txt`](https://opentui.vercel.app/llms-full.txt) — expanded implementation and decision context
+- [`/faq.json`](https://opentui.vercel.app/faq.json) — machine-readable FAQ
+- [`/qa.json`](https://opentui.vercel.app/qa.json) — retrieval-friendly Q&A corpus
+- [`/skills/shadcn-opentui/SKILL.md`](https://opentui.vercel.app/skills/shadcn-opentui/SKILL.md) — published agent skill
+- [`AGENTS.md`](./AGENTS.md) — repository-level coding-agent instructions
+
+## Current focus
+
+- **Stable shadcn components:** installable terminal and terminal-oriented components from the Shadcn OpenTUI registry.
+- **Agent and developer workflows:** browser consoles for coding, deployment, debugging, approvals, and other terminal-native product surfaces.
+- **OpenTUI-to-shadcn codegen:** parser and generator research for translating practical OpenTUI TypeScript/TSX into inspectable web code.
+- **Future runtime research:** Zig/WASM packages remain in-tree for later experimentation but are not required for normal component usage.
+
+## Shadcn OpenTUI or termcn?
+
+The key distinction is the render target.
+
+| Choose | Best when |
+| --- | --- |
+| **Shadcn OpenTUI** | The terminal experience belongs inside a browser React/Next.js product: agent console, deploy/debug panel, in-app terminal, or approval flow. |
+| **termcn** | You are building a native terminal application directly on Ink or OpenTUI and want components designed for terminal-runtime rendering. |
+
+See the full [Shadcn OpenTUI vs termcn decision guide](https://opentui.vercel.app/docs/compare-termcn). The projects overlap in style and distribution ideas but are not one-to-one replacements.
+
+## Basic usage
+
+```tsx
+import { Terminal } from "@/components/ui/terminal"
+
+const commands = {
+  status: {
+    name: "status",
+    description: "Show service status",
+    handler: async (_args, context) => {
+      context?.addLine?.("Service: healthy", "success")
+    },
+  },
+}
+
+export default function App() {
+  return (
+    <Terminal
+      commands={commands}
+      welcomeMessage={["Agent console ready", "Try: status"]}
+    />
+  )
+}
+```
+
+## Registry
+
+You can also register the full registry in `components.json`:
 
 ```json
 {
@@ -45,25 +100,15 @@ Add the registry to your `components.json`:
 }
 ```
 
-Install components:
+Then install supported registry items with the shadcn CLI.
 
-```bash
-npx shadcn@latest add terminal
-```
+## Why Hunk matters
 
-## Usage
+[Hunk](https://github.com/modem-dev/hunk), a review-first terminal diff viewer built on OpenTUI, is a useful validation target for the codegen track. A strong outcome is translating Hunk-like OpenTUI experiences into browser-viewable, inspectable shadcn/React code.
 
-```tsx
-import { Terminal } from "@/components/ui/terminal"
+## Codegen track
 
-export default function App() {
-  return <Terminal title="My Terminal" />
-}
-```
-
-## Codegen Track
-
-The OpenTUI-to-shadcn generator starts with a custom grammar and an intermediate representation. The initial goal is to translate a practical OpenTUI TSX subset into readable shadcn/React components, not to emulate the full OpenTUI runtime.
+The OpenTUI-to-shadcn generator starts with a custom grammar and intermediate representation. The initial goal is to translate a practical OpenTUI TSX subset into readable shadcn/React components, not to emulate the full native runtime.
 
 See `lib/opentui-codegen/README.md` and `grammars/OpenTUIProgram.g4` for the current scaffold.
 
@@ -76,16 +121,16 @@ bun install
 bun dev
 ```
 
-## Future Runtime Research
+Before making agent-oriented changes, also read [`AGENTS.md`](./AGENTS.md) and [`.agents/skills/shadcn-opentui/SKILL.md`](./.agents/skills/shadcn-opentui/SKILL.md).
 
-The Zig/WASM code in `packages/web-core`, `packages/web-renderer`, and `packages/web-react` is kept for a later browser-native runtime integration. It is not required for the current shadcn component or codegen workflow.
+## Future runtime research
+
+The Zig/WASM code in `packages/web-core`, `packages/web-renderer`, and `packages/web-react` is kept for later browser-native runtime integration research. It is not required for the stable shadcn component or codegen workflow.
 
 ```bash
 bun run build:web-runtime
 bun run dev:web-runtime
 ```
-
-Open `http://localhost:8090/packages/web-renderer/demo/index.html` when working on that research track.
 
 ## License
 
