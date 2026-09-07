@@ -1,8 +1,35 @@
 "use client"
 
 import { ThemeProvider as NextThemesProvider } from "next-themes"
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 import { TerminalThemeProvider } from "@/lib/opentui/themes"
+
+const PROJECT_GITHUB_URL = "https://github.com/canadian-ai/shadcn-opentui"
+const OLD_HOMEPAGE_GITHUB_URL = "https://github.com/tyrellshawn/opentui"
+
+function HomepageGithubLinkGuard() {
+  useEffect(() => {
+    const rewriteHomepageGithubLinks = () => {
+      if (window.location.pathname !== "/") return
+
+      document
+        .querySelectorAll<HTMLAnchorElement>(`a[href="${OLD_HOMEPAGE_GITHUB_URL}"]`)
+        .forEach((link) => {
+          link.href = PROJECT_GITHUB_URL
+          link.setAttribute("aria-label", "Open Shadcn OpenTUI on GitHub")
+        })
+    }
+
+    rewriteHomepageGithubLinks()
+
+    const observer = new MutationObserver(rewriteHomepageGithubLinks)
+    observer.observe(document.body, { childList: true, subtree: true })
+
+    return () => observer.disconnect()
+  }, [])
+
+  return null
+}
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +40,7 @@ export function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       <TerminalThemeProvider defaultTheme="github-light">
+        <HomepageGithubLinkGuard />
         {children}
       </TerminalThemeProvider>
     </NextThemesProvider>
