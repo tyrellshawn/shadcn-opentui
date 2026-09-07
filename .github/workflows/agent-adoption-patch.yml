@@ -1,0 +1,54 @@
+name: Agent adoption patch
+
+on:
+  push:
+    branches:
+      - feat/agent-adoption-surface
+
+permissions:
+  contents: write
+
+jobs:
+  patch-home-theme-demo:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[agent-adoption-patch]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/agent-adoption-surface
+          fetch-depth: 0
+
+      - name: Stop homepage theme autoplay from fighting user selection
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('app/page.tsx')
+          text = path.read_text()
+
+          old_state = 'const [autoPreview, setAutoPreview] = useState(true)'
+          new_state = 'const [autoPreview, setAutoPreview] = useState(false)'
+          if old_state not in text:
+              raise SystemExit('Expected autoPreview state was not found')
+          text = text.replace(old_state, new_state, 1)
+
+          old_copy = 'Auto-previewing themes. Type <span className="font-mono">theme</span> to take control.'
+          new_copy = 'Choose a theme or type <span className="font-mono">theme</span> for keyboard navigation.'
+          if old_copy not in text:
+              raise SystemExit('Expected theme demo copy was not found')
+          text = text.replace(old_copy, new_copy, 1)
+
+          path.write_text(text)
+          PY
+
+      - name: Commit patch
+        run: |
+          if git diff --quiet -- app/page.tsx; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx
+          git commit -m "fix: stop theme demo flicker [agent-adoption-patch]"
+          git push origin HEAD:feat/agent-adoption-surface
