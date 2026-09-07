@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Search, Check, Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { ThemeConfig } from "@/lib/opentui/themes"
@@ -30,6 +30,12 @@ export function TerminalThemeSelector({
   const searchRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+  const onPreviewRef = useRef(onPreview)
+  const lastPreviewedThemeRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    onPreviewRef.current = onPreview
+  }, [onPreview])
 
   const filtered = useMemo(() => {
     let result = themes
@@ -58,24 +64,21 @@ export function TerminalThemeSelector({
     return result
   }, [themes, filterTab, query])
 
-  const currentIdx = useMemo(
-    () => themes.findIndex((t) => t.name === currentThemeName),
-    [themes, currentThemeName],
-  )
-
   useEffect(() => {
-    if (open) {
-      setQuery("")
-      setFilterTab("all")
-      const idx = filtered.findIndex((t) => t.name === currentThemeName)
-      setSelectedIndex(idx >= 0 ? idx : 0)
-    }
+    if (!open) return
+
+    setQuery("")
+    setFilterTab("all")
+    const idx = themes.findIndex((theme) => theme.name === currentThemeName)
+    const nextIndex = idx >= 0 ? idx : 0
+    setSelectedIndex((previousIndex) => (previousIndex === nextIndex ? previousIndex : nextIndex))
   }, [open])
 
   useEffect(() => {
     if (!open) return
-    const idx = filtered.findIndex((t) => t.name === currentThemeName)
-    setSelectedIndex(idx >= 0 ? idx : 0)
+    const idx = filtered.findIndex((theme) => theme.name === currentThemeName)
+    const nextIndex = idx >= 0 ? idx : 0
+    setSelectedIndex((previousIndex) => (previousIndex === nextIndex ? previousIndex : nextIndex))
   }, [filterTab, query, filtered, currentThemeName, open])
 
   useEffect(() => {
@@ -85,11 +88,19 @@ export function TerminalThemeSelector({
     }
   }, [selectedIndex])
 
-  useLayoutEffect(() => {
-    if (!open) return
-    const theme = filtered[selectedIndex]
-    if (theme) onPreview?.(theme.name)
-  }, [selectedIndex, filtered, open, onPreview])
+  const previewThemeName = open ? filtered[selectedIndex]?.name : undefined
+
+  useEffect(() => {
+    if (!open) {
+      lastPreviewedThemeRef.current = null
+      return
+    }
+
+    if (!previewThemeName || lastPreviewedThemeRef.current === previewThemeName) return
+
+    lastPreviewedThemeRef.current = previewThemeName
+    onPreviewRef.current?.(previewThemeName)
+  }, [open, previewThemeName])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -118,7 +129,7 @@ export function TerminalThemeSelector({
           break
       }
     },
-    [filtered, selectedIndex, onSelect, onCancel, onPreview],
+    [filtered, selectedIndex, onSelect, onCancel],
   )
 
   if (!open) return null
@@ -128,18 +139,18 @@ export function TerminalThemeSelector({
       className="absolute inset-2 flex items-center justify-center sm:inset-4"
       onKeyDown={handleKeyDown}
     >
-      {/* backdrop */}
       <div
         className="absolute inset-0 -m-2 sm:-m-4 bg-terminal-bg/95 backdrop-blur-sm"
-        onClick={(e) => { e.stopPropagation(); onCancel?.() }}
+        onClick={(e) => {
+          e.stopPropagation()
+          onCancel?.()
+        }}
       />
 
-      {/* panel */}
       <div
         className="relative flex w-full max-h-full min-h-0 flex-col overflow-hidden rounded-lg border border-terminal-border bg-terminal-bg mx-auto max-w-[500px]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* header: search */}
         <div className="relative flex-shrink-0 border-b border-terminal-border">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-terminal-muted">
             <Search className="h-4 w-4" />
@@ -160,7 +171,6 @@ export function TerminalThemeSelector({
           />
         </div>
 
-        {/* filter tabs */}
         <div className="flex flex-shrink-0 gap-1 border-b border-terminal-border px-2 py-1.5 sm:py-2">
           {(["all", "dark", "light"] as FilterTab[]).map((tab) => (
             <button
@@ -183,7 +193,6 @@ export function TerminalThemeSelector({
           ))}
         </div>
 
-        {/* theme list */}
         <div ref={listRef} className="flex-1 overflow-y-auto py-1 terminal-scrollbar overscroll-contain min-h-0">
           {filtered.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-terminal-muted">
@@ -201,16 +210,12 @@ export function TerminalThemeSelector({
                   else itemRefs.current.delete(idx)
                 }}
                 onClick={() => onSelect?.(theme.name)}
-                onMouseEnter={() => {
-                  setSelectedIndex(idx)
-                  onPreview?.(theme.name)
-                }}
+                onMouseEnter={() => setSelectedIndex(idx)}
                 className={cn(
                   "flex cursor-pointer items-start gap-3 px-4 py-2.5 transition-colors",
                   isHighlighted && "bg-terminal-highlight-bg",
                 )}
               >
-                {/* color swatches */}
                 <div className="flex flex-shrink-0 items-center gap-1 pt-0.5">
                   <span
                     className="block h-4 w-4 rounded-full border border-terminal-border"
@@ -226,7 +231,6 @@ export function TerminalThemeSelector({
                   />
                 </div>
 
-                {/* info */}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm font-medium text-terminal-text">
@@ -255,7 +259,6 @@ export function TerminalThemeSelector({
           })}
         </div>
 
-        {/* footer */}
         <div className="flex-shrink-0 border-t border-terminal-border px-4 py-2 text-center text-xs text-terminal-muted">
           ↑↓ Navigate · Enter Save · Esc Cancel
         </div>
