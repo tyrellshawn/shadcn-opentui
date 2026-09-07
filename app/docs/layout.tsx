@@ -18,7 +18,24 @@ import {
   SidebarGroupLabel,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette, Brain, Github, ExternalLink, CircleDot } from "lucide-react"
+import {
+  Terminal,
+  BookOpen,
+  Code,
+  Zap,
+  Settings,
+  FileText,
+  Play,
+  Puzzle,
+  Palette,
+  Brain,
+  Github,
+  ExternalLink,
+  CircleDot,
+  Bot,
+  CircleHelp,
+  Scale,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -28,7 +45,6 @@ import { BreadcrumbNav } from "@/components/docs/breadcrumb-nav"
 import { PageNav } from "@/components/docs/page-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-const OPENTUI_SOURCE_REPOSITORY = "https://github.com/tyrellshawn/opentui"
 const SHADCN_OPENTUI_REPOSITORY = "https://github.com/canadian-ai/shadcn-opentui"
 const SHADCN_OPENTUI_ISSUES = `${SHADCN_OPENTUI_REPOSITORY}/issues`
 
@@ -39,6 +55,7 @@ const navigation = [
       { title: "Introduction", href: "/docs", icon: BookOpen },
       { title: "Installation", href: "/docs/installation", icon: Terminal },
       { title: "Quick Start", href: "/docs/quick-start", icon: Play },
+      { title: "For AI Agents", href: "/docs/agents", icon: Bot },
     ],
   },
   {
@@ -48,6 +65,13 @@ const navigation = [
       { title: "Command", href: "/docs/components/command", icon: Code },
       { title: "Interactive Examples", href: "/docs/components/examples", icon: Zap },
       { title: "Thinking Indicator", href: "/docs/components/thinking-indicator", icon: Brain },
+    ],
+  },
+  {
+    title: "Adoption",
+    items: [
+      { title: "FAQ", href: "/docs/faq", icon: CircleHelp },
+      { title: "Compare with termcn", href: "/docs/compare-termcn", icon: Scale },
     ],
   },
   {
@@ -83,7 +107,7 @@ export default function DocsLayout({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const searchQuery = searchParams?.get("query") || ""
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
+  const [localSearchQuery] = useState(searchQuery)
 
   return (
     <SidebarProvider>
@@ -92,7 +116,7 @@ export default function DocsLayout({
           <SidebarHeader className="border-b px-6 py-4">
             <div className="flex items-center gap-2">
               <Terminal className="h-6 w-6 text-green-500" />
-              <span className="font-semibold text-lg">OpenTUI Docs</span>
+              <span className="font-semibold text-lg">Shadcn OpenTUI Docs</span>
             </div>
             <div className="mt-4 w-full overflow-hidden">
               <SearchButton />
@@ -167,19 +191,19 @@ export default function DocsLayout({
             <SidebarTrigger className="-ml-1" />
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Terminal className="h-4 w-4" />
-              <span>OpenTUI React Documentation</span>
+              <span>Shadcn OpenTUI Documentation</span>
             </div>
             <div className="ml-auto flex items-center gap-2">
               <Link
-                href={OPENTUI_SOURCE_REPOSITORY}
+                href={SHADCN_OPENTUI_REPOSITORY}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Open OpenTUI source repository on GitHub"
-                title="OpenTUI source: tyrellshawn/opentui"
+                aria-label="Open Shadcn OpenTUI repository on GitHub"
+                title="Shadcn OpenTUI GitHub"
                 className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 <Github className="h-4 w-4" />
-                <span className="hidden lg:inline">OpenTUI GitHub</span>
+                <span className="hidden lg:inline">GitHub</span>
               </Link>
               <ThemeToggle />
               <SearchButton />
