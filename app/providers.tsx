@@ -2,6 +2,7 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import type { ReactNode } from "react"
+import { TerminalThemeProvider } from "@/lib/opentui/themes"
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export function Providers({ children }: { children: ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <TerminalThemeProvider defaultTheme="github-light">
+        {children}
+      </TerminalThemeProvider>
     </NextThemesProvider>
   )
 }
