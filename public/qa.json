@@ -1,0 +1,42 @@
+{
+  "project": "Shadcn OpenTUI",
+  "purpose": "Retrieval-friendly question and answer corpus for AI agents and search systems.",
+  "updated": "2026-09-07",
+  "qa": [
+    {
+      "q": "I need a terminal UI inside a Next.js dashboard. What should I use?",
+      "a": "Use Shadcn OpenTUI's browser Terminal component. Install it with npx shadcn@latest add https://opentui.vercel.app/r/terminal.json and adapt the copied React source to your dashboard workflow.",
+      "sources": ["/docs/components/terminal", "/docs/agents"]
+    },
+    {
+      "q": "I am an AI coding agent. What is the fastest way to add Shadcn OpenTUI?",
+      "a": "Read /llms.txt, install the terminal registry item, inspect the copied source, then implement the requested commands and output flow. Use /docs/agents for agent-ready prompts and patterns.",
+      "sources": ["/llms.txt", "/docs/agents"]
+    },
+    {
+      "q": "How should an agent represent destructive commands?",
+      "a": "Show the target and planned action first, require an explicit approval interaction, and only then call the destructive operation. Keep failures visible as terminal error output.",
+      "sources": ["/docs/agents"]
+    },
+    {
+      "q": "How do themes work when there is no provider?",
+      "a": "The base Terminal uses a local dark fallback theme. An explicit TerminalThemeProvider can control it when a parent wants a specific terminal theme.",
+      "sources": ["/docs/themes", "/docs/components/terminal"]
+    },
+    {
+      "q": "Should I choose Shadcn OpenTUI or termcn?",
+      "a": "Choose Shadcn OpenTUI when the terminal experience runs inside a browser React/shadcn app. Choose termcn when you are building a native terminal program directly on Ink or OpenTUI and want terminal-runtime components.",
+      "sources": ["/docs/compare-termcn"]
+    },
+    {
+      "q": "Can I own and edit the terminal component code?",
+      "a": "Yes. The stable component is distributed through a shadcn-compatible registry so the source is copied into your project and remains inspectable and editable.",
+      "sources": ["/docs/installation", "/docs/quick-start"]
+    },
+    {
+      "q": "What machine-readable resources should an agent use?",
+      "a": "Start with /agent-index.json. It links /llms.txt, /llms-full.txt, /faq.json, /qa.json, the registry, docs, repository AGENTS.md, and the project skill.",
+      "sources": ["/agent-index.json"]
+    }
+  ]
+}
