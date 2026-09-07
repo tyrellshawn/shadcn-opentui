@@ -1,0 +1,64 @@
+name: Homepage agent quickstart patch
+
+on:
+  push:
+    branches:
+      - feat/agent-adoption-surface
+
+permissions:
+  contents: write
+
+jobs:
+  patch-home-agent-quickstart:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[home-agent-patch]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/agent-adoption-surface
+          fetch-depth: 0
+
+      - name: Add homepage agent quickstart and canonical links
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('app/page.tsx')
+          text = path.read_text()
+
+          import_anchor = 'import { TerminalParallelTasks, type ParallelTask } from "@/components/ui/terminal-parallel-tasks"\n'
+          import_line = 'import { AgentQuickstartCard } from "@/components/docs/agent-quickstart-card"\n'
+          if import_line not in text:
+              if import_anchor not in text:
+                  raise SystemExit('Expected import anchor was not found')
+              text = text.replace(import_anchor, import_anchor + import_line, 1)
+
+          text = text.replace('https://github.com/tyrellshawn/opentui', 'https://github.com/canadian-ai/shadcn-opentui')
+          text = text.replace(
+              'This is not the native OpenTUI project; OpenTUI source is at tyrellshawn/opentui.',
+              'This is not the native OpenTUI project. The canonical Shadcn OpenTUI source is canadian-ai/shadcn-opentui.',
+          )
+          text = text.replace('OpenTUI GitHub', 'GitHub')
+          text = text.replace('aria-label="Open OpenTUI on GitHub"', 'aria-label="Open Shadcn OpenTUI on GitHub"')
+
+          card_anchor = '''              <div className="mx-auto max-w-3xl text-left">\n                <OpenTUIRuntimeStatusCard />\n              </div>\n'''
+          card_insert = card_anchor + '''\n              <div className="mx-auto w-full max-w-4xl text-left fade-in-up-delay-2">\n                <AgentQuickstartCard />\n              </div>\n'''
+          if '<AgentQuickstartCard />' not in text:
+              if card_anchor not in text:
+                  raise SystemExit('Expected runtime status anchor was not found')
+              text = text.replace(card_anchor, card_insert, 1)
+
+          path.write_text(text)
+          PY
+
+      - name: Commit patch
+        run: |
+          if git diff --quiet -- app/page.tsx; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx
+          git commit -m "feat: add homepage agent quickstart [home-agent-patch]"
+          git push origin HEAD:feat/agent-adoption-surface
