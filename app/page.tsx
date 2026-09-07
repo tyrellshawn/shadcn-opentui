@@ -32,6 +32,7 @@ import { TerminalEditBlock } from "@/components/ui/terminal-edit-block"
 import { TerminalJsTable } from "@/components/ui/terminal-js-table"
 import { TerminalEmailDraft } from "@/components/ui/terminal-email-draft"
 import { TerminalParallelTasks, type ParallelTask } from "@/components/ui/terminal-parallel-tasks"
+import { AgentQuickstartCard } from "@/components/docs/agent-quickstart-card"
 
 const homePreviewThemeNames = ["matrix", "tokyo-night", "catppuccin", "cai-dark", "cai-light"]
 
@@ -648,7 +649,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
-                <Link href="https://github.com/tyrellshawn/opentui" target="_blank" rel="noreferrer" aria-label="Open OpenTUI on GitHub">
+                <Link href="https://github.com/canadian-ai/shadcn-opentui" target="_blank" rel="noreferrer" aria-label="Open Shadcn OpenTUI on GitHub">
                   <Github className="w-4 h-4" />
                 </Link>
               </Button>
@@ -694,11 +695,15 @@ export default function Home() {
 
               <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-black/40 px-5 py-4 text-sm text-muted-foreground">
                 Built for <span className="font-semibold text-foreground">React and Next.js apps in the browser</span>.
-                This is not the native OpenTUI project; OpenTUI source is at tyrellshawn/opentui.
+                This is not the native OpenTUI project. The canonical Shadcn OpenTUI source is canadian-ai/shadcn-opentui.
               </div>
 
               <div className="mx-auto max-w-3xl text-left">
                 <OpenTUIRuntimeStatusCard />
+              </div>
+
+              <div className="mx-auto w-full max-w-4xl text-left fade-in-up-delay-2">
+                <AgentQuickstartCard />
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 fade-in-up-delay-3">
@@ -718,9 +723,9 @@ export default function Home() {
                   className="px-8 bg-black/40 border-border/50 hover:bg-black/60"
                   asChild
                 >
-                  <Link href="https://github.com/tyrellshawn/opentui" target="_blank" rel="noreferrer">
+                  <Link href="https://github.com/canadian-ai/shadcn-opentui" target="_blank" rel="noreferrer">
                     <Github className="w-4 h-4 mr-2" />
-                    OpenTUI GitHub
+                    GitHub
                   </Link>
                 </Button>
               </div>
@@ -995,7 +1000,7 @@ export default function Home() {
                   Documentation
                 </Link>
                 <Link
-                  href="https://github.com/tyrellshawn/opentui"
+                  href="https://github.com/canadian-ai/shadcn-opentui"
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
