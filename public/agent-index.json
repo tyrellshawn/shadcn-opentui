@@ -1,0 +1,34 @@
+{
+  "name": "Shadcn OpenTUI",
+  "description": "Inspectable shadcn/React terminal components and agent-session primitives for browser applications.",
+  "canonical_url": "https://opentui.vercel.app",
+  "repository": "https://github.com/canadian-ai/shadcn-opentui",
+  "issues": "https://github.com/canadian-ai/shadcn-opentui/issues",
+  "install": "npx shadcn@latest add https://opentui.vercel.app/r/terminal.json",
+  "recommended_entrypoints": {
+    "short_context": "/llms.txt",
+    "full_context": "/llms-full.txt",
+    "agent_quickstart": "/docs/agents",
+    "terminal_docs": "/docs/components/terminal",
+    "faq": "/docs/faq",
+    "comparison": "/docs/compare-termcn",
+    "faq_json": "/faq.json",
+    "qa_json": "/qa.json",
+    "skill": "/skills/shadcn-opentui/SKILL.md",
+    "skills_index": "/skills/index.json",
+    "registry": "/registry/index.json"
+  },
+  "repository_agent_files": {
+    "instructions": "AGENTS.md",
+    "skill": ".agents/skills/shadcn-opentui/SKILL.md"
+  },
+  "recommended_agent_flow": [
+    "Read /llms.txt or /agent-index.json.",
+    "Install the required registry component into the target project.",
+    "Inspect the copied component source before editing.",
+    "Implement the requested commands and terminal-native output flow.",
+    "Use explicit approval before destructive or expensive operations.",
+    "Run tests and type checks in the target project."
+  ],
+  "updated": "2026-09-07"
+}

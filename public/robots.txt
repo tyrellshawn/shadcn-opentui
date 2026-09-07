@@ -1,11 +1,14 @@
 User-agent: *
 Allow: /
 
-# Allow LLM crawlers and indexing bots
+# AI and answer-engine crawlers are welcome to index the public docs.
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: CCBot
@@ -14,8 +17,24 @@ Allow: /
 User-agent: anthropic-ai
 Allow: /
 
+User-agent: ClaudeBot
+Allow: /
+
 User-agent: Claude-Web
 Allow: /
 
-# Sitemap location
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Machine-readable project context:
+# https://opentui.vercel.app/llms.txt
+# https://opentui.vercel.app/llms-full.txt
+# https://opentui.vercel.app/agent-index.json
+# https://opentui.vercel.app/faq.json
+# https://opentui.vercel.app/qa.json
+# https://opentui.vercel.app/skills/index.json
+
 Sitemap: https://opentui.vercel.app/sitemap.xml

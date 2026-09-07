@@ -1,23 +1,44 @@
 # Shadcn OpenTUI
 
-Shadcn OpenTUI is an independent browser/web implementation that brings OpenTUI-style terminal interfaces into React and shadcn/ui applications.
+Shadcn OpenTUI is an independent React + shadcn/ui project for OpenTUI-inspired terminal experiences in browser applications. Use it for web agent consoles, in-app terminals, deploy/debug surfaces, approval workflows, and other terminal-native interactions that should live inside a React/Next.js product.
 
-Canonical project repository: https://github.com/canadian-ai/shadcn-opentui
-Issue tracker and feature requests: https://github.com/canadian-ai/shadcn-opentui/issues
-OpenTUI source repository: https://github.com/tyrellshawn/opentui
+Canonical site: https://opentui.vercel.app
+Canonical repository: https://github.com/canadian-ai/shadcn-opentui
+Issues: https://github.com/canadian-ai/shadcn-opentui/issues
 
-## Documentation
+## Agent quickstart
 
-Documentation home: /docs
-Terminal component: /docs/components/terminal
-Installation: /docs/installation
-Quick start: /docs/quick-start
-Themes: /docs/themes
-Plugins: /docs/plugins
+Install the terminal:
 
-## Registry
+```bash
+npx shadcn@latest add https://opentui.vercel.app/r/terminal.json
+```
 
-Terminal registry endpoint: /api/registry/terminal
-Registry metadata: /registry/index.json
+Recommended agent prompt:
 
-For bugs, feature requests, component requests, and agent-generated improvement proposals, use the canonical project issue tracker above so work can be inspected and tracked publicly.
+> Install Shadcn OpenTUI's terminal component, inspect the copied source, then build my requested terminal workflow with typed commands, streaming-friendly output, and explicit approval before destructive actions. Keep the source local and editable.
+
+## Read next
+
+- Agent quickstart and templates: /docs/agents
+- Terminal component: /docs/components/terminal
+- Installation: /docs/installation
+- Quick start: /docs/quick-start
+- FAQ: /docs/faq
+- Shadcn OpenTUI vs termcn: /docs/compare-termcn
+- Themes: /docs/themes
+- Expanded model context: /llms-full.txt
+- Machine FAQ: /faq.json
+- Retrieval Q&A: /qa.json
+- Agent resource index: /agent-index.json
+- Published agent skill: /skills/shadcn-opentui/SKILL.md
+- Skills index: /skills/index.json
+- Registry metadata: /registry/index.json
+
+## Product boundary
+
+The stable Shadcn OpenTUI path is browser React/shadcn source installed through a shadcn-compatible registry. It is not the official native OpenTUI runtime, and the experimental Zig/WASM research is not required for normal component use.
+
+Choose Shadcn OpenTUI when the terminal runs inside a browser app. For native terminal programs built directly on Ink or OpenTUI, use native terminal tooling such as termcn where appropriate.
+
+For repository-level coding-agent instructions, read `AGENTS.md` and `.agents/skills/shadcn-opentui/SKILL.md` in the canonical GitHub repository.

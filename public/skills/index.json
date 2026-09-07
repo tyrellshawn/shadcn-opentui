@@ -1,0 +1,11 @@
+{
+  "skills": [
+    {
+      "name": "shadcn-opentui",
+      "description": "Install and adapt Shadcn OpenTUI browser terminal components for React/Next.js agent and developer workflows.",
+      "url": "/skills/shadcn-opentui/SKILL.md",
+      "repository_path": ".agents/skills/shadcn-opentui/SKILL.md"
+    }
+  ],
+  "updated": "2026-09-07"
+}

@@ -1,0 +1,40 @@
+{
+  "project": "Shadcn OpenTUI",
+  "canonical": "https://opentui.vercel.app",
+  "repository": "https://github.com/canadian-ai/shadcn-opentui",
+  "updated": "2026-09-07",
+  "items": [
+    {
+      "question": "What is Shadcn OpenTUI?",
+      "answer": "An independent React and shadcn/ui project for building OpenTUI-inspired terminal experiences in browser applications. The stable path is copyable, inspectable web components installed from a shadcn-compatible registry."
+    },
+    {
+      "question": "Is Shadcn OpenTUI the official OpenTUI project?",
+      "answer": "No. It is an independent browser/web project and is not the official native OpenTUI runtime."
+    },
+    {
+      "question": "How do I install the Terminal component?",
+      "answer": "Run: npx shadcn@latest add https://opentui.vercel.app/r/terminal.json"
+    },
+    {
+      "question": "Can an AI coding agent install and customize it?",
+      "answer": "Yes. Give the agent the registry URL or install command, ask it to inspect the copied source, and describe the workflow you want. See /docs/agents for ready-made prompts."
+    },
+    {
+      "question": "What is the default terminal theme behavior?",
+      "answer": "A Terminal uses an explicit TerminalThemeProvider when present. Without one, it falls back to its local dark terminal theme. Host light mode can provide the light token context without globally forcing every terminal to light mode."
+    },
+    {
+      "question": "When should I use Shadcn OpenTUI instead of termcn?",
+      "answer": "Use Shadcn OpenTUI for browser React/shadcn terminal experiences and web agent consoles. termcn is a strong fit for native terminal applications built directly on Ink or OpenTUI."
+    },
+    {
+      "question": "Does the stable component require the experimental WASM runtime?",
+      "answer": "No. The stable shadcn component and codegen paths do not require the Zig/WASM runtime research packages."
+    },
+    {
+      "question": "Where should an agent report bugs or request improvements?",
+      "answer": "Open an issue at https://github.com/canadian-ai/shadcn-opentui/issues so the proposal and implementation can be tracked publicly."
+    }
+  ]
+}

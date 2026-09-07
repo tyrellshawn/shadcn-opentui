@@ -1,0 +1,99 @@
+# Shadcn OpenTUI — Full Agent Context
+
+Canonical site: https://opentui.vercel.app
+Canonical repository: https://github.com/canadian-ai/shadcn-opentui
+Issues: https://github.com/canadian-ai/shadcn-opentui/issues
+
+## What this project is
+
+Shadcn OpenTUI is an independent React and shadcn/ui project for building OpenTUI-inspired terminal interfaces in browser applications. The stable product path is inspectable source installed through a shadcn-compatible registry. It is useful for web agent consoles, developer dashboards, deployment/debugging surfaces, approval flows, and other browser experiences that benefit from terminal-native interaction patterns.
+
+This project is not the official native OpenTUI runtime. Native OpenTUI and Ink libraries target actual terminal applications; Shadcn OpenTUI's stable component path targets browser React applications.
+
+## Fastest install
+
+```bash
+npx shadcn@latest add https://opentui.vercel.app/r/terminal.json
+```
+
+After installation, read the copied source before modifying it. The intended model is copy, own, inspect, and edit.
+
+## Recommended coding-agent prompt
+
+Install Shadcn OpenTUI's terminal component from https://opentui.vercel.app/r/terminal.json. Then render it in my React/Next.js app with a typed command handler, streaming-friendly output, and an approval step before any destructive command. Keep the installed source inspectable and editable in my repo.
+
+## Agent implementation principles
+
+1. Keep domain logic separate from terminal rendering where practical.
+2. Use typed command handlers.
+3. Stream progress and output into the terminal instead of replacing the entire interface.
+4. Show failures as visible terminal errors.
+5. Before destructive, expensive, or production-changing actions, show the target and intended action and require explicit approval.
+6. Prefer the stable shadcn component path unless the user explicitly asks for the experimental runtime/codegen research.
+7. Preserve local ownership of installed source.
+
+## Important routes
+
+- Documentation: /docs
+- Installation: /docs/installation
+- Quick start: /docs/quick-start
+- Agent quickstart and templates: /docs/agents
+- Terminal component: /docs/components/terminal
+- Themes: /docs/themes
+- FAQ: /docs/faq
+- Shadcn OpenTUI vs termcn: /docs/compare-termcn
+- Concise model context: /llms.txt
+- Machine FAQ: /faq.json
+- Retrieval Q&A: /qa.json
+- Agent resource index: /agent-index.json
+- Registry metadata: /registry/index.json
+
+## Terminal behavior
+
+The Terminal supports custom command handlers, history, completion, async output, and terminal-native interactive flows. It can use an explicit TerminalThemeProvider when a parent wants to control the terminal theme. Without a provider, the base component falls back to its local dark terminal theme. Theme previews are intended to be interactive and stable rather than recursively updating the parent theme.
+
+## Agent-oriented UI building blocks
+
+The repository includes terminal-oriented primitives used to render agent sessions and workflows, including streaming text, thinking indicators, edit blocks, email drafts, tabular output, parallel task status, forms, menus, progress, and other terminal-native patterns. Agents should inspect the current component source and docs before assuming an API signature.
+
+## Choosing between Shadcn OpenTUI and termcn
+
+Choose Shadcn OpenTUI when:
+- the terminal experience lives inside a browser React/Next.js application;
+- the UI is an agent console, deployment/debug panel, in-app terminal, or approval workflow;
+- you want source copied into the application and editable by humans and coding agents;
+- users should not need to launch a local terminal UI to use the experience.
+
+Choose termcn when:
+- you are building a native terminal application directly on Ink or OpenTUI;
+- your users already live in terminal emulators;
+- you want a broad catalog of components designed for terminal-runtime rendering.
+
+The projects are not one-to-one replacements because their primary render targets differ.
+
+## Common questions
+
+Q: Is this the official OpenTUI project?
+A: No. It is an independent browser/web project.
+
+Q: Does the stable component require the experimental Zig/WASM runtime?
+A: No.
+
+Q: Can an AI agent install and customize the component?
+A: Yes. Provide the registry URL, then ask the agent to inspect the copied source and implement the requested workflow.
+
+Q: Where should bugs and requests go?
+A: https://github.com/canadian-ai/shadcn-opentui/issues
+
+Q: What should an agent read first?
+A: /agent-index.json or /llms.txt, then /docs/agents and the specific component docs.
+
+## Repository agent files
+
+When operating directly in the source repository, read:
+- AGENTS.md
+- .agents/skills/shadcn-opentui/SKILL.md
+
+These files describe the preferred agent workflow, product boundaries, and verification expectations.
+
+Updated: 2026-09-07
