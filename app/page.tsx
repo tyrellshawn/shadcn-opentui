@@ -648,7 +648,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary" asChild>
-                <Link href="https://github.com/anomalyco/opentui" target="_blank">
+                <Link href="https://github.com/tyrellshawn/opentui" target="_blank" rel="noreferrer" aria-label="Open OpenTUI on GitHub">
                   <Github className="w-4 h-4" />
                 </Link>
               </Button>
@@ -694,7 +694,7 @@ export default function Home() {
 
               <div className="mx-auto max-w-3xl rounded-xl border border-primary/20 bg-black/40 px-5 py-4 text-sm text-muted-foreground">
                 Built for <span className="font-semibold text-foreground">React and Next.js apps in the browser</span>.
-                This is not the official OpenTUI project; upstream OpenTUI remains at anomalyco/opentui.
+                This is not the native OpenTUI project; OpenTUI source is at tyrellshawn/opentui.
               </div>
 
               <div className="mx-auto max-w-3xl text-left">
@@ -718,9 +718,9 @@ export default function Home() {
                   className="px-8 bg-black/40 border-border/50 hover:bg-black/60"
                   asChild
                 >
-                  <Link href="https://github.com/anomalyco/opentui" target="_blank">
+                  <Link href="https://github.com/tyrellshawn/opentui" target="_blank" rel="noreferrer">
                     <Github className="w-4 h-4 mr-2" />
-                    Upstream OpenTUI
+                    OpenTUI GitHub
                   </Link>
                 </Button>
               </div>
@@ -995,8 +995,9 @@ export default function Home() {
                   Documentation
                 </Link>
                 <Link
-                  href="https://github.com/anomalyco/opentui"
+                  href="https://github.com/tyrellshawn/opentui"
                   target="_blank"
+                  rel="noreferrer"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   GitHub
