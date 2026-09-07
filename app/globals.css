@@ -124,18 +124,34 @@
   --sidebar-accent-foreground: oklch(0.15 0 0);
   --sidebar-border: oklch(0.85 0.01 260);
   --sidebar-ring: oklch(0.55 0.18 160);
-  --terminal-bg: oklch(0.98 0 0);
-  --terminal-text: oklch(0.3 0.18 160);
-  --terminal-primary: oklch(0.5 0.18 160);
-  --terminal-muted: oklch(0.5 0.18 160 / 0.6);
-  --terminal-success: oklch(0.5 0.22 160);
-  --terminal-error: oklch(0.577 0.245 27.325);
-  --terminal-warning: oklch(0.6 0.2 80);
-  --terminal-info: oklch(0.5 0.2 200);
-  --terminal-border: oklch(0.5 0.18 160 / 0.2);
-  --terminal-cursor: oklch(0.5 0.18 160);
-  --terminal-highlight-bg: oklch(0.5 0.18 160 / 0.2);
-  --terminal-shadow: oklch(0.5 0.18 160 / 0.1);
+  --terminal-bg: #ffffff;
+  --terminal-text: #1f2328;
+  --terminal-primary: #0969da;
+  --terminal-muted: #656d76;
+  --terminal-success: #1a7f37;
+  --terminal-error: #cf222e;
+  --terminal-warning: #9a6700;
+  --terminal-info: #0969da;
+  --terminal-border: #d0d7de;
+  --terminal-cursor: #1f2328;
+  --terminal-highlight-bg: #0969da22;
+  --terminal-shadow: #1f232812;
+}
+
+/* Respect the host app's light mode even when a component-level theme supplies dark inline tokens. */
+.light .bg-terminal-bg {
+  --terminal-bg: #ffffff !important;
+  --terminal-text: #1f2328 !important;
+  --terminal-primary: #0969da !important;
+  --terminal-muted: #656d76 !important;
+  --terminal-success: #1a7f37 !important;
+  --terminal-error: #cf222e !important;
+  --terminal-warning: #9a6700 !important;
+  --terminal-info: #0969da !important;
+  --terminal-border: #d0d7de !important;
+  --terminal-cursor: #1f2328 !important;
+  --terminal-highlight-bg: #0969da22 !important;
+  --terminal-shadow: #1f232812 !important;
 }
 
 @theme inline {
@@ -220,6 +236,15 @@
   .terminal-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--terminal-primary) 30%, transparent) transparent;
+  }
+
+  /* Use the browser caret for pixel-accurate positioning after tab completion. */
+  .bg-terminal-bg input.caret-transparent {
+    caret-color: var(--terminal-cursor) !important;
+  }
+
+  .bg-terminal-bg input.caret-transparent + .bg-terminal-cursor {
+    display: none;
   }
 
   /* Progress bar line styling - prevent wrapping */
