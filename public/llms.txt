@@ -31,6 +31,8 @@ Recommended agent prompt:
 - Machine FAQ: /faq.json
 - Retrieval Q&A: /qa.json
 - Agent resource index: /agent-index.json
+- Published agent skill: /skills/shadcn-opentui/SKILL.md
+- Skills index: /skills/index.json
 - Registry metadata: /registry/index.json
 
 ## Product boundary
