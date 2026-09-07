@@ -2,7 +2,6 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { useEffect, type ReactNode } from "react"
-import { TerminalThemeProvider } from "@/lib/opentui/themes"
 
 const PROJECT_GITHUB_URL = "https://github.com/canadian-ai/shadcn-opentui"
 const OLD_HOMEPAGE_GITHUB_URL = "https://github.com/tyrellshawn/opentui"
@@ -39,10 +38,8 @@ export function Providers({ children }: { children: ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <TerminalThemeProvider defaultTheme="github-light">
-        <HomepageGithubLinkGuard />
-        {children}
-      </TerminalThemeProvider>
+      <HomepageGithubLinkGuard />
+      {children}
     </NextThemesProvider>
   )
 }
