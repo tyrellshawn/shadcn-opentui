@@ -1,10 +1,14 @@
-import { Terminal, BookOpen, Code, Zap, ArrowRight, Github, ExternalLink } from "lucide-react"
+import { Terminal, BookOpen, Code, Zap, ArrowRight, Github, ExternalLink, CircleDot } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Terminal as TerminalComponent } from "@/components/ui/terminal"
 import { OpenTUIRuntimeStatusCard } from "@/components/opentui/runtime-status-card"
+
+const OPENTUI_SOURCE_REPOSITORY = "https://github.com/tyrellshawn/opentui"
+const SHADCN_OPENTUI_REPOSITORY = "https://github.com/canadian-ai/shadcn-opentui"
+const SHADCN_OPENTUI_ISSUES = `${SHADCN_OPENTUI_REPOSITORY}/issues`
 
 export default function DocsPage() {
   return (
@@ -26,11 +30,10 @@ export default function DocsPage() {
           <div className="mb-2 font-semibold text-emerald-300">Who this is for</div>
           <p>
             This library is for <span className="font-medium text-foreground">React and Next.js teams</span> who want
-            a browser-rendered terminal UI that fits shadcn patterns. It is not the official OpenTUI project, a Python CLI
-            framework, or a native TUI runtime.
+            a browser-rendered terminal UI that fits shadcn patterns. It is not the native OpenTUI runtime.
           </p>
         </div>
-        <div className="flex items-center gap-4 pt-4">
+        <div className="flex flex-wrap items-center gap-3 pt-4">
           <Button asChild>
             <Link href="/docs/installation">
               Get Started
@@ -38,10 +41,23 @@ export default function DocsPage() {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="https://github.com/anomalyco/opentui" target="_blank">
+            <Link href={OPENTUI_SOURCE_REPOSITORY} target="_blank" rel="noreferrer">
               <Github className="mr-2 h-4 w-4" />
-              Upstream OpenTUI
+              OpenTUI GitHub
               <ExternalLink className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={SHADCN_OPENTUI_REPOSITORY} target="_blank" rel="noreferrer">
+              <Github className="mr-2 h-4 w-4" />
+              Shadcn OpenTUI repo
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link href={SHADCN_OPENTUI_ISSUES} target="_blank" rel="noreferrer">
+              <CircleDot className="mr-2 h-4 w-4" />
+              Issues & requests
             </Link>
           </Button>
         </div>
@@ -62,6 +78,7 @@ export default function DocsPage() {
         <CardContent>
           <TerminalComponent
             variant="default"
+            defaultTheme="github-light"
             className="h-64"
             welcomeMessage={["Welcome to Shadcn OpenTUI Terminal!", "Type 'help' to see available commands.", ""]}
           />
