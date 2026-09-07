@@ -1,0 +1,23 @@
+# Shadcn OpenTUI
+
+Shadcn OpenTUI is an independent browser/web implementation that brings OpenTUI-style terminal interfaces into React and shadcn/ui applications.
+
+Canonical project repository: https://github.com/canadian-ai/shadcn-opentui
+Issue tracker and feature requests: https://github.com/canadian-ai/shadcn-opentui/issues
+OpenTUI source repository: https://github.com/tyrellshawn/opentui
+
+## Documentation
+
+Documentation home: /docs
+Terminal component: /docs/components/terminal
+Installation: /docs/installation
+Quick start: /docs/quick-start
+Themes: /docs/themes
+Plugins: /docs/plugins
+
+## Registry
+
+Terminal registry endpoint: /api/registry/terminal
+Registry metadata: /registry/index.json
+
+For bugs, feature requests, component requests, and agent-generated improvement proposals, use the canonical project issue tracker above so work can be inspected and tracked publicly.
