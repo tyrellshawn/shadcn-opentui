@@ -1,5 +1,7 @@
 "use client"
 
+/* eslint-disable @next/next/no-img-element */
+
 import type React from "react"
 
 import { Suspense } from "react"
@@ -16,7 +18,7 @@ import {
   SidebarGroupLabel,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette, Brain } from "lucide-react"
+import { Terminal, BookOpen, Code, Zap, Settings, FileText, Play, Puzzle, Palette, Brain, Github, ExternalLink, CircleDot } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useSearchParams } from "next/navigation"
@@ -25,6 +27,10 @@ import { SearchButton } from "@/components/search"
 import { BreadcrumbNav } from "@/components/docs/breadcrumb-nav"
 import { PageNav } from "@/components/docs/page-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
+
+const OPENTUI_SOURCE_REPOSITORY = "https://github.com/tyrellshawn/opentui"
+const SHADCN_OPENTUI_REPOSITORY = "https://github.com/canadian-ai/shadcn-opentui"
+const SHADCN_OPENTUI_ISSUES = `${SHADCN_OPENTUI_REPOSITORY}/issues`
 
 const navigation = [
   {
@@ -91,6 +97,43 @@ export default function DocsLayout({
             <div className="mt-4 w-full overflow-hidden">
               <SearchButton />
             </div>
+            <div className="mt-3 overflow-hidden rounded-lg border bg-card">
+              <Link
+                href={SHADCN_OPENTUI_REPOSITORY}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open canadian-ai/shadcn-opentui on GitHub"
+                className="block border-b bg-muted/20"
+              >
+                <img
+                  src="https://opengraph.githubassets.com/1/canadian-ai/shadcn-opentui"
+                  alt="GitHub preview for canadian-ai/shadcn-opentui"
+                  className="aspect-[2/1] w-full object-cover"
+                  loading="lazy"
+                />
+              </Link>
+              <div className="space-y-2 p-3 text-xs">
+                <Link
+                  href={SHADCN_OPENTUI_REPOSITORY}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 font-medium text-foreground hover:underline"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                  canadian-ai/shadcn-opentui
+                  <ExternalLink className="ml-auto h-3 w-3 text-muted-foreground" />
+                </Link>
+                <Link
+                  href={SHADCN_OPENTUI_ISSUES}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+                >
+                  <CircleDot className="h-3.5 w-3.5" />
+                  Track issues and requests
+                </Link>
+              </div>
+            </div>
           </SidebarHeader>
           <SidebarContent className="px-4 py-4">
             {navigation.map((section) => (
@@ -127,6 +170,17 @@ export default function DocsLayout({
               <span>OpenTUI React Documentation</span>
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <Link
+                href={OPENTUI_SOURCE_REPOSITORY}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open OpenTUI source repository on GitHub"
+                title="OpenTUI source: tyrellshawn/opentui"
+                className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <Github className="h-4 w-4" />
+                <span className="hidden lg:inline">OpenTUI GitHub</span>
+              </Link>
               <ThemeToggle />
               <SearchButton />
             </div>

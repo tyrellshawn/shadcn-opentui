@@ -1,14 +1,16 @@
 # Shadcn OpenTUI
 
-[![Registry Build](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/registry-build.yml/badge.svg)](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/registry-build.yml)
-[![Release](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/release.yml/badge.svg)](https://github.com/tyrellshawn/shadcn-opentui/actions/workflows/release.yml)
+[![Registry Build](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/registry-build.yml/badge.svg)](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/registry-build.yml)
+[![Release](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/release.yml/badge.svg)](https://github.com/canadian-ai/shadcn-opentui/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Independent shadcn/ui experiments for bringing OpenTUI-style terminal applications to the web.
 
-This is not the official OpenTUI project. It started as a one-day experiment to explore an OpenTUI web adapter with React in mind, and is now focused on translating OpenTUI TypeScript applications into inspectable shadcn web code.
+This is not the native OpenTUI project. It started as a one-day experiment to explore an OpenTUI web adapter with React in mind, and is now focused on translating OpenTUI TypeScript applications into inspectable shadcn web code.
 
-Upstream OpenTUI lives at [anomalyco/opentui](https://github.com/anomalyco/opentui).
+- OpenTUI source repository: [tyrellshawn/opentui](https://github.com/tyrellshawn/opentui)
+- Canonical Shadcn OpenTUI repository: [canadian-ai/shadcn-opentui](https://github.com/canadian-ai/shadcn-opentui)
+- Issues and feature requests: [canadian-ai/shadcn-opentui/issues](https://github.com/canadian-ai/shadcn-opentui/issues)
 
 ## Current Focus
 
@@ -28,7 +30,8 @@ The first Hunk target is a static browser-viewable diff review example. Later mi
 - OpenTUI-inspired forms, menus, and progress indicators
 - Terminal-style sliders and controls
 - TypeScript support with full type definitions
-- Theme support for light and dark modes
+- Theme support for light and dark modes, with a white GitHub-style terminal available out of the box
+- Native browser caret positioning for accurate tab-completion editing
 
 ## Installation
 
@@ -67,7 +70,7 @@ See `lib/opentui-codegen/README.md` and `grammars/OpenTUIProgram.g4` for the cur
 ## Development
 
 ```bash
-git clone https://github.com/tyrellshawn/shadcn-opentui.git
+git clone https://github.com/canadian-ai/shadcn-opentui.git
 cd shadcn-opentui
 bun install
 bun dev
